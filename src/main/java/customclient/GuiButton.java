@@ -1,104 +1,70 @@
 package customclient;
 
+import com.google.gson.annotations.SerializedName;
+import customclient.swing.ButtonBucket;
+import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.network.chat.Component;
 
 import java.io.Serializable;
 
-public class GuiButton implements Serializable {
-    transient AbstractWidget abstractWidget;
-    int buttonID = -1;
-    String buttonText = "";
-    int x, y, width, height, color;
-    private boolean visible = true;
-    private String originalName;
+public class GuiButton extends Widget implements Serializable {
+    @SerializedName("버튼 명령")
+    protected ButtonBucket buttonBucket;
+    @SerializedName("버튼 이름")
+    private String buttonText = "";
+
+    @SerializedName("버튼 텍스트 표시")
+    private boolean textVisible;
+    @SerializedName("버튼 배경 표시")
+    private boolean textureVisible;
 
     public GuiButton(int id, AbstractWidget widget){
-        this.abstractWidget = widget;
-        this.buttonID = id;
+        super(widget);
+        setID(id);
         this.buttonText = widget.getMessage().getString();
-        this.x = widget.getX();
-        this.y = widget.getY();
-        this.width = widget.getWidth();
-        this.height = widget.getHeight();
-        this.color = widget.getFGColor();
     }
 
-    public void setButtonID(int buttonID) {
-        this.buttonID = buttonID;
-    }
-
-    public int getColor() {
-        return abstractWidget.getFGColor();
-    }
-
-    public int getHeight() {
-        return abstractWidget.getHeight();
-    }
-
-    public int getWidth() {
-        return abstractWidget.getWidth();
-    }
-
-    public boolean isVisible() {
-        return abstractWidget.visible;
-    }
-
-    public void setVisible(boolean visible) {
-        abstractWidget.visible = visible;
-        this.visible = visible;
-    }
-
-    public void setWidth(int width) {
-        this.width = width;
-        abstractWidget.setWidth(width);
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-        abstractWidget.setHeight(height);
-    }
-
-    public void setPosition(int x, int y){
-        this.x = x;
-        this.y = y;
-        abstractWidget.setPosition(x, y);
-    }
-    public void setX(int x) {
-        this.x = x;
-        abstractWidget.setX(x);
-    }
-
-    public void setY(int y) {
-        this.y = y;
-        abstractWidget.setY(y);
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public int getButtonID() {
-        return buttonID;
+    public ButtonBucket getButtonBucket() {
+        return buttonBucket;
     }
 
     public void update(){
-        this.setPosition(x, y);
-        this.setHeight(height);
-        this.setWidth(width);
-        this.setVisible(isVisible());
+        super.update();
+        setButtonText(buttonText);
     }
-    public boolean isMouseOver(double mouseX, double mouseY ){
 
+    public String getButtonText() {
+        return buttonText;
+    }
+
+    public void setButtonText(String buttonText) {
+        this.buttonText = buttonText;
+        abstractWidget.setMessage(Component.literal(buttonText));
+    }
+
+    public void setTextureVisible(boolean textureVisible) {
+        this.textureVisible = textureVisible;
+    }
+
+    public boolean isTextureVisible() {
+        return textureVisible;
+    }
+
+    public void setTextVisible(boolean textVisible) {
+        this.textVisible = textVisible;
+    }
+
+
+    public boolean isTextVisible() {
+        return textVisible;
+    }
+
+    public boolean isMouseOver(double mouseX, double mouseY ){
         return abstractWidget.isMouseOver(mouseX, mouseY);
     }
 
-    public void setAbstractWidget(AbstractWidget abstractWidget) {
-        this.abstractWidget = abstractWidget;
-    }
 }
 
 

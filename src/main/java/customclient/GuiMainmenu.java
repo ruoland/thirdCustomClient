@@ -1,36 +1,12 @@
 package customclient;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.blaze3d.platform.TextureUtil;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
+import customclient.swing.ButtonBucket;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.gui.screens.inventory.BookEditScreen;
-import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.references.Blocks;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
-import net.minecraft.world.level.block.PumpkinBlock;
-import net.neoforged.neoforge.client.gui.LoadingErrorScreen;
-import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL11;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.file.Path;
-import java.util.List;
 
 public class GuiMainmenu  extends ScreenCustom {
-    private static ResourceLocation BACKGROUND_IMAGE = new ResourceLocation(CustomClient.MODID, "textures/screenshot.png");
+
     GuiButton buttonSingleplayer ;
     GuiButton buttonMultiplayer;
     GuiButton buttonRelams;
@@ -39,35 +15,17 @@ public class GuiMainmenu  extends ScreenCustom {
     GuiButton buttonOptions;
     GuiButton buttonQuitGame;
     GuiButton buttonAccesssibility;
-    private static ResourceLocation resourceLocation;
+
+
     public GuiMainmenu(){
+        super();
 
     }
-    @Override
-    protected void init() {
-        super.init();
-        try {
-
-            NativeImage nativeImage = NativeImage.read(GuiMainmenu.class.getResourceAsStream("/assets/customclient/textures/screenshot.png"));
-            DynamicTexture dynamicTexture = new DynamicTexture(nativeImage);
-            resourceLocation = getMinecraft().getTextureManager().register("test.png", dynamicTexture);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
-        super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
-    }
-
 
     @Override
     public void renderBackground(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
-        pGuiGraphics.pose().pushPose();;
-
-        renderTexture(pGuiGraphics, resourceLocation, 1);
-
+        pGuiGraphics.pose().pushPose();
+        renderTexture(pGuiGraphics, BACKGROUND_IMAGE, 0, 0, width, height, 1);
         pGuiGraphics.pose().popPose();
     }
     @Override
@@ -75,12 +33,6 @@ public class GuiMainmenu  extends ScreenCustom {
         //super.renderPanorama(pGuiGraphics, pPartialTick);
     }
 
-
-    @Override
-    public void onFilesDrop(List<Path> pPacks) {
-        super.onFilesDrop(pPacks);
-        CustomClient.LOGGER.info(pPacks+"");
-    }
     public void renderTransparentBackground(GuiGraphics pGuiGraphics) {
         pGuiGraphics.fillGradient(0, 0, this.width, this.height, -1072689136, -804253680);
     }
@@ -94,10 +46,31 @@ public class GuiMainmenu  extends ScreenCustom {
         buttonList.add(5, buttonOptions= new GuiButton(5,(AbstractWidget) children().get(5)));
         buttonList.add(6, buttonQuitGame = new GuiButton(6,(AbstractWidget) children().get(6)));
         buttonList.add(7, buttonAccesssibility = new GuiButton(7,(AbstractWidget) children().get(7)));
+        for(int i = 0; i < buttonList.size();i++){
+            GuiButton button = buttonList.get(i);
+            button.setID(i);
+            button.setWidth(button.getWidth());
+            button.setHeight(button.getHeight());
+            button.setPosition(button.getX(), button.getY());
+            button.setVisible(button.isVisible());
+            button.setAlpha(1);
+            button.buttonBucket = new ButtonBucket(button);
+
+        }
+        CustomClient.LOGGER.info(buttonList.size() +" - ");
     }
 
     @Override
     public void actionPerformed(int buttonID, double mouseX, double mouseY, int pButton) {
-
+        super.actionPerformed(buttonID, mouseX, mouseY, buttonID);
+        CustomClient.LOGGER.info(buttonList.get(buttonID).buttonBucket.getActionScript(0) + buttonList.get(buttonID).getButtonText());
     }
+
+    @Override
+    public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
+        return super.keyPressed(pKeyCode, pScanCode, pModifiers);
+    }
+
+
+
 }

@@ -57,15 +57,20 @@ public class CustomClient
         if(screenEvent.getScreen() instanceof TitleScreen titleScreen){
             GuiMainmenu mainmenu = new GuiMainmenu();
             screenEvent.setNewScreen(mainmenu);
-
+            CustomClient.LOGGER.info("두번");
         }
     }
-
+    private GuiMainmenu mainmenu;
     @SubscribeEvent
     public void screenEvent2(ScreenEvent.Init.Post postInit){
         Screen screen = postInit.getScreen();
-        if(screen instanceof GuiMainmenu){
-            ((GuiMainmenu) screen).postInit();
+
+        if(screen instanceof GuiMainmenu ){
+            if(mainmenu == null || (mainmenu != null && mainmenu.hashCode() != screen.hashCode())) {
+                CustomClient.LOGGER.info("두번?");
+                mainmenu = (GuiMainmenu) screen;
+                mainmenu.postInit();
+            }
         }
     }
     // You can use SubscribeEvent and let the Event Bus discover methods to call
@@ -74,9 +79,6 @@ public class CustomClient
     {
         LOGGER.info("HELLO from server starting");
     }
-
-
-
 
     @EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
     public static class ClientModEvents
