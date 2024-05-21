@@ -37,7 +37,7 @@ public abstract class ScreenCustom extends TitleScreen {
     protected ArrayList<DrawTexture> drawTextureList = new ArrayList<>();
     protected ArrayList<GuiButton> buttonList = new ArrayList<>();
 
-    protected SwingButton swingButton;
+    protected SwingButton currentSwingButton;
 
     protected boolean editMode = false;
 
@@ -45,7 +45,7 @@ public abstract class ScreenCustom extends TitleScreen {
     protected Path screenButtons = screenPath.resolve("buttons.json");
     protected Path screenDrawtexture = screenPath.resolve("drawtexture.json");
 
-    protected Widget selectWidget;
+    protected Widget selectWidget, lastSelectWidget;
 
     @Override
     protected void init() {
@@ -58,9 +58,10 @@ public abstract class ScreenCustom extends TitleScreen {
 
     public void changeEditMode(){
         editMode = !editMode;
-        if(swingButton != null) {
-            swingButton.dispose();
-            swingButton = null;
+        if(currentSwingButton != null) {
+
+            currentSwingButton.dispose();
+            currentSwingButton = null;
         }
         selectWidget = null;
         saveWidget();
@@ -132,8 +133,7 @@ public abstract class ScreenCustom extends TitleScreen {
         super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
         if(editMode){
             pGuiGraphics.drawString(font, Component.literal("편집 모드 실행 중"),0, 0,0xFFFFFF, false);
-            pGuiGraphics.drawString(font, Component.literal("버튼을 클릭하여 움직일 때 오른쪽 클릭으로 멈출 수 있습니다..."),0, 20,0xFFFFFF, false);
-
+            pGuiGraphics.drawString(font, Component.literal("버튼을 이동할 때 오른쪽 클릭으로 멈출 수 있습니다..."),0, 20,0xFFFFFF, false);
         }
         for(DrawTexture drawTexture : drawTextureList){
             renderTexture(pGuiGraphics, drawTexture.getTexture(), drawTexture.getX(), drawTexture.getY(), drawTexture.getWidth(), drawTexture.getHeight(), drawTexture.getAlpha());
@@ -157,18 +157,25 @@ public abstract class ScreenCustom extends TitleScreen {
     public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
         if(editMode){
             for(GuiButton button : buttonList){
-                if(pButton == 0 && button.isMouseOver(pMouseX, pMouseY) && !button.isLock()) {
+                if(button.isMouseOver(pMouseX, pMouseY)) {
                     selectWidget = button;
-                    if(swingButton != null ) {
-                        if(swingButton.getSelComponent() == button)
-                            return false;
-                        else
-                            swingButton.dispose();
+
+                    if(pButton == 0 && !button.isLock()) {
+                        if (currentSwingButton != null) {
+                            if (currentSwingButton.getSelComponent() == button) {
+                                return false;
+                            }
+                            else {
+                                currentSwingButton.dispose();
+                                currentSwingButton = null;
+                            }
+                        }
+                        currentSwingButton = new SwingButton(this, (GuiButton) selectWidget);
+                        return true;
                     }
-
-                    swingButton = new SwingButton(this, (GuiButton) selectWidget);
-
-                    return true;
+                    else if(pButton == 1){
+                        selectWidget.setLock(false);
+                    }
                 }
             }
             for(DrawTexture texture : drawTextureList){
@@ -184,6 +191,7 @@ public abstract class ScreenCustom extends TitleScreen {
             for(GuiButton button : buttonList){
                 if(button.isMouseOver(pMouseX, pMouseY)) {
                     actionPerformed(button.getID(), pMouseX, pMouseY, pButton);
+                    return false;
                 }
             }
         }
@@ -192,7 +200,6 @@ public abstract class ScreenCustom extends TitleScreen {
 
     public void actionPerformed(int buttonID, double mouseX, double mouseY, int pButton){
         buttonFunction.runScript(buttonList.get(buttonID));
-
     }
     @Override
     public void mouseMoved(double pMouseX, double pMouseY) {
@@ -202,6 +209,7 @@ public abstract class ScreenCustom extends TitleScreen {
                 int mouseX = (int) pMouseX;
                 int mouseY = (int) pMouseY;
                 selectWidget.setPosition(mouseX, mouseY);
+                currentSwingButton.update();
             }
         }
     }
@@ -277,5 +285,9 @@ public abstract class ScreenCustom extends TitleScreen {
 
     public Widget getSelectWidget() {
         return selectWidget;
+    }
+
+    public Widget getLastSelectWidget() {
+        return lastSelectWidget;
     }
 }

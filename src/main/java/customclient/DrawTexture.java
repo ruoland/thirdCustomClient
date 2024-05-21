@@ -12,7 +12,7 @@ public class DrawTexture extends Widget {
     }
 
     public void setTexture(ResourceLocation texture) {
-        this.TEXTURE = TEXTURE;
+        this.TEXTURE = texture;
     }
 
     public ResourceLocation getTexture() {

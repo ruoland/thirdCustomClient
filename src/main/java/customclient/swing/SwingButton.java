@@ -7,6 +7,7 @@ import customclient.Widget;
 import net.minecraft.client.Minecraft;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -61,6 +62,15 @@ public class SwingButton extends SwingComponentBase implements KeyListener {
         buttonTextUpdate(visibleStringButton, button.isVisible());
         buttonTextUpdate(visibleTextureButton, button.isTextVisible());
         buttonTextUpdate(lockButton, button.isLock());
+    }
+
+
+    public void update() {
+
+        xField.setText(""+getSelComponent().getX());
+        yField.setText(""+getSelComponent().getY());
+        widthField.setText(""+getSelComponent().getWidth());
+        heightField.setText(""+getSelComponent().getHeight());CustomClient.LOGGER.info("업데이트");
     }
 
     public void comboBoxAddItem() {

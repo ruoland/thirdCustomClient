@@ -60,17 +60,16 @@ public class CustomClient
             CustomClient.LOGGER.info("두번");
         }
     }
-    private GuiMainmenu mainmenu;
+
     @SubscribeEvent
     public void screenEvent2(ScreenEvent.Init.Post postInit){
         Screen screen = postInit.getScreen();
 
-        if(screen instanceof GuiMainmenu ){
-            if(mainmenu == null || (mainmenu != null && mainmenu.hashCode() != screen.hashCode())) {
+        if(screen instanceof GuiMainmenu mainmenu){
+
                 CustomClient.LOGGER.info("두번?");
-                mainmenu = (GuiMainmenu) screen;
-                mainmenu.postInit();
-            }
+            mainmenu.postInit();
+
         }
     }
     // You can use SubscribeEvent and let the Event Bus discover methods to call

@@ -1,5 +1,6 @@
 package customclient;
 
+import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.AbstractWidget;
 
 public abstract class Widget {
@@ -15,9 +16,11 @@ public abstract class Widget {
 
     Widget(AbstractWidget widget) {
         this.abstractWidget = widget;
+        abstractWidget.active =true;
     }
     public void setID(int ID) {
         this.id = ID;
+
 
     }
 
@@ -44,14 +47,14 @@ public abstract class Widget {
     }
 
     public void setWidth(int width) {
-        if(this.width >= 0)
+        if(width <= 0)
             return;
         this.width = width;
         abstractWidget.setWidth(width);
     }
 
     public void setHeight(int height) {
-        if(this.height >= 0)
+        if(height <= 0)
             return;
         this.height = height;
         abstractWidget.setHeight(height);

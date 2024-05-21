@@ -55,15 +55,13 @@ public class GuiMainmenu  extends ScreenCustom {
             button.setVisible(button.isVisible());
             button.setAlpha(1);
             button.buttonBucket = new ButtonBucket(button);
-
         }
-        CustomClient.LOGGER.info(buttonList.size() +" - ");
     }
 
     @Override
     public void actionPerformed(int buttonID, double mouseX, double mouseY, int pButton) {
         super.actionPerformed(buttonID, mouseX, mouseY, buttonID);
-        CustomClient.LOGGER.info(buttonList.get(buttonID).buttonBucket.getActionScript(0) + buttonList.get(buttonID).getButtonText());
+
     }
 
     @Override

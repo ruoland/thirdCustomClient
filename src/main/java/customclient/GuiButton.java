@@ -62,9 +62,23 @@ public class GuiButton extends Widget implements Serializable {
     }
 
     public boolean isMouseOver(double mouseX, double mouseY ){
+
         return abstractWidget.isMouseOver(mouseX, mouseY);
     }
 
+    @Override
+    public String toString() {
+        return "GuiButton{" +
+                "id=" + id +
+                ", x=" + x +
+                ", y=" + y +
+                ", width=" + width +
+                ", height=" + height +
+                ", texture='" + texture + '\'' +
+                ", visible=" + visible +
+                ", lock=" + lock +
+                '}';
+    }
 }
 
 

@@ -2,6 +2,7 @@ package customclient.swing;
 
 import com.mojang.realmsclient.RealmsMainScreen;
 
+import customclient.CustomClient;
 import customclient.GuiButton;
 import customclient.ScreenCustom;
 import net.minecraft.client.Minecraft;
@@ -30,6 +31,7 @@ public class ButtonFunction {
 
     public void runScript(GuiButton button) {
         try {
+
             for (String script : button.getButtonBucket().getScripts()) {
                 runCommand(script);
             }
@@ -40,9 +42,13 @@ public class ButtonFunction {
 
     private void runCommand(String command) {
         Minecraft mc = Minecraft.getInstance();
-
+        CustomClient.LOGGER.info("명령 실행: "+command);
         if (command.startsWith("종료")) {
             mc.stop();
+        }
+        if(command.startsWith("맵 선택:")){
+            mc.setScreen(new SelectWorldScreen(customBase));
+            return;
         }
         if (command.startsWith("배경 변경:")) {
             String guiName = command.replace("배경 변경:", "");
@@ -51,8 +57,9 @@ public class ButtonFunction {
         if (command.startsWith("열기:")) {
             String guiName = command.replace("열기:", "");
             switch (guiName) {
-                case "멀티":
+                case "멀티": {
                     mc.setScreen(new JoinMultiplayerScreen(customBase));
+                }
                     break;
                 case "옵션":
                     mc.setScreen(new OptionsScreen(customBase, mc.options));
