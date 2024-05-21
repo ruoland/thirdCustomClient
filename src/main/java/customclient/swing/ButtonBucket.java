@@ -8,8 +8,8 @@ import java.util.Arrays;
 public class ButtonBucket {
     private ArrayList<String> scripts = new ArrayList<>();
     private int buttonID;
-    public ButtonBucket(GuiButton button) {
-        this.buttonID = button.getID();
+    public ButtonBucket(int buttonID) {
+        this.buttonID = buttonID;
         updateButton();
     }
 

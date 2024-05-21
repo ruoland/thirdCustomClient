@@ -20,8 +20,7 @@ public abstract class Widget {
     }
     public void setID(int ID) {
         this.id = ID;
-
-
+        update();
     }
 
     public int getColor() {
@@ -116,6 +115,9 @@ public abstract class Widget {
     }
     public boolean isMouseOver(double mouseX, double mouseY ){
         return abstractWidget.isMouseOver(mouseX, mouseY);
+    }
+    public boolean canSelectByMouse(double mouseX, double mouseY ){
+        return !isLock() && abstractWidget.isMouseOver(mouseX, mouseY);
     }
 
     public void remove(){

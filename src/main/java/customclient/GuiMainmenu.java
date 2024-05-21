@@ -5,6 +5,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.AbstractWidget;
 
+import java.nio.file.Paths;
+
 public class GuiMainmenu  extends ScreenCustom {
 
     GuiButton buttonSingleplayer ;
@@ -18,8 +20,7 @@ public class GuiMainmenu  extends ScreenCustom {
 
 
     public GuiMainmenu(){
-        super();
-
+        super("mainmenu.json");
     }
 
     @Override
@@ -38,23 +39,24 @@ public class GuiMainmenu  extends ScreenCustom {
     }
     public void addButton(){
         CustomClient.LOGGER.info("실행");
-        buttonList.add(0, buttonSingleplayer= new GuiButton(0,(AbstractWidget) children().get(0)));
-        buttonList.add(1, buttonMultiplayer = new GuiButton(1,(AbstractWidget) children().get(1)));
-        buttonList.add(2, buttonRelams = new GuiButton(2,(AbstractWidget) children().get(2)));
-        buttonList.add(3, buttonMods = new GuiButton(3,(AbstractWidget) children().get(3)));
-        buttonList.add(4, buttonLanguage = new GuiButton(4,(AbstractWidget) children().get(4)));
-        buttonList.add(5, buttonOptions= new GuiButton(5,(AbstractWidget) children().get(5)));
-        buttonList.add(6, buttonQuitGame = new GuiButton(6,(AbstractWidget) children().get(6)));
-        buttonList.add(7, buttonAccesssibility = new GuiButton(7,(AbstractWidget) children().get(7)));
-        for(int i = 0; i < buttonList.size();i++){
-            GuiButton button = buttonList.get(i);
+        getData().add(0, buttonSingleplayer= new GuiButton(0,(AbstractWidget) children().get(0)));
+        getData().add(0, buttonSingleplayer= new GuiButton(0,(AbstractWidget) children().get(0)));
+        getData().add(1, buttonMultiplayer = new GuiButton(1,(AbstractWidget) children().get(1)));
+        getData().add(2, buttonRelams = new GuiButton(2,(AbstractWidget) children().get(2)));
+        getData().add(3, buttonMods = new GuiButton(3,(AbstractWidget) children().get(3)));
+        getData().add(4, buttonLanguage = new GuiButton(4,(AbstractWidget) children().get(4)));
+        getData().add(5, buttonOptions= new GuiButton(5,(AbstractWidget) children().get(5)));
+        getData().add(6, buttonQuitGame = new GuiButton(6,(AbstractWidget) children().get(6)));
+        getData().add(7, buttonAccesssibility = new GuiButton(7,(AbstractWidget) children().get(7)));
+        for(int i = 0; i < getData().getButtonList().size();i++){
+            GuiButton button = getData().getButtonList().get(i);
             button.setID(i);
             button.setWidth(button.getWidth());
             button.setHeight(button.getHeight());
             button.setPosition(button.getX(), button.getY());
             button.setVisible(button.isVisible());
             button.setAlpha(1);
-            button.buttonBucket = new ButtonBucket(button);
+            button.buttonBucket = new ButtonBucket(button.id);
         }
     }
 

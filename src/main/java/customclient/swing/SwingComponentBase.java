@@ -18,8 +18,9 @@ import java.io.File;
 import java.util.regex.Pattern;
 
 public abstract class SwingComponentBase extends JFrame implements KeyListener, ActionListener {
-    protected ScreenCustom customBase;
+
     protected Widget widget;
+    private SwingManager swingManager;
     JTextField pathField = new JTextField(10);
     JTextField xField = new JTextField(3);
     JTextField yField = new JTextField(3);
@@ -31,46 +32,48 @@ public abstract class SwingComponentBase extends JFrame implements KeyListener, 
     JButton fileSelectButton = new JButton("이미지 선택");
     JButton removeButton = new JButton("삭제");
 
-    public SwingComponentBase(ScreenCustom base, Widget widget) {
-        this.customBase = base;
+
+    public SwingComponentBase(boolean addDefault) {
+
         Minecraft mc = Minecraft.getInstance();
         setSize(400, 200);
         setLocation(mc.getWindow().getX() - 400, mc.getWindow().getY() + 300);
         setLayout(new FlowLayout(FlowLayout.LEADING));
-        xField.setText(String.valueOf(widget.getX()));
-        yField.setText(String.valueOf(widget.getY()));
-        widthField.setText(String.valueOf(widget.getWidth()));
-        heightField.setText(String.valueOf(widget.getHeight()));
-        if(widget instanceof DrawTexture) {
-            alphaField.setText(String.valueOf((widget).getAlpha()));
-            alphaField.setToolTipText("투명도(1~0 사이 값)");
+        if (addDefault) {
+            xField.setText(String.valueOf(widget.getX()));
+            yField.setText(String.valueOf(widget.getY()));
+            widthField.setText(String.valueOf(widget.getWidth()));
+            heightField.setText(String.valueOf(widget.getHeight()));
+            if (widget instanceof DrawTexture) {
+                alphaField.setText(String.valueOf((widget).getAlpha()));
+                alphaField.setToolTipText("투명도(1~0 사이 값)");
+            }
+
+            pathField.addKeyListener(this);
+            xField.addKeyListener(this);
+            yField.addKeyListener(this);
+            widthField.addKeyListener(this);
+            alphaField.addKeyListener(this);
+            heightField.addKeyListener(this);
+            lockButton.addActionListener(this);
+            fileSelectButton.addActionListener(this);
+            removeButton.addActionListener(this);
+
+            add(pathField);
+            add(xField);
+            add(yField);
+            add(widthField);
+            add(heightField);
+            add(alphaField);
+            add(fileSelectButton);
+            add(lockButton);
+            add(removeButton);
         }
-
-        pathField.addKeyListener(this);
-        xField.addKeyListener(this);
-        yField.addKeyListener(this);
-        widthField.addKeyListener(this);
-        alphaField.addKeyListener(this);
-        heightField.addKeyListener(this);
-        lockButton.addActionListener(this);
-        fileSelectButton.addActionListener(this);
-        removeButton.addActionListener(this);
-
-        add(pathField);
-        add(xField);
-        add(yField);
-        add(widthField);
-        add(heightField);
-        add(alphaField);
-        add(fileSelectButton);
-        add(lockButton);
-        add(removeButton);
     }
-    @Override
-    public void keyTyped(KeyEvent e) {
-
+    public void init(SwingManager swingManager) {
+        this.swingManager = swingManager;
     }
-    public void buttonTextUpdate(JButton button, boolean onoff){
+        public void buttonTextUpdate(JButton button, boolean onoff){
         String text = button.getText();
         String buttonStr = "";
         if(text.contains("켜짐") || text.contains("꺼짐")){
@@ -113,7 +116,7 @@ public abstract class SwingComponentBase extends JFrame implements KeyListener, 
             JFileChooser jFileChooser = new JFileChooser();
             int select = jFileChooser.showOpenDialog(null);
             if(select == 0) {
-                customBase.getSelectWidget().setTexture(customBase.getTexture(jFileChooser.getSelectedFile().toPath()).toString());
+                swingManager.getWidget().setTexture(ScreenCustom.getTexture(jFileChooser.getSelectedFile().toPath()).toString());
             }
         }
 
@@ -123,9 +126,9 @@ public abstract class SwingComponentBase extends JFrame implements KeyListener, 
         JTextField textField = (JTextField) e.getSource();
         if (!textField.getText().isEmpty()) {
             if (textField == pathField) {
-                if (customBase.getSelectWidget() instanceof DrawTexture drawTexture)
+                if (swingManager.getWidget() instanceof DrawTexture drawTexture)
                     drawTexture.setTexture(new ResourceLocation(textField.getText()));
-                else if(customBase.getSelectWidget() instanceof GuiButton guiButton)
+                else if(swingManager.getWidget() instanceof GuiButton guiButton)
                     guiButton.setButtonText(textField.getText());
             }
             if (textField == xField) {

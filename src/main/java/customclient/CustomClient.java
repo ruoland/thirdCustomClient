@@ -65,10 +65,11 @@ public class CustomClient
     public void screenEvent2(ScreenEvent.Init.Post postInit){
         Screen screen = postInit.getScreen();
 
-        if(screen instanceof GuiMainmenu mainmenu){
+        if(screen instanceof ScreenCustom mainmenu){
 
                 CustomClient.LOGGER.info("두번?");
-            mainmenu.postInit();
+            mainmenu.getData().init(mainmenu);
+
 
         }
     }
