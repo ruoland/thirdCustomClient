@@ -3,7 +3,6 @@ package com.example;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import customclient.CustomClient;
 import net.minecraft.client.gui.GuiGraphics;
@@ -11,7 +10,6 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import org.apache.logging.log4j.core.util.JsonUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,17 +17,19 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 
 public class GuiData {
+
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    protected static final ResourceLocation DEFAULT_BACKGROUND_IMAGE = new ResourceLocation(CustomClient.MODID, "textures/screenshot.png");
     private final Screen screen;
+    private final JsonObject widgetObject = new JsonObject();
+
     private ArrayList<WidgetData> widgetArrayList = new ArrayList<>();
     private ArrayList<WidgetImage> widgetImageList = new ArrayList<>();
-    private JsonObject widgetObject = new JsonObject();
+    protected String background = "customclient:textures/screenshot.png";
     private Path filePath;
     public GuiData(Screen screen, String screenName){
         this.screen = screen;
-
         filePath = Path.of("./customclient/").resolve(screenName+".json");
-
         makeFiles();
         loadWidgetList();
         if(widgetArrayList == null || widgetArrayList.isEmpty()) {
@@ -46,11 +46,11 @@ public class GuiData {
             widgetArrayList.get(i).widget = (AbstractWidget) screen.children().get(i);
             widgetArrayList.get(i).widgetUpdate();
         }
+        ICustomBackground customBackground = (ICustomBackground) screen;
+        customBackground.setBackground(new ResourceLocation(background));
 
         if(screen.children().isEmpty() || widgetArrayList.isEmpty())
-        {
             throw new NullPointerException(filePath.toString() + "의 커스텀 위젯과 화면의 위젯이 존재하지 않음");
-        }
     }
 
     public void updateData(){
@@ -65,6 +65,7 @@ public class GuiData {
 
     public void save(){
         try {
+            widgetObject.addProperty("background", background);
             widgetObject.add("widgetButton", GSON.toJsonTree(widgetArrayList));
             widgetObject.add("widgetImage", GSON.toJsonTree(widgetImageList));
             Files.writeString(filePath, GSON.toJson(widgetObject));
@@ -90,6 +91,7 @@ public class GuiData {
             if(json.equals("[]"))
                 return;
             JsonObject jsonObject = GSON.fromJson(json, JsonObject.class);
+            background = jsonObject.get("background").getAsString();
             widgetArrayList = GSON.fromJson(jsonObject.get("widgetButton"), new TypeToken<ArrayList<WidgetData>>(){}.getType());
             widgetImageList = GSON.fromJson(jsonObject.get("widgetImage"), new TypeToken<ArrayList<WidgetImage>>(){}.getType());
         } catch (IOException e) {
@@ -97,17 +99,30 @@ public class GuiData {
         }
     }
 
-    public ArrayList<WidgetImage> getWidgetImageList() {
-        return widgetImageList;
+    public void addImage(WidgetImage widgetImage){
+        widgetImage.resource = "customclient:"+widgetImage;
+        widgetImageList.add(widgetImage);
+
     }
-    public class WidgetImage{
+    public void renderImage(GuiGraphics guiGraphics){
+        for(WidgetImage image : widgetImageList){
+            image.render(guiGraphics);
+        }
+    }
+    public static class WidgetImage{
         private transient ResourceLocation resourceLocation;
         private String resource;
         private int id, x, y, width, height;
         private boolean isVisible = true;
         private float alpha = 1;
-        WidgetImage(){
-
+        WidgetImage(ResourceLocation resourceLocation, String fileName, int x, int y, int width, int height, float alpha){
+            this.resource = fileName;
+            this.resourceLocation = resourceLocation;
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+            this.alpha = alpha;
         }
         public void render(GuiGraphics pGuiGraphcis){
             if(isVisible)

@@ -1,14 +1,16 @@
 package com.example;
 
+import com.example.gui.event.FilesDropEvent;
+import com.example.gui.event.ImageWidgetEvent;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import customclient.CustomClient;
-import customclient.DrawTexture;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.common.NeoForge;
 
 import javax.swing.*;
 import java.io.FileInputStream;
@@ -18,36 +20,61 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-public class ScreenNewTitle  extends TitleScreen {
+public class ScreenNewTitle extends TitleScreen implements ICustomBackground {
+
     protected ResourceLocation BACKGROUND_IMAGE = new ResourceLocation(CustomClient.MODID, "textures/screenshot.png");
+    private static final Path CUSTOM_CLIENT_PATH = Paths.get("D:\\Projects\\thirdCustomClient\\src\\main\\resources\\assets\\customclient/");
 
-    @Override
-    public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
-        super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
-        //for(DrawTexture drawTexture : ){
-          //  renderTexture(pGuiGraphics, drawTexture.getTexture(), drawTexture.getX(), drawTexture.getY(), drawTexture.getWidth(), drawTexture.getHeight(), drawTexture.getAlpha());
-        //}
+    ScreenNewTitle(){
+        System.setProperty("java.awt.headless", "false");
     }
-
     @Override
     public void onFilesDrop(List<Path> pPacks) {
         super.onFilesDrop(pPacks);
-        String fileName = pPacks.get(0).toFile().getName();
-        ResourceLocation resourceLocation = getTexture(pPacks.get(0));
-        int select = JOptionPane.showOptionDialog(null, "어떤 걸로 설정할까요?" , "이미지 불러오기", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]{"배경화면", "이미지", "취소"}, "취소");
+        if(!NeoForge.EVENT_BUS.post(new FilesDropEvent(this, pPacks)).isCanceled()) {
+            ResourceLocation resourceLocation = getTexture(pPacks.get(0));
 
-        switch (select){
-            case JOptionPane.YES_OPTION -> {
-                BACKGROUND_IMAGE = resourceLocation;
+            int select = JOptionPane.showOptionDialog(null, "어떤 걸로 설정할까요?", "이미지 불러오기", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]{"배경화면", "이미지", "취소"}, "취소");
+
+            switch (select) {
+                case JOptionPane.YES_OPTION -> {
+                    BACKGROUND_IMAGE = resourceLocation;
+                }
+                case JOptionPane.NO_OPTION -> {
+                }
             }
-            case JOptionPane.NO_OPTION -> {
-                //getData().getDrawTextureList().add(new DrawTexture(fileName, resourceLocation));
-            }
+            if(select == JOptionPane.YES_OPTION)
+                NeoForge.EVENT_BUS.post(new ImageWidgetEvent.Background(this, resourceLocation, pPacks.get(0)));
+            else
+                NeoForge.EVENT_BUS.post(new ImageWidgetEvent.Image(this, resourceLocation, pPacks.get(0)));
         }
     }
 
+    @Override
+    public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+
+        super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
+    }
+
+    @Override
+    public void renderBackground(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+        if(hasBackground()) {
+            renderBlurredBackground(pPartialTick);
+            renderTexture(pGuiGraphics, BACKGROUND_IMAGE, 0, 0, width, height, 1);
+        }
+    }
+
+    @Override
+    protected void renderPanorama(GuiGraphics pGuiGraphics, float pPartialTick) {
+        if(!hasBackground())
+            super.renderPanorama(pGuiGraphics, pPartialTick);
+    }
+
+    public boolean hasBackground(){
+        return (BACKGROUND_IMAGE != GuiData.DEFAULT_BACKGROUND_IMAGE);
+    }
     public ResourceLocation getTexture(Path dropFile){
-        Path toPath = Paths.get("D:\\Projects\\thirdCustomClient\\src\\main\\resources\\assets\\customclient/"+dropFile.getFileName().toString().replace(" ","_"));
+        Path toPath = CUSTOM_CLIENT_PATH.resolve(dropFile.getFileName().toString().replace(" ","_"));
         try {
             if(!Files.exists(toPath))
                 Files.copy(dropFile, toPath);
@@ -76,4 +103,13 @@ public class ScreenNewTitle  extends TitleScreen {
         pGuiGraphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
+    @Override
+    public ResourceLocation getBackground() {
+        return BACKGROUND_IMAGE;
+    }
+
+    @Override
+    public void setBackground(ResourceLocation resourceLocation) {
+        BACKGROUND_IMAGE = resourceLocation;
+    }
 }

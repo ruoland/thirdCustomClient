@@ -12,6 +12,7 @@ public class SwingBackground extends JFrame implements DropTargetListener {
     JTextPane pane = new JTextPane();
     SwingBackground(){
         new DropTarget(pane, DnDConstants.ACTION_COPY_OR_MOVE, this);
+
     }
 
 
