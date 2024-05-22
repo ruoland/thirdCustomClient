@@ -31,15 +31,24 @@ public abstract class SwingComponentBase extends JFrame implements KeyListener, 
     JButton lockButton = new JButton("이동 잠금 : 풀림");
     JButton fileSelectButton = new JButton("이미지 선택");
     JButton removeButton = new JButton("삭제");
-
+    private boolean canDefaultValue = false;
 
     public SwingComponentBase(boolean addDefault) {
-
+        this.canDefaultValue = addDefault;
         Minecraft mc = Minecraft.getInstance();
         setSize(400, 200);
         setLocation(mc.getWindow().getX() - 400, mc.getWindow().getY() + 300);
         setLayout(new FlowLayout(FlowLayout.LEADING));
-        if (addDefault) {
+
+    }
+
+    public void init(SwingManager swingManager){
+
+    }
+
+    public void widgetUpdate(){
+        widget = swingManager.getWidget();
+        if (canDefaultValue) {
             xField.setText(String.valueOf(widget.getX()));
             yField.setText(String.valueOf(widget.getY()));
             widthField.setText(String.valueOf(widget.getWidth()));
@@ -70,10 +79,7 @@ public abstract class SwingComponentBase extends JFrame implements KeyListener, 
             add(removeButton);
         }
     }
-    public void init(SwingManager swingManager) {
-        this.swingManager = swingManager;
-    }
-        public void buttonTextUpdate(JButton button, boolean onoff){
+    public void buttonTextUpdate(JButton button, boolean onoff){
         String text = button.getText();
         String buttonStr = "";
         if(text.contains("켜짐") || text.contains("꺼짐")){

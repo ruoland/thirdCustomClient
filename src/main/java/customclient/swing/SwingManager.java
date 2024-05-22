@@ -22,7 +22,6 @@ public abstract class SwingManager {
     public void update(){
         swingComponentBase.positionUpdate(screenCustom.getSelectWidget().getX(), screenCustom.getSelectWidget().getY());
         swingComponentBase.sizeUpdate(screenCustom.getSelectWidget().getWidth(), screenCustom.getSelectWidget().getHeight());
-        screenCustom.getSelectWidget();
     }
 
     public void setSwing(SwingComponentBase swingComponentBase){

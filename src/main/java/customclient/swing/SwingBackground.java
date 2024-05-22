@@ -34,6 +34,12 @@ public class SwingBackground extends SwingComponentBase implements ActionListene
         setSize(300, 200);
         setLocation(Minecraft.getInstance().getWindow().getX() - 300, Minecraft.getInstance().getWindow().getY());
         setLayout(new FlowLayout(FlowLayout.LEADING));
+
+    }
+
+    @Override
+    public void widgetUpdate() {
+        super.widgetUpdate();
         fileSelectButton.addActionListener(this);
         imageButton.addActionListener(this);
         updateButton.addActionListener(this);
@@ -41,13 +47,15 @@ public class SwingBackground extends SwingComponentBase implements ActionListene
         add(fileSelectButton);
         add(imageButton);
         //add(updateButton);
-
         setVisible(true);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
+        if(e.getSource() == fileSelectButton){
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.showOpenDialog(this);
+        }
     }
 
     @Override

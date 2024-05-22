@@ -20,7 +20,6 @@ public abstract class Widget {
     }
     public void setID(int ID) {
         this.id = ID;
-        update();
     }
 
     public int getColor() {

@@ -22,7 +22,6 @@ import java.nio.file.Paths;
 import java.util.List;
 
 public abstract class ScreenCustom extends TitleScreen {
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     protected ResourceLocation BACKGROUND_IMAGE = new ResourceLocation(CustomClient.MODID, "textures/screenshot.png");
     private SwingManager swingButtonManager;
     private SwingManager swingDraw;
@@ -34,14 +33,20 @@ public abstract class ScreenCustom extends TitleScreen {
     protected boolean editMode = false;
     protected Widget selectWidget;
 
-    ScreenCustom(String screenName){
-        widgetData = new WidgetData(Paths.get(screenName));
+    ScreenCustom(String screenNameFolder){
+        System.setProperty("java.awt.headless", "false");
+        widgetData = new WidgetData(this, Paths.get(screenNameFolder));
         swingButtonManager = new SwingManager.ButtonManager(this);
         swingBackgroundManager = new SwingManager.BackgroundManager(this);
-
         buttonFunction = new ButtonFunction(this);
+    }
 
-        System.setProperty("java.awt.headless", "false");
+    @Override
+    protected void init() {
+        super.init();
+        swingButtonManager.init();
+        swingBackgroundManager.init();
+
     }
 
     public abstract void addButton();

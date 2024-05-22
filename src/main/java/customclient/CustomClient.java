@@ -1,7 +1,9 @@
 package customclient;
 
 
+import com.example.RemakeEvent;
 import com.mojang.logging.LogUtils;
+import com.mojang.realmsclient.gui.screens.RealmsNotificationsScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -32,7 +34,7 @@ public class CustomClient
     public CustomClient(IEventBus modEventBus, ModContainer modContainer)
     {
         modEventBus.addListener(this::commonSetup);
-        NeoForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(new RemakeEvent());
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
 
     }
@@ -54,10 +56,9 @@ public class CustomClient
 
     @SubscribeEvent
     public void screenEvent(ScreenEvent.Opening screenEvent){
-        if(screenEvent.getScreen() instanceof TitleScreen titleScreen){
+        if(screenEvent.getNewScreen().getClass().getSimpleName().equals("TitleScreen")){
             GuiMainmenu mainmenu = new GuiMainmenu();
             screenEvent.setNewScreen(mainmenu);
-            CustomClient.LOGGER.info("두번");
         }
     }
 
@@ -65,11 +66,11 @@ public class CustomClient
     public void screenEvent2(ScreenEvent.Init.Post postInit){
         Screen screen = postInit.getScreen();
 
-        if(screen instanceof ScreenCustom mainmenu){
-
-                CustomClient.LOGGER.info("두번?");
-            mainmenu.getData().init(mainmenu);
-
+        if(screen.getClass().getSimpleName().equals("GuiMainmenu")) {
+            CustomClient.LOGGER.info("포스트 클래스 이름 "+screen.getClass().getSimpleName() + "- "+screen.getClass().getSuperclass().getSimpleName());
+            ScreenCustom screenCustom = (ScreenCustom) screen;
+            screenCustom.addButton();
+            screenCustom.getData().widgetLoad();
 
         }
     }

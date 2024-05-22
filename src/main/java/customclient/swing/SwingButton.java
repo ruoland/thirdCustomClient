@@ -34,11 +34,16 @@ public class SwingButton extends SwingComponentBase implements KeyListener {
     public void init(SwingManager.ButtonManager buttonManager){
 
         this.buttonManager = buttonManager;
+
+    }
+
+    @Override
+    public void widgetUpdate() {
+        super.widgetUpdate();
         this.buttonBucket = buttonManager.createBucket();
         setTitle(buttonManager.getWidget().getButtonText());
         comboBoxAddItem();
         visibleStringButton.addActionListener(this);
-
         visibleTextureButton.addActionListener(this);
         resetButton.addActionListener(this);
         actionComboBox.addActionListener(this);

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WidgetData {
+    private final ScreenCustom widgetScreen;
     private final Path screenPath;
     private Path screenButtons;
     private Path screenDrawtexture;
@@ -23,15 +24,25 @@ public class WidgetData {
 
     private static final Gson GSON = new GsonBuilder().create();
 
-    WidgetData(Path screenName){
+    WidgetData(ScreenCustom screenCustom, Path screenName){
+        widgetScreen = screenCustom;
         screenPath = screenName == null ? Path.of("./") : screenName;
         screenButtons = screenPath.resolve("buttons.json");
         screenDrawtexture = screenPath.resolve("drawtexture.json");
     }
 
-    public void init(ScreenCustom screenCustom){
+    /**
+     * GUI가 완전히 불러온 이후 실행됨.
+     */
+    public void widgetLoad(){
         try{
-            makeButtons(screenCustom.children());
+            CustomClient.LOGGER.info(screenPath.toString());
+            if(!Files.isDirectory(screenPath)) {
+                Files.createDirectories(screenPath);
+                Files.createFile(screenButtons);
+                Files.createFile(screenDrawtexture);
+            }
+            makeButtons(widgetScreen.children());
             makeDrawTexture();
         }catch (Exception e){
             e.printStackTrace();
@@ -46,17 +57,13 @@ public class WidgetData {
         return drawTextureList;
     }
 
-    public Path getScreenButtons() {
-        return screenButtons;
-    }
-
     private ArrayList<GuiButton> makeButtons(List<? extends GuiEventListener> children) throws Exception{
         ArrayList<GuiButton> buttons = new ArrayList();
 
         if(exists(EnumData.BUTTON)) {
             String json = new String(Files.readAllBytes(screenButtons));
             buttons = GSON.fromJson(json, new TypeToken<List<GuiButton>>(){}.getType());
-            if(!buttons.isEmpty()) {
+            if(buttons != null) {
                 buttonList = buttons;
                 return buttons;
             }
@@ -74,16 +81,13 @@ public class WidgetData {
         if(Files.exists(screenDrawtexture)) {
             String json = new String(Files.readAllBytes(screenDrawtexture));
             ArrayList<DrawTexture> drawTextures = new Gson().fromJson(json, new TypeToken<List<DrawTexture>>(){}.getType());
-            if(!drawTextures.isEmpty())
+            if(drawTextures != null)
                 drawTextureList = drawTextures;
         }
         return drawTextureList;
     }
     public void saveWidget(){
         try {
-            if(!Files.exists(screenPath)) {
-                Files.createFile(screenPath);
-            }
             Files.writeString(screenButtons, GSON.toJson(buttonList));
             Files.writeString(screenDrawtexture, GSON.toJson(drawTextureList));
         } catch (IOException e) {
@@ -92,10 +96,13 @@ public class WidgetData {
     }
     public boolean exists(EnumData enumData){
         switch (enumData) {
-            case BUTTON -> Files.exists(screenButtons);
-            case TEXTURE -> Files.exists(screenDrawtexture);
+            case BUTTON:
+                return Files.exists(screenButtons);
+
+            case TEXTURE:
+                return Files.exists(screenDrawtexture);
         }
-        throw new NullPointerException();
+        return false;
     }
 
     public void add(int i, GuiButton guiButton) {

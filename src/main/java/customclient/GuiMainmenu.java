@@ -20,7 +20,7 @@ public class GuiMainmenu  extends ScreenCustom {
 
 
     public GuiMainmenu(){
-        super("mainmenu.json");
+        super("mainmenu");
     }
 
     @Override
@@ -37,9 +37,14 @@ public class GuiMainmenu  extends ScreenCustom {
     public void renderTransparentBackground(GuiGraphics pGuiGraphics) {
         pGuiGraphics.fillGradient(0, 0, this.width, this.height, -1072689136, -804253680);
     }
+
+    /**
+     * init 이후 실행 됨
+     * 이유는 children에 버튼이 추가될 때까지 기다리기
+     */
     public void addButton(){
-        CustomClient.LOGGER.info("실행");
-        getData().add(0, buttonSingleplayer= new GuiButton(0,(AbstractWidget) children().get(0)));
+        CustomClient.LOGGER.info("버튼 추가 중");
+
         getData().add(0, buttonSingleplayer= new GuiButton(0,(AbstractWidget) children().get(0)));
         getData().add(1, buttonMultiplayer = new GuiButton(1,(AbstractWidget) children().get(1)));
         getData().add(2, buttonRelams = new GuiButton(2,(AbstractWidget) children().get(2)));
@@ -48,9 +53,13 @@ public class GuiMainmenu  extends ScreenCustom {
         getData().add(5, buttonOptions= new GuiButton(5,(AbstractWidget) children().get(5)));
         getData().add(6, buttonQuitGame = new GuiButton(6,(AbstractWidget) children().get(6)));
         getData().add(7, buttonAccesssibility = new GuiButton(7,(AbstractWidget) children().get(7)));
+
+
+
         for(int i = 0; i < getData().getButtonList().size();i++){
             GuiButton button = getData().getButtonList().get(i);
             button.setID(i);
+            button.setAbstractWidget((AbstractWidget) children().get(i));
             button.setWidth(button.getWidth());
             button.setHeight(button.getHeight());
             button.setPosition(button.getX(), button.getY());
