@@ -11,7 +11,7 @@ public abstract class Widget {
     protected float alpha = 1;
     protected boolean visible = true, lock = false;
 
-    Widget() {
+    public Widget() {
     }
 
     Widget(AbstractWidget widget) {
@@ -126,5 +126,9 @@ public abstract class Widget {
     }
     public void setAbstractWidget(AbstractWidget abstractWidget) {
         this.abstractWidget = abstractWidget;
+    }
+
+    public AbstractWidget getAbstractWidget() {
+        return abstractWidget;
     }
 }

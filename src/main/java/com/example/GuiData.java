@@ -5,8 +5,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import customclient.CustomClient;
+import customclient.FakeTextureWidget;
+import customclient.Widget;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -93,7 +96,8 @@ public class GuiData {
             JsonObject jsonObject = GSON.fromJson(json, JsonObject.class);
             background = jsonObject.get("background").getAsString();
             widgetArrayList = GSON.fromJson(jsonObject.get("widgetButton"), new TypeToken<ArrayList<WidgetData>>(){}.getType());
-            widgetImageList = GSON.fromJson(jsonObject.get("widgetImage"), new TypeToken<ArrayList<WidgetImage>>(){}.getType());
+            if(jsonObject.get("widgetImage").isJsonObject())
+                widgetImageList = GSON.fromJson(jsonObject.get("widgetImage"), new TypeToken<ArrayList<WidgetImage>>(){}.getType());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -102,35 +106,48 @@ public class GuiData {
     public void addImage(WidgetImage widgetImage){
         widgetImage.resource = "customclient:"+widgetImage;
         widgetImageList.add(widgetImage);
-
     }
+
+    public ArrayList<WidgetImage> getWidgetImageList() {
+        return widgetImageList;
+    }
+
     public void renderImage(GuiGraphics guiGraphics){
         for(WidgetImage image : widgetImageList){
             image.render(guiGraphics);
         }
     }
-    public static class WidgetImage{
+    public static class WidgetImage extends Widget {
         private transient ResourceLocation resourceLocation;
         private String resource;
-        private int id, x, y, width, height;
         private boolean isVisible = true;
-        private float alpha = 1;
+
         WidgetImage(ResourceLocation resourceLocation, String fileName, int x, int y, int width, int height, float alpha){
             this.resource = fileName;
             this.resourceLocation = resourceLocation;
-            this.x = x;
-            this.y = y;
-            this.width = width;
-            this.height = height;
             this.alpha = alpha;
+            createFakeWidget();
         }
-        public void render(GuiGraphics pGuiGraphcis){
-            if(isVisible)
-                ScreenNewTitle.renderTexture(pGuiGraphcis, getResource(), x, y, width, height, alpha);
-        }
+
         public ResourceLocation getResource() {
             return resourceLocation == null ? resourceLocation = new ResourceLocation(resource) : resourceLocation;
         }
+
+
+        protected void render(GuiGraphics pGuiGraphics) {
+            if(isVisible)
+                ScreenNewTitle.renderTexture(pGuiGraphics, getResource(), getX(), getY(), getWidth(), getHeight(), alpha);
+        }
+
+        public FakeTextureWidget createFakeWidget(){
+            if(getAbstractWidget() == null) {
+                FakeTextureWidget fakeTextureWidget = new FakeTextureWidget(x, y, width, height, Component.literal(resource));
+                setAbstractWidget(fakeTextureWidget);
+            }
+            return (FakeTextureWidget) getAbstractWidget();
+
+        }
+
     }
     public class WidgetData{
 

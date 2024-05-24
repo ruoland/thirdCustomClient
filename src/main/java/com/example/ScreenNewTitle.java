@@ -96,7 +96,7 @@ public class ScreenNewTitle extends TitleScreen implements ICustomBackground {
         RenderSystem.enableBlend();
         pGuiGraphics.setColor(1.0F, 1.0F, 1.0F, pAlpha);
 
-        pGuiGraphics.blit(pShaderLocation, 0, 0, -90, 0.0F, 0.0F, pGuiGraphics.guiWidth(), pGuiGraphics.guiHeight(), pGuiGraphics.guiWidth(), pGuiGraphics.guiHeight());
+        pGuiGraphics.blit(pShaderLocation, x, y, -90, 0.0F, 0.0F, width, height, width, height);
         RenderSystem.disableBlend();
         RenderSystem.depthMask(true);
         RenderSystem.enableDepthTest();
