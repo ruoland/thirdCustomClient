@@ -3,7 +3,6 @@ package customclient;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import customclient.swing.ButtonBucket;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 
@@ -73,7 +72,7 @@ public class WidgetData {
             GuiButton button = buttonList.get(i);
             button.setAbstractWidget((AbstractWidget) children.get(i));
             button.setID(i);
-            button.buttonBucket = new ButtonBucket(button.id);
+
         }
         return buttons;
     }

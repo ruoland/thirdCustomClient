@@ -1,11 +1,7 @@
 package customclient;
 
-import customclient.swing.ButtonBucket;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.AbstractWidget;
-
-import java.nio.file.Paths;
 
 public class GuiMainmenu  extends ScreenCustom {
 
@@ -65,7 +61,6 @@ public class GuiMainmenu  extends ScreenCustom {
             button.setPosition(button.getX(), button.getY());
             button.setVisible(button.isVisible());
             button.setAlpha(1);
-            button.buttonBucket = new ButtonBucket(button.id);
         }
     }
 

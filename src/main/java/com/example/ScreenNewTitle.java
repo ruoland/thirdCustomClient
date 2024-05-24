@@ -33,7 +33,8 @@ public class ScreenNewTitle extends TitleScreen implements ICustomBackground {
         super.onFilesDrop(pPacks);
         if(!NeoForge.EVENT_BUS.post(new FilesDropEvent(this, pPacks)).isCanceled()) {
             ResourceLocation resourceLocation = getTexture(pPacks.get(0));
-
+            if(resourceLocation == null)
+                return;
             int select = JOptionPane.showOptionDialog(null, "어떤 걸로 설정할까요?", "이미지 불러오기", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]{"배경화면", "이미지", "취소"}, "취소");
 
             switch (select) {
@@ -85,7 +86,8 @@ public class ScreenNewTitle extends TitleScreen implements ICustomBackground {
             return Minecraft.getInstance().getTextureManager().register("customclient", dynamicTexture);
         }
         catch (IOException e){
-            JOptionPane.showMessageDialog(null, "PNG 파일만 인식합니다!");
+            JOptionPane.showMessageDialog(null, "인식할 수 없는 파일입니다! png 파일만 인식하며 윈도우 외의 환경에서는 정상작동 하지 않을 수 있습니다."+e.getCause().toString());
+
         }
         return null;
     }

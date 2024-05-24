@@ -28,6 +28,7 @@ public class GuiData {
 
     private ArrayList<WidgetData> widgetArrayList = new ArrayList<>();
     private ArrayList<WidgetImage> widgetImageList = new ArrayList<>();
+
     protected String background = "customclient:textures/screenshot.png";
     private Path filePath;
     public GuiData(Screen screen, String screenName){
@@ -102,10 +103,17 @@ public class GuiData {
             throw new RuntimeException(e);
         }
     }
+    public void addButton(WidgetData data){
+        widgetArrayList.add(data);
+    }
 
     public void addImage(WidgetImage widgetImage){
-        widgetImage.resource = "customclient:"+widgetImage;
+        widgetImage.resource = "customclient:"+widgetImage.resource;
         widgetImageList.add(widgetImage);
+    }
+
+    public ArrayList<WidgetData> getWidgetArrayList() {
+        return widgetArrayList;
     }
 
     public ArrayList<WidgetImage> getWidgetImageList() {
@@ -149,12 +157,11 @@ public class GuiData {
         }
 
     }
-    public class WidgetData{
+    public class WidgetData extends Widget{
 
         private transient AbstractWidget widget;
-        private int id, x, y, width, height;
-        private boolean isVisible , active;
-        private float alpha = 1;
+        private String action;
+
         private String message;
         WidgetData(AbstractWidget widget){
             this.widget = widget;
@@ -166,8 +173,7 @@ public class GuiData {
             y = widget.getY();
             width = widget.getWidth();
             height = widget.getHeight();
-            isVisible = widget.visible;
-            active = widget.active;
+            visible = widget.visible;
             message = widget.getMessage().getString();
         }
 
@@ -176,12 +182,27 @@ public class GuiData {
             widget.setY(y);
             widget.setWidth(width);
             widget.setHeight(height);
-            widget.visible = isVisible;
-            widget.active = active;
+            widget.visible = visible;
+
             widget.setMessage(Component.literal(message));
         }
 
 
+        public void setMessage(String message) {
+            this.message = message;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public String getAction() {
+            return action;
+        }
+
+        public void setAction(String action) {
+            this.action = action;
+        }
     }
 
 }

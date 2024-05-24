@@ -8,6 +8,7 @@ import customclient.FakeTextureWidget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -85,13 +86,13 @@ public class RemakeEvent {
                 lastSelectWidget.setWidth(lastSelectWidget.getWidth() - 1);
             }
             if(InputConstants.isKeyDown(mc.getWindow().getWindow(), InputConstants.KEY_RIGHT)) {
-                    lastSelectWidget.setWidth(lastSelectWidget.getWidth() + 1);
+                lastSelectWidget.setWidth(lastSelectWidget.getWidth() + 1);
             }
             if(InputConstants.isKeyDown(mc.getWindow().getWindow(), InputConstants.KEY_UP)) {
-                    lastSelectWidget.setHeight(lastSelectWidget.getHeight() - 1);
+                lastSelectWidget.setHeight(lastSelectWidget.getHeight() - 1);
             }
             if(InputConstants.isKeyDown(mc.getWindow().getWindow(), InputConstants.KEY_DOWN)) {
-                    lastSelectWidget.setHeight(lastSelectWidget.getHeight() + 1);
+                lastSelectWidget.setHeight(lastSelectWidget.getHeight() + 1);
             }
             guiData.updateData();
             event.setCanceled(true);
@@ -152,9 +153,12 @@ public class RemakeEvent {
                         return;
                     }
                 }
-                for (GuiEventListener guiEventListener : opening.getScreen().children()) {
-                    if (guiEventListener instanceof AbstractWidget && guiEventListener.isMouseOver(opening.getMouseX(), opening.getMouseY())) {
-                        setSelectWidget((AbstractWidget) guiEventListener);
+                for (GuiData.WidgetData widgetData : guiData.getWidgetArrayList()) {
+                    if (widgetData.isMouseOver(opening.getMouseX(), opening.getMouseY())) {
+                        setSelectWidget(widgetData.getAbstractWidget());
+                        if(selectWidget instanceof Button){
+                            new SwingButton(widgetData);
+                        }
                         opening.setCanceled(true);
                         return;
                     }
