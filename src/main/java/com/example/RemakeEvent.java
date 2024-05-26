@@ -1,29 +1,23 @@
 package com.example;
 
 import com.example.gui.event.FilesDropEvent;
-import com.example.gui.event.ImageWidgetEvent;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import org.lwjgl.glfw.GLFW;
 
 public class RemakeEvent {
-    private String[] whiteList = {"ScreenNewTitle"};
 
-    public boolean check(Screen screen){
-        for(String black : whiteList) {
-            if (screen.getClass().getSimpleName().equals(black))
-                return true;
-        }
-        return false;
+
+    public boolean canEdit(Screen screen){
+        return screen.getClass().getSimpleName().equals("ScreenNewTitle") || screen.getClass().getSimpleName().equals("ScreenUserCustom");
     }
 
     @SubscribeEvent
@@ -35,8 +29,16 @@ public class RemakeEvent {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void screenPostInitEvent(ScreenEvent.Init.Post event){
-        if(check(event.getScreen())) {
-            ScreenAPI.setGui(event.getScreen());
+        if(canEdit(event.getScreen())) {
+            ScreenAPI.setGui(event.getScreen(), "Mainmenu");
+            ScreenAPI.addTextfield(new GuiData.WidgetData(new EditBox(Minecraft.getInstance().font, 30, 40, 400, 20, Component.literal("안녕"))));
+            ScreenAPI.addButton(new GuiData.WidgetData(new Button.Builder(Component.literal("ㅌ테스트"), new Button.OnPress() {
+                @Override
+                public void onPress(Button pButton) {
+
+                }
+            }).size(40,20)
+                    .pos(0,0).build()));
             System.out.println("데이터 업데이트 됨");
         }
     }
@@ -63,16 +65,16 @@ public class RemakeEvent {
             Minecraft mc = Minecraft.getInstance();
 
             if(InputConstants.isKeyDown(mc.getWindow().getWindow(), InputConstants.KEY_LEFT)) {
-                ScreenAPI.addWidth(-1);
+                ScreenAPI.addSelectWidth(-1);
             }
             if(InputConstants.isKeyDown(mc.getWindow().getWindow(), InputConstants.KEY_RIGHT)) {
-                ScreenAPI.addWidth(1);
+                ScreenAPI.addSelectWidth(1);
             }
             if(InputConstants.isKeyDown(mc.getWindow().getWindow(), InputConstants.KEY_UP)) {
-                ScreenAPI.addHeight(-1);
+                ScreenAPI.addSelectHeight(-1);
             }
             if(InputConstants.isKeyDown(mc.getWindow().getWindow(), InputConstants.KEY_DOWN)) {
-                ScreenAPI.addHeight(1);
+                ScreenAPI.addSelectHeight(1);
             }
             ScreenAPI.update();
             event.setCanceled(true);
@@ -87,7 +89,7 @@ public class RemakeEvent {
 
     @SubscribeEvent
     public void editModeEvent(ScreenEvent.KeyPressed.Post event){
-        if(check(event.getScreen()) && event.getKeyCode() == GLFW.GLFW_KEY_LEFT_ALT) {
+        if(canEdit(event.getScreen()) && event.getKeyCode() == GLFW.GLFW_KEY_LEFT_ALT) {
             ScreenAPI.changeEditMode(event.getScreen());
         }
     }

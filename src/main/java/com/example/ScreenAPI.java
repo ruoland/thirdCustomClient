@@ -1,6 +1,5 @@
 package com.example;
 
-import com.example.gui.event.FilesDropEvent;
 import com.example.gui.event.ImageWidgetEvent;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.Minecraft;
@@ -24,16 +23,24 @@ public class ScreenAPI {
     private static SwingButton selectSwingButton;
     private static SwingImage selectImage;
 
-    public static void addWidth(int i){
+    public static void addSelectWidth(int i){
         lastSelectWidget.setWidth(lastSelectWidget.getWidth() + i);
     }
 
-    public static void addHeight(int i){
+    public static void addSelectHeight(int i){
         lastSelectWidget.setHeight(lastSelectWidget.getHeight() + i);
     }
 
+    public static void addTextfield(GuiData.WidgetData text){
+
+        guiData.addTextfield(text);
+    }
+
+    public static void addButton(GuiData.WidgetData button){
+        guiData.addButton(button);
+    }
     public static void update(){
-        guiData.updateData();
+        guiData.syncWithDefault();
     }
     public static void setSelectWidget(AbstractWidget selectWidget) {
         if(isEditMode()) {
@@ -48,7 +55,7 @@ public class ScreenAPI {
             if(selectWidget != null){
                 selectWidget.setX((int) (mouseX +dragX));
                 selectWidget.setY((int) (mouseY +dragY));
-                guiData.updateData();
+                guiData.syncWithDefault();
             }
         }
     }
@@ -99,12 +106,12 @@ public class ScreenAPI {
     public static void changeEditMode(Screen screen){
         editMode = !editMode;
         if(!editMode){
-            guiData.updateData();
+            guiData.syncWithDefault();
             guiData.save();
         }
         else {
             guiData = new GuiData((Screen) screen, screen.getClass().getSimpleName());
-            guiData.updateWidget();
+            guiData.syncWithDefaultWidget();
             if(screen instanceof ICustomBackground background)
                 background.setBackground(new ResourceLocation(guiData.background));
         }
@@ -119,9 +126,9 @@ public class ScreenAPI {
         if(editMode)
             guiData.renderImage(guiGraphics);
     }
-    public static void setGui(Screen screen){
-        guiData = new GuiData(screen, screen.getClass().getSimpleName());
-        guiData.updateWidget();
+    public static void setGui(Screen screen, String name){
+        guiData = new GuiData(screen, name);
+        guiData.syncWithDefaultWidget();
     }
     public static void fileDrops(Screen screen, Path pPacks){
         ResourceLocation resourceLocation = ScreenAPI.getDynamicTexture(pPacks);

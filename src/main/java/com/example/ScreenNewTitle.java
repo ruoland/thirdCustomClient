@@ -7,8 +7,13 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import customclient.CustomClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.NeoForge;
 
@@ -20,7 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-public class ScreenNewTitle extends TitleScreen implements ICustomBackground {
+public class ScreenNewTitle extends TitleScreen implements ICustomBackground, ICustomRenderable {
 
     protected ResourceLocation BACKGROUND_IMAGE = new ResourceLocation(CustomClient.MODID, "textures/screenshot.png");
 
@@ -35,6 +40,17 @@ public class ScreenNewTitle extends TitleScreen implements ICustomBackground {
 
         }
 
+    }
+
+    @Override
+    protected void init() {
+        super.init();
+
+    }
+
+    @Override
+    public <T extends GuiEventListener & Renderable & NarratableEntry> T addRenderableWidget(T pWidget) {
+        return super.addRenderableWidget(pWidget);
     }
 
     @Override

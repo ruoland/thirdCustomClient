@@ -2,9 +2,12 @@ package com.example;
 
 
 
-import customclient.swing.SwingComponentBase;
-import customclient.swing.SwingManager;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
+import net.minecraft.client.gui.screens.worldselection.EditWorldScreen;
+import net.minecraft.network.chat.Component;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,30 +15,25 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
-public class SwingCustomGUI extends SwingComponentBase implements ActionListener {
+public class SwingCustomGUI extends JFrame implements ActionListener {
+    private ScreenUserCustom screenUserCustom;
+    private JButton fileSelectButton = new JButton("배경 파일 선택");
+    private JButton addImageButton = new JButton("이미지 추가하기");
+    private JButton mcButtonButton = new JButton("버튼 추가하기");
+    private JButton addTextField = new JButton("텍스트필드 추가하기");
 
-    JButton fileSelectButton = new JButton("배경 파일 선택");
-    JButton addImageButton = new JButton("이미지 추가하기");
-    JButton mcButtonButton = new JButton("버튼 추가하기");
-    JButton textfieldButton = new JButton("텍스트 필드 추가하기");
-
-    public SwingCustomGUI(boolean addDefault) {
-        super(addDefault);
-    }
-
-
-    @Override
-    public void init(SwingManager buttonManager) {
-        super.init(buttonManager);
-        setTitle("배경화면 설정");
+    public SwingCustomGUI(ScreenUserCustom userCustom) {
+        this.screenUserCustom = userCustom;
+        setTitle("유저 스크린 설정");
         setSize(300, 200);
         setLocation(Minecraft.getInstance().getWindow().getX() - 300, Minecraft.getInstance().getWindow().getY());
         setLayout(new FlowLayout(FlowLayout.LEADING));
-    }
 
-    @Override
+        widgetUpdate();
+    }
     public void widgetUpdate() {
-        super.widgetUpdate();
+
+
         fileSelectButton.addActionListener(this);
         addImageButton.addActionListener(this);
         mcButtonButton.addActionListener(this);
@@ -53,10 +51,19 @@ public class SwingCustomGUI extends SwingComponentBase implements ActionListener
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.showOpenDialog(this);
         }
+        if(e.getSource() == mcButtonButton){
+            ScreenAPI.addButton(new GuiData.WidgetData(new Button.Builder(Component.literal("ㅌ테스트"), new Button.OnPress() {
+                @Override
+                public void onPress(Button pButton) {
+
+                }
+            }).size(40,20)
+                    .pos(0,0).build()));
+
+        }
+        if(e.getSource() == addTextField){
+            ScreenAPI.addTextfield(new GuiData.WidgetData(new EditBox(Minecraft.getInstance().font, 200, 20, Component.literal("기본값"))));
+        }
     }
 
-    @Override
-    public void keyTyped(KeyEvent e) {
-
-    }
 }

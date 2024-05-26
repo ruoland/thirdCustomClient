@@ -6,10 +6,11 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import customclient.CustomClient;
 import customclient.FakeTextureWidget;
-import customclient.OldWidget;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
@@ -39,10 +40,10 @@ public class GuiData {
                 widgetArrayList.add(new WidgetData((AbstractWidget) screen.children().get(i)));
             }
         }
-        updateWidget();
+        syncWithDefaultWidget();
     }
 
-    public void updateWidget(){
+    public void syncWithDefaultWidget(){
         for(int i = 0; i < screen.children().size(); i++) {
             widgetArrayList.get(i).abstractWidget = (AbstractWidget) screen.children().get(i);
             widgetArrayList.get(i).widgetUpdate();
@@ -51,9 +52,6 @@ public class GuiData {
         }
         ICustomBackground customBackground = (ICustomBackground) screen;
         customBackground.setBackground(new ResourceLocation(getBackground()));
-
-        if(screen.children().isEmpty() || widgetArrayList.isEmpty())
-            throw new NullPointerException(filePath.toString() + "의 커스텀 위젯과 화면의 위젯이 존재하지 않음");
     }
     public String getBackground() {
         if (dynamicBackground != null)
@@ -62,10 +60,7 @@ public class GuiData {
             return background;
     }
 
-    public void updateData(){
-        if(screen.children().isEmpty()) {
-            CustomClient.LOGGER.info("너무 빠른 데이터 업데이트");
-        }
+    public void syncWithDefault(){
         for(int i = 0; i < screen.children().size(); i++) {
             widgetArrayList.get(i).abstractWidget = (AbstractWidget) screen.children().get(i);
             widgetArrayList.get(i).dataUpdate();
@@ -108,8 +103,16 @@ public class GuiData {
             throw new RuntimeException(e);
         }
     }
+    public void addTextfield(WidgetData data){
+        data.isTextField = true;
+        widgetArrayList.add(data);
+        ICustomRenderable customRenderable = (ICustomRenderable) screen;
+        customRenderable.addRenderableWidget(data.abstractWidget);
+    }
     public void addButton(WidgetData data){
         widgetArrayList.add(data);
+        ICustomRenderable customRenderable = (ICustomRenderable) screen;
+        customRenderable.addRenderableWidget(data.abstractWidget);
     }
 
     public void addImage(WidgetImage widgetImage){
@@ -166,10 +169,10 @@ public class GuiData {
         }
 
     }
-    public class WidgetData extends NewWidget {
+    public static class WidgetData extends NewWidget {
 
         private String action;
-
+        protected boolean isTextField = false;
         private String message;
         WidgetData(AbstractWidget widget){
             super(widget);
@@ -184,6 +187,7 @@ public class GuiData {
             height = abstractWidget.getHeight();
             visible = abstractWidget.visible;
             message = abstractWidget.getMessage().getString();
+
         }
 
         public void widgetUpdate(){
@@ -192,7 +196,6 @@ public class GuiData {
             abstractWidget.setWidth(width);
             abstractWidget.setHeight(height);
             abstractWidget.visible = visible;
-
             abstractWidget.setMessage(Component.literal(message));
         }
 
@@ -200,6 +203,10 @@ public class GuiData {
         public void setMessage(String message) {
             this.message = message;
             abstractWidget.setMessage(Component.literal(message));
+        }
+
+        public boolean isTextField() {
+            return isTextField;
         }
 
         public String getMessage() {
