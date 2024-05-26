@@ -6,10 +6,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import customclient.CustomClient;
 import customclient.FakeTextureWidget;
-import customclient.Widget;
+import customclient.OldWidget;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -47,11 +46,12 @@ public class GuiData {
 
     public void updateWidget(){
         for(int i = 0; i < screen.children().size(); i++) {
-            widgetArrayList.get(i).widget = (AbstractWidget) screen.children().get(i);
+            widgetArrayList.get(i).abstractWidget = (AbstractWidget) screen.children().get(i);
             widgetArrayList.get(i).widgetUpdate();
+            System.out.println(widgetArrayList.get(i).getMessage() + "에 위젯 객체 추가 및 업데이트");
         }
         ICustomBackground customBackground = (ICustomBackground) screen;
-        customBackground.setBackground(new ResourceLocation(background));
+        customBackground.setBackground(new ResourceLocation("customclient", background));
 
         if(screen.children().isEmpty() || widgetArrayList.isEmpty())
             throw new NullPointerException(filePath.toString() + "의 커스텀 위젯과 화면의 위젯이 존재하지 않음");
@@ -62,7 +62,7 @@ public class GuiData {
             CustomClient.LOGGER.info("너무 빠른 데이터 업데이트");
         }
         for(int i = 0; i < screen.children().size(); i++) {
-            widgetArrayList.get(i).widget = (AbstractWidget) screen.children().get(i);
+            widgetArrayList.get(i).abstractWidget = (AbstractWidget) screen.children().get(i);
             widgetArrayList.get(i).dataUpdate();
         }
     }
@@ -125,12 +125,16 @@ public class GuiData {
             image.render(guiGraphics);
         }
     }
-    public static class WidgetImage extends Widget {
+    public static class WidgetImage extends NewWidget {
         private transient ResourceLocation resourceLocation;
         private String resource;
         private boolean isVisible = true;
 
         WidgetImage(ResourceLocation resourceLocation, String fileName, int x, int y, int width, int height, float alpha){
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
             this.resource = fileName;
             this.resourceLocation = resourceLocation;
             this.alpha = alpha;
@@ -138,7 +142,7 @@ public class GuiData {
         }
 
         public ResourceLocation getResource() {
-            return resourceLocation == null ? resourceLocation = new ResourceLocation(resource) : resourceLocation;
+            return resourceLocation == null ? resourceLocation = new ResourceLocation("customclient", resource) : resourceLocation;
         }
 
 
@@ -157,39 +161,40 @@ public class GuiData {
         }
 
     }
-    public class WidgetData extends Widget{
+    public class WidgetData extends NewWidget {
 
-        private transient AbstractWidget widget;
         private String action;
 
         private String message;
         WidgetData(AbstractWidget widget){
-            this.widget = widget;
+            super(widget);
+
             dataUpdate();
         }
 
         public void dataUpdate(){
-            x = widget.getX();
-            y = widget.getY();
-            width = widget.getWidth();
-            height = widget.getHeight();
-            visible = widget.visible;
-            message = widget.getMessage().getString();
+            x = abstractWidget.getX();
+            y = abstractWidget.getY();
+            width = abstractWidget.getWidth();
+            height = abstractWidget.getHeight();
+            visible = abstractWidget.visible;
+            message = abstractWidget.getMessage().getString();
         }
 
         public void widgetUpdate(){
-            widget.setX(x);
-            widget.setY(y);
-            widget.setWidth(width);
-            widget.setHeight(height);
-            widget.visible = visible;
+            abstractWidget.setX(x);
+            abstractWidget.setY(y);
+            abstractWidget.setWidth(width);
+            abstractWidget.setHeight(height);
+            abstractWidget.visible = visible;
 
-            widget.setMessage(Component.literal(message));
+            abstractWidget.setMessage(Component.literal(message));
         }
 
 
         public void setMessage(String message) {
             this.message = message;
+            abstractWidget.setMessage(Component.literal(message));
         }
 
         public String getMessage() {

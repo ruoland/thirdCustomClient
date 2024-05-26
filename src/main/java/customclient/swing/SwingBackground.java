@@ -2,7 +2,6 @@ package customclient.swing;
 
 
 
-import customclient.ScreenCustom;
 import net.minecraft.client.Minecraft;
 
 import javax.swing.*;
@@ -10,7 +9,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.io.File;
 
 public class SwingBackground extends SwingComponentBase implements ActionListener {
     public JTextField youtubeField = new JTextField(40);

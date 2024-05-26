@@ -3,7 +3,7 @@ package customclient;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 
-public class GuiMainmenu  extends ScreenCustom {
+public class GuiMainmenu  extends OldScreenCustom {
 
     GuiButton buttonSingleplayer ;
     GuiButton buttonMultiplayer;

@@ -3,13 +3,10 @@ package com.example;
 import com.example.gui.event.FilesDropEvent;
 import com.example.gui.event.ImageWidgetEvent;
 import com.mojang.blaze3d.platform.InputConstants;
-import customclient.CustomClient;
-import customclient.FakeTextureWidget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -43,6 +40,7 @@ public class RemakeEvent {
         if(check(event.getScreen())) {
             guiData = new GuiData(event.getScreen(), event.getScreen().getClass().getSimpleName());
             guiData.updateWidget();
+            System.out.println("데이터 업데이트 됨");
         }
     }
 
@@ -53,16 +51,6 @@ public class RemakeEvent {
                 selectWidget = null;
     }
 
-    @SubscribeEvent
-    public void screenButton(ScreenEvent.MouseDragged.Post opening){
-        if(editMode){
-            if(selectWidget != null){
-                selectWidget.setX((int) (opening.getMouseX() + opening.getDragX()));
-                selectWidget.setY((int) (opening.getMouseY() + opening.getDragY()));
-                guiData.updateData();
-            }
-        }
-    }
 
     @SubscribeEvent
     public void screenRender(ScreenEvent.Render.Post render){
@@ -104,22 +92,34 @@ public class RemakeEvent {
             event.setCanceled(true);
     }
     @SubscribeEvent
+    public void imageBackground(ImageWidgetEvent.Background event){
+        if(!editMode)
+            event.setCanceled(true);
+        else{
+            System.out.println("배경화면 설정: "+event.getFileName());
+            ICustomBackground customBackground = (ICustomBackground) event.getScreen();
+
+        }
+
+    }
+    @SubscribeEvent
     public void imageWidgetAdd(ImageWidgetEvent.Image event){
         if(!editMode)
             event.setCanceled(true);
         else{
-            guiData.addImage(new GuiData.WidgetImage(event.get(), event.getFileName(), 0,0, event.getScreen().width, event.getScreen().height, 1));
+            System.out.println(event.getFileName());
+            guiData.addImage(new GuiData.WidgetImage(event.getLocation(), event.getFileName(), 0,0, event.getScreen().width, event.getScreen().height, 1));
         }
 
     }
     @SubscribeEvent
     public void editModeEvent(ScreenEvent.KeyPressed.Post event){
         if(check(event.getScreen()) && event.getKeyCode() == GLFW.GLFW_KEY_LEFT_ALT) {
-            editMode = !editMode;
+            changeEditMode();
             ICustomBackground screen = (ICustomBackground) event.getScreen();
             if(!editMode){
                 guiData.updateData();
-                guiData.background = screen.getBackground().toString();
+                guiData.background = screen.getBackgroundFileName().toString();
                 guiData.save();
             }
             else {
@@ -129,7 +129,6 @@ public class RemakeEvent {
             }
         }
     }
-    protected ResourceLocation BACKGROUND_IMAGE = new ResourceLocation(CustomClient.MODID, "textures/screenshot.png");
 
     @SubscribeEvent
     public void screenButton(ScreenEvent.Render.Post event){
@@ -141,6 +140,17 @@ public class RemakeEvent {
 
     }
 
+    @SubscribeEvent
+    public void screenButton(ScreenEvent.MouseDragged.Post opening){
+        if(editMode){
+            if(selectWidget != null){
+                selectWidget.setX((int) (opening.getMouseX() + opening.getDragX()));
+                selectWidget.setY((int) (opening.getMouseY() + opening.getDragY()));
+                guiData.updateData();
+            }
+        }
+    }
+    private SwingButton selectSwingButton;
     @SubscribeEvent
     public void screenButton(ScreenEvent.MouseButtonPressed.Pre opening){
         if(editMode){
@@ -155,10 +165,19 @@ public class RemakeEvent {
                 }
                 for (GuiData.WidgetData widgetData : guiData.getWidgetArrayList()) {
                     if (widgetData.isMouseOver(opening.getMouseX(), opening.getMouseY())) {
-                        setSelectWidget(widgetData.getAbstractWidget());
-                        if(selectWidget instanceof Button){
-                            new SwingButton(widgetData);
+                        if(selectSwingButton != null){
+                            if(selectSwingButton.guiButton.abstractWidget == widgetData.abstractWidget) {
+                                opening.setCanceled(true);
+                                setSelectWidget(widgetData.getAbstractWidget());
+                                return;
+                            }
+                            else
+                                selectSwingButton.dispose();
                         }
+                        if(widgetData.abstractWidget instanceof Button){
+                            selectSwingButton = new SwingButton(widgetData);
+                        }
+                        setSelectWidget(widgetData.getAbstractWidget());
                         opening.setCanceled(true);
                         return;
                     }
@@ -172,7 +191,12 @@ public class RemakeEvent {
         selectWidget = abstractWidget;
         lastSelectWidget = abstractWidget;
     }
-    public void reset(){
-        editMode = false;
+    public void changeEditMode(){
+        editMode = !editMode;
+        if(selectSwingButton != null){
+            selectSwingButton.dispose();
+            selectSwingButton = null;
+        }
     }
+
 }

@@ -3,9 +3,7 @@ package customclient;
 
 import com.example.RemakeEvent;
 import com.mojang.logging.LogUtils;
-import com.mojang.realmsclient.gui.screens.RealmsNotificationsScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.api.distmarker.Dist;
@@ -68,9 +66,9 @@ public class CustomClient
 
         if(screen.getClass().getSimpleName().equals("GuiMainmenu")) {
             CustomClient.LOGGER.info("포스트 클래스 이름 "+screen.getClass().getSimpleName() + "- "+screen.getClass().getSuperclass().getSimpleName());
-            ScreenCustom screenCustom = (ScreenCustom) screen;
-            screenCustom.addButton();
-            screenCustom.getData().widgetLoad();
+            OldScreenCustom oldScreenCustom = (OldScreenCustom) screen;
+            oldScreenCustom.addButton();
+            oldScreenCustom.getData().widgetLoad();
 
         }
     }

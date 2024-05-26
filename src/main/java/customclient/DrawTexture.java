@@ -2,7 +2,7 @@ package customclient;
 
 import net.minecraft.resources.ResourceLocation;
 
-public class DrawTexture extends Widget {
+public class DrawTexture extends OldWidget {
     private transient ResourceLocation TEXTURE;
     private String fileName;
     DrawTexture(String fileName, ResourceLocation resourceLocation){

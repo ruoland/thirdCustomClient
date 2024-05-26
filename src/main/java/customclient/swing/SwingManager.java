@@ -1,15 +1,16 @@
 package customclient.swing;
 
+import customclient.ButtonBucket;
 import customclient.GuiButton;
-import customclient.ScreenCustom;
-import customclient.Widget;
+import customclient.OldScreenCustom;
+import customclient.OldWidget;
 
 public abstract class SwingManager {
     protected SwingComponentBase swingComponentBase;
-    private ScreenCustom screenCustom;
+    private OldScreenCustom oldScreenCustom;
 
-    public SwingManager(ScreenCustom screenCustom, SwingComponentBase componentBase){
-        this.screenCustom = screenCustom;
+    public SwingManager(OldScreenCustom oldScreenCustom, SwingComponentBase componentBase){
+        this.oldScreenCustom = oldScreenCustom;
         this.swingComponentBase = componentBase;
     }
     public void close(){
@@ -20,8 +21,8 @@ public abstract class SwingManager {
     }
     public abstract void init();
     public void update(){
-        swingComponentBase.positionUpdate(screenCustom.getSelectWidget().getX(), screenCustom.getSelectWidget().getY());
-        swingComponentBase.sizeUpdate(screenCustom.getSelectWidget().getWidth(), screenCustom.getSelectWidget().getHeight());
+        swingComponentBase.positionUpdate(oldScreenCustom.getSelectWidget().getX(), oldScreenCustom.getSelectWidget().getY());
+        swingComponentBase.sizeUpdate(oldScreenCustom.getSelectWidget().getWidth(), oldScreenCustom.getSelectWidget().getHeight());
     }
 
     public void setSwing(SwingComponentBase swingComponentBase){
@@ -32,15 +33,15 @@ public abstract class SwingManager {
     public boolean canSwing(){
         return swingComponentBase != null;
     }
-    public Widget getWidget(){
-        return this.screenCustom.getSelectWidget();
+    public OldWidget getWidget(){
+        return this.oldScreenCustom.getSelectWidget();
     }
 
     public static class BackgroundManager extends SwingManager{
 
 
-        public BackgroundManager(ScreenCustom screenCustom) {
-            super(screenCustom, new SwingBackground(true));
+        public BackgroundManager(OldScreenCustom oldScreenCustom) {
+            super(oldScreenCustom, new SwingBackground(true));
         }
 
         @Override
@@ -57,8 +58,8 @@ public abstract class SwingManager {
         private ButtonBucket buttonBucket;
         private int buttonID;
         private SwingButton swingButton;
-        public ButtonManager(ScreenCustom screenCustom){
-            super(screenCustom, new SwingButton());
+        public ButtonManager(OldScreenCustom oldScreenCustom){
+            super(oldScreenCustom, new SwingButton());
             swingButton = (SwingButton) swingComponentBase;
         }
 
@@ -80,8 +81,6 @@ public abstract class SwingManager {
             return (GuiButton) super.getWidget();
         }
 
-        public ButtonBucket createBucket(){
-            return buttonBucket = new ButtonBucket(getWidget().getID());
-        }
+
     }
 }

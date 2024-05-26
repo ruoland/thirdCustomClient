@@ -2,19 +2,16 @@ package customclient.swing;
 
 import customclient.CustomClient;
 import customclient.GuiButton;
-import customclient.ScreenCustom;
-import customclient.Widget;
 import net.minecraft.client.Minecraft;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class SwingButton extends SwingComponentBase implements KeyListener {
     private SwingManager.ButtonManager buttonManager;
-    private ButtonBucket buttonBucket;
+    //private ButtonBucket buttonBucket;
 
     JButton resetButton = new JButton("이미지 리셋");
     JButton visibleStringButton = new JButton("이름 표시: 켜짐");
@@ -40,7 +37,7 @@ public class SwingButton extends SwingComponentBase implements KeyListener {
     @Override
     public void widgetUpdate() {
         super.widgetUpdate();
-        this.buttonBucket = buttonManager.createBucket();
+        //this.buttonBucket = buttonManager.createBucket();
         setTitle(buttonManager.getWidget().getButtonText());
         comboBoxAddItem();
         visibleStringButton.addActionListener(this);
@@ -54,21 +51,12 @@ public class SwingButton extends SwingComponentBase implements KeyListener {
         add(actionComboBox);
         add(actionField);
         pathField.setText(buttonManager.getWidget().getButtonText());
-        String type = buttonBucket.getType(0);
-        String script = buttonBucket.getActionScript(0);
-        if (type.equals("접속:")) {
-            actionField.setVisible(true);
-            actionComboBox.setSelectedItem(type);
-            actionField.setText(script.replace(type, ""));
-        } else
-            actionComboBox.setSelectedItem(type + script);
 
         setFocusableWindowState(false);
         setVisible(true);
         setFocusableWindowState(true);
 
         buttonTextUpdate(visibleStringButton, buttonManager.getWidget().isVisible());
-        buttonTextUpdate(visibleTextureButton, buttonManager.getWidget().isTextVisible());
         buttonTextUpdate(lockButton, buttonManager.getWidget().isLock());
     }
 
@@ -111,20 +99,11 @@ public class SwingButton extends SwingComponentBase implements KeyListener {
             String selectItem = (String) comboBox.getSelectedItem();
             if (selectItem.equalsIgnoreCase("접속:")) {
                 actionField.setVisible(true);
-                actionField.setText(guiButton.getButtonBucket().getActionScript(0).replace("접속:", ""));
             } else {
                 //콤보 박스는 한번에 하나만 선택 가능하니 init 메서드를 사용함
-                guiButton.getButtonBucket().initScript(selectItem);
             }
         }
-        if (e.getSource() == visibleTextureButton) {
-            guiButton.setVisible(!guiButton.isTextureVisible());
-            visibleTextureButton.setText(guiButton.isTextureVisible() ? "이미지 표시: 켜짐" : "이미지 표시: 꺼짐");
-        }
-        if (e.getSource() == visibleStringButton) {
-            guiButton.setTextVisible(!guiButton.isTextVisible());
-            visibleStringButton.setText(guiButton.isTextVisible() ? "이름 표시: 켜짐" : "이름 표시: 꺼짐");
-        }
+
     }
 
     @Override
@@ -136,6 +115,5 @@ public class SwingButton extends SwingComponentBase implements KeyListener {
             comboBox.append(actionField.getText());
         }
 
-        buttonManager.getWidget().getButtonBucket().initScript(comboBox.toString());
     }
 }

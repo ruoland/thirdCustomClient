@@ -1,13 +1,12 @@
 package customclient;
 
 import com.google.gson.annotations.SerializedName;
-import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.network.chat.Component;
 
 import java.io.Serializable;
 
-public class GuiButton extends Widget implements Serializable {
+public class GuiButton extends OldWidget implements Serializable {
 
     @SerializedName("버튼 이름")
     private String buttonText = "";

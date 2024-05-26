@@ -3,8 +3,8 @@ package customclient.swing;
 
 import customclient.DrawTexture;
 import customclient.GuiButton;
-import customclient.ScreenCustom;
-import customclient.Widget;
+import customclient.OldScreenCustom;
+import customclient.OldWidget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 
@@ -14,12 +14,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.File;
-import java.util.regex.Pattern;
 
 public abstract class SwingComponentBase extends JFrame implements KeyListener, ActionListener {
 
-    protected Widget widget;
+    protected OldWidget oldWidget;
     private SwingManager swingManager;
     JTextField pathField = new JTextField(10);
     JTextField xField = new JTextField(3);
@@ -47,14 +45,14 @@ public abstract class SwingComponentBase extends JFrame implements KeyListener, 
     }
 
     public void widgetUpdate(){
-        widget = swingManager.getWidget();
+        oldWidget = swingManager.getWidget();
         if (canDefaultValue) {
-            xField.setText(String.valueOf(widget.getX()));
-            yField.setText(String.valueOf(widget.getY()));
-            widthField.setText(String.valueOf(widget.getWidth()));
-            heightField.setText(String.valueOf(widget.getHeight()));
-            if (widget instanceof DrawTexture) {
-                alphaField.setText(String.valueOf((widget).getAlpha()));
+            xField.setText(String.valueOf(oldWidget.getX()));
+            yField.setText(String.valueOf(oldWidget.getY()));
+            widthField.setText(String.valueOf(oldWidget.getWidth()));
+            heightField.setText(String.valueOf(oldWidget.getHeight()));
+            if (oldWidget instanceof DrawTexture) {
+                alphaField.setText(String.valueOf((oldWidget).getAlpha()));
                 alphaField.setToolTipText("투명도(1~0 사이 값)");
             }
 
@@ -99,8 +97,8 @@ public abstract class SwingComponentBase extends JFrame implements KeyListener, 
 
     }
 
-    protected Widget getSelComponent(){
-        return widget;
+    protected OldWidget getSelComponent(){
+        return oldWidget;
     }
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -122,7 +120,7 @@ public abstract class SwingComponentBase extends JFrame implements KeyListener, 
             JFileChooser jFileChooser = new JFileChooser();
             int select = jFileChooser.showOpenDialog(null);
             if(select == 0) {
-                swingManager.getWidget().setTexture(ScreenCustom.getTexture(jFileChooser.getSelectedFile().toPath()).toString());
+                swingManager.getWidget().setTexture(OldScreenCustom.getTexture(jFileChooser.getSelectedFile().toPath()).toString());
             }
         }
 
@@ -138,19 +136,19 @@ public abstract class SwingComponentBase extends JFrame implements KeyListener, 
                     guiButton.setButtonText(textField.getText());
             }
             if (textField == xField) {
-                widget.setX(Integer.parseInt(textField.getText()));
+                oldWidget.setX(Integer.parseInt(textField.getText()));
             }
             if (textField == yField) {
-                widget.setY(Integer.parseInt(textField.getText()));
+                oldWidget.setY(Integer.parseInt(textField.getText()));
             }
             if (textField == widthField) {
-                widget.setWidth(Integer.parseInt(textField.getText()));
+                oldWidget.setWidth(Integer.parseInt(textField.getText()));
             }
             if (textField == heightField) {
-               widget.setHeight(Integer.parseInt(textField.getText()));
+               oldWidget.setHeight(Integer.parseInt(textField.getText()));
             }
             if (textField == alphaField) {
-                widget.setAlpha(Float.parseFloat(textField.getText()));
+                oldWidget.setAlpha(Float.parseFloat(textField.getText()));
             }
         }
     }

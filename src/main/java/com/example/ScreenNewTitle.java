@@ -23,8 +23,7 @@ import java.util.List;
 public class ScreenNewTitle extends TitleScreen implements ICustomBackground {
 
     protected ResourceLocation BACKGROUND_IMAGE = new ResourceLocation(CustomClient.MODID, "textures/screenshot.png");
-    private static final Path CUSTOM_CLIENT_PATH = Paths.get("D:\\Projects\\thirdCustomClient\\src\\main\\resources\\assets\\customclient/");
-
+    private String backgroundFileName;
     ScreenNewTitle(){
         System.setProperty("java.awt.headless", "false");
     }
@@ -33,13 +32,17 @@ public class ScreenNewTitle extends TitleScreen implements ICustomBackground {
         super.onFilesDrop(pPacks);
         if(!NeoForge.EVENT_BUS.post(new FilesDropEvent(this, pPacks)).isCanceled()) {
             ResourceLocation resourceLocation = getTexture(pPacks.get(0));
-            if(resourceLocation == null)
+            System.out.println("파일 드랍됨"+pPacks.get(0));
+            if(resourceLocation == null) {
                 return;
+            }
+            System.out.println("파일 선택 창 띄우기 전");
             int select = JOptionPane.showOptionDialog(null, "어떤 걸로 설정할까요?", "이미지 불러오기", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]{"배경화면", "이미지", "취소"}, "취소");
-
+            System.out.println("파일 선택 창");
             switch (select) {
                 case JOptionPane.YES_OPTION -> {
                     BACKGROUND_IMAGE = resourceLocation;
+                    backgroundFileName = pPacks.get(0).getFileName().toString();
                 }
                 case JOptionPane.NO_OPTION -> {
                 }
@@ -75,12 +78,9 @@ public class ScreenNewTitle extends TitleScreen implements ICustomBackground {
         return (BACKGROUND_IMAGE != GuiData.DEFAULT_BACKGROUND_IMAGE);
     }
     public ResourceLocation getTexture(Path dropFile){
-        Path toPath = CUSTOM_CLIENT_PATH.resolve(dropFile.getFileName().toString().replace(" ","_"));
-        try {
-            if(!Files.exists(toPath))
-                Files.copy(dropFile, toPath);
 
-            NativeImage nativeImage = NativeImage.read(new FileInputStream(toPath.toString()));
+        try {
+            NativeImage nativeImage = NativeImage.read(new FileInputStream(dropFile.toString()));
             DynamicTexture dynamicTexture = new DynamicTexture(nativeImage);
 
             return Minecraft.getInstance().getTextureManager().register("customclient", dynamicTexture);
@@ -113,5 +113,10 @@ public class ScreenNewTitle extends TitleScreen implements ICustomBackground {
     @Override
     public void setBackground(ResourceLocation resourceLocation) {
         BACKGROUND_IMAGE = resourceLocation;
+    }
+
+    @Override
+    public String getBackgroundFileName() {
+        return backgroundFileName;
     }
 }

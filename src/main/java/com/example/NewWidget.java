@@ -1,9 +1,8 @@
-package customclient;
+package com.example;
 
-import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.AbstractWidget;
 
-public abstract class Widget {
+public abstract class NewWidget {
     protected int id =0;
     protected transient AbstractWidget abstractWidget;
     protected int x, y, width, height, color;
@@ -11,10 +10,10 @@ public abstract class Widget {
     protected float alpha = 1;
     protected boolean visible = true, lock = false;
 
-    public Widget() {
+    public NewWidget() {
     }
 
-    Widget(AbstractWidget widget) {
+    NewWidget(AbstractWidget widget) {
         this.abstractWidget = widget;
         abstractWidget.active =true;
     }
@@ -130,5 +129,21 @@ public abstract class Widget {
 
     public AbstractWidget getAbstractWidget() {
         return abstractWidget;
+    }
+
+    @Override
+    public String toString() {
+        return "NewWidget{" +
+                "id=" + id +
+                ", x=" + x +
+                ", y=" + y +
+                ", width=" + width +
+                ", height=" + height +
+                ", color=" + color +
+                ", texture='" + texture + '\'' +
+                ", alpha=" + alpha +
+                ", visible=" + visible +
+                ", lock=" + lock +
+                '}';
     }
 }

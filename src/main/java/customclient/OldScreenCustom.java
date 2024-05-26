@@ -1,7 +1,5 @@
 package customclient;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import customclient.swing.*;
@@ -21,21 +19,21 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-public abstract class ScreenCustom extends TitleScreen {
+public abstract class OldScreenCustom extends TitleScreen {
     protected ResourceLocation BACKGROUND_IMAGE = new ResourceLocation(CustomClient.MODID, "textures/screenshot.png");
     private SwingManager swingButtonManager;
     private SwingManager swingDraw;
     private SwingManager swingBackgroundManager;
-    protected WidgetData widgetData;
+    protected OldWidgetData oldWidgetData;
 
     protected ButtonFunction buttonFunction;
 
     protected boolean editMode = false;
-    protected Widget selectWidget;
+    protected OldWidget selectOldWidget;
 
-    ScreenCustom(String screenNameFolder){
+    OldScreenCustom(String screenNameFolder){
         System.setProperty("java.awt.headless", "false");
-        widgetData = new WidgetData(this, Paths.get(screenNameFolder));
+        oldWidgetData = new OldWidgetData(this, Paths.get(screenNameFolder));
         swingButtonManager = new SwingManager.ButtonManager(this);
         swingBackgroundManager = new SwingManager.BackgroundManager(this);
         buttonFunction = new ButtonFunction(this);
@@ -53,7 +51,7 @@ public abstract class ScreenCustom extends TitleScreen {
 
     public void changeEditMode(){
         editMode = !editMode;
-        selectWidget = null;
+        selectOldWidget = null;
         getData().saveWidget();
     }
 
@@ -78,9 +76,9 @@ public abstract class ScreenCustom extends TitleScreen {
         if(editMode){
             for(GuiButton button : getData().getButtonList()){
                 if(button.isMouseOver(pMouseX, pMouseY)) {
-                    selectWidget = button;
+                    selectOldWidget = button;
                     if(pButton == 0 && !button.isLock()) {
-                        if (selectWidget == button) {
+                        if (selectOldWidget == button) {
                             return false;
                         }
                         else {
@@ -90,17 +88,17 @@ public abstract class ScreenCustom extends TitleScreen {
                         return true;
                     }
                     else if(pButton == 1){
-                        selectWidget.setLock(false);
+                        selectOldWidget.setLock(false);
                     }
                 }
             }
             for(DrawTexture texture : getData().getDrawTextureList()){
                 if(pButton == 0 && texture.canSelectByMouse(pMouseX, pMouseY)) {
-                    selectWidget = texture;
+                    selectOldWidget = texture;
                     return true;
                 }
             }
-            selectWidget = null;
+            selectOldWidget = null;
             return false;
         }
         else{
@@ -115,7 +113,7 @@ public abstract class ScreenCustom extends TitleScreen {
     }
 
     public void actionPerformed(int buttonID, double mouseX, double mouseY, int pButton){
-        buttonFunction.runScript(getData().getButtonList().get(buttonID));
+        //buttonFunction.runScript(getData().getButtonList().get(buttonID));
     }
     @Override
     public void mouseMoved(double pMouseX, double pMouseY) {
@@ -124,14 +122,14 @@ public abstract class ScreenCustom extends TitleScreen {
             if(isSelect()){
                 int mouseX = (int) pMouseX;
                 int mouseY = (int) pMouseY;
-                selectWidget.setPosition(mouseX, mouseY);
+                selectOldWidget.setPosition(mouseX, mouseY);
                 swingButtonManager.update();
             }
         }
     }
 
     public boolean isSelect(){
-        return selectWidget != null;
+        return selectOldWidget != null;
     }
 
 
@@ -145,13 +143,13 @@ public abstract class ScreenCustom extends TitleScreen {
 
                 switch (pKeyCode) {
                     case GLFW.GLFW_KEY_RIGHT:
-                        selectWidget.setWidth(selectWidget.getWidth() + 1);
+                        selectOldWidget.setWidth(selectOldWidget.getWidth() + 1);
                     case GLFW.GLFW_KEY_LEFT:
-                        selectWidget.setWidth(selectWidget.getWidth() - 1);
+                        selectOldWidget.setWidth(selectOldWidget.getWidth() - 1);
                     case GLFW.GLFW_KEY_UP:
-                        selectWidget.setHeight(selectWidget.getHeight() + 1);
+                        selectOldWidget.setHeight(selectOldWidget.getHeight() + 1);
                     case GLFW.GLFW_KEY_DOWN:
-                        selectWidget.setHeight(selectWidget.getHeight() - 1);
+                        selectOldWidget.setHeight(selectOldWidget.getHeight() - 1);
                 }
             }
             return false;
@@ -206,12 +204,12 @@ public abstract class ScreenCustom extends TitleScreen {
         pGuiGraphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
-    public Widget getSelectWidget() {
-        return selectWidget;
+    public OldWidget getSelectWidget() {
+        return selectOldWidget;
     }
 
-    protected WidgetData getData(){
-        return widgetData;
+    protected OldWidgetData getData(){
+        return oldWidgetData;
     }
 
     public SwingManager getSwingDraw() {

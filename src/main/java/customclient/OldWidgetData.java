@@ -12,8 +12,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WidgetData {
-    private final ScreenCustom widgetScreen;
+public class OldWidgetData {
+    private final OldScreenCustom widgetScreen;
     private final Path screenPath;
     private Path screenButtons;
     private Path screenDrawtexture;
@@ -23,8 +23,8 @@ public class WidgetData {
 
     private static final Gson GSON = new GsonBuilder().create();
 
-    WidgetData(ScreenCustom screenCustom, Path screenName){
-        widgetScreen = screenCustom;
+    OldWidgetData(OldScreenCustom oldScreenCustom, Path screenName){
+        widgetScreen = oldScreenCustom;
         screenPath = screenName == null ? Path.of("./") : screenName;
         screenButtons = screenPath.resolve("buttons.json");
         screenDrawtexture = screenPath.resolve("drawtexture.json");
