@@ -30,8 +30,4 @@ public class ScreenCustom extends Screen implements ICustomBackground{
         BACKGROUND_IMAGE = resourceLocation;
     }
 
-    @Override
-    public String getBackgroundFileName() {
-        return null;
-    }
 }

@@ -23,40 +23,22 @@ import java.util.List;
 public class ScreenNewTitle extends TitleScreen implements ICustomBackground {
 
     protected ResourceLocation BACKGROUND_IMAGE = new ResourceLocation(CustomClient.MODID, "textures/screenshot.png");
-    private String backgroundFileName;
+
     ScreenNewTitle(){
         System.setProperty("java.awt.headless", "false");
     }
     @Override
     public void onFilesDrop(List<Path> pPacks) {
         super.onFilesDrop(pPacks);
-        if(!NeoForge.EVENT_BUS.post(new FilesDropEvent(this, pPacks)).isCanceled()) {
-            ResourceLocation resourceLocation = getTexture(pPacks.get(0));
-            System.out.println("파일 드랍됨"+pPacks.get(0));
-            if(resourceLocation == null) {
-                return;
-            }
-            System.out.println("파일 선택 창 띄우기 전");
-            int select = JOptionPane.showOptionDialog(null, "어떤 걸로 설정할까요?", "이미지 불러오기", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]{"배경화면", "이미지", "취소"}, "취소");
-            System.out.println("파일 선택 창");
-            switch (select) {
-                case JOptionPane.YES_OPTION -> {
-                    BACKGROUND_IMAGE = resourceLocation;
-                    backgroundFileName = pPacks.get(0).getFileName().toString();
-                }
-                case JOptionPane.NO_OPTION -> {
-                }
-            }
-            if(select == JOptionPane.YES_OPTION)
-                NeoForge.EVENT_BUS.post(new ImageWidgetEvent.Background(this, resourceLocation, pPacks.get(0)));
-            else
-                NeoForge.EVENT_BUS.post(new ImageWidgetEvent.Image(this, resourceLocation, pPacks.get(0)));
+        if(!NeoForge.EVENT_BUS.post(new FilesDropEvent(this, pPacks.get(0))).isCanceled()) {
+            ScreenAPI.fileDrops(this, pPacks.get(0));
+
         }
+
     }
 
     @Override
     public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
-
         super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
     }
 
@@ -77,20 +59,7 @@ public class ScreenNewTitle extends TitleScreen implements ICustomBackground {
     public boolean hasBackground(){
         return (BACKGROUND_IMAGE != GuiData.DEFAULT_BACKGROUND_IMAGE);
     }
-    public ResourceLocation getTexture(Path dropFile){
 
-        try {
-            NativeImage nativeImage = NativeImage.read(new FileInputStream(dropFile.toString()));
-            DynamicTexture dynamicTexture = new DynamicTexture(nativeImage);
-
-            return Minecraft.getInstance().getTextureManager().register("customclient", dynamicTexture);
-        }
-        catch (IOException e){
-            JOptionPane.showMessageDialog(null, "인식할 수 없는 파일입니다! png 파일만 인식하며 윈도우 외의 환경에서는 정상작동 하지 않을 수 있습니다."+e.getCause().toString());
-
-        }
-        return null;
-    }
 
     protected static void renderTexture(GuiGraphics pGuiGraphics, ResourceLocation pShaderLocation, int x, int y, int width, int height, float pAlpha) {
         RenderSystem.disableDepthTest();
@@ -115,8 +84,4 @@ public class ScreenNewTitle extends TitleScreen implements ICustomBackground {
         BACKGROUND_IMAGE = resourceLocation;
     }
 
-    @Override
-    public String getBackgroundFileName() {
-        return backgroundFileName;
-    }
 }

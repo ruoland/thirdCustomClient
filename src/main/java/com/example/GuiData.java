@@ -19,16 +19,15 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 
 public class GuiData {
-
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     protected static final ResourceLocation DEFAULT_BACKGROUND_IMAGE = new ResourceLocation(CustomClient.MODID, "textures/screenshot.png");
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private final Screen screen;
     private final JsonObject widgetObject = new JsonObject();
 
     private ArrayList<WidgetData> widgetArrayList = new ArrayList<>();
     private ArrayList<WidgetImage> widgetImageList = new ArrayList<>();
 
-    protected String background = "customclient:textures/screenshot.png";
+    protected String dynamicBackground, background = "customclient:textures/screenshot.png";
     private Path filePath;
     public GuiData(Screen screen, String screenName){
         this.screen = screen;
@@ -43,18 +42,24 @@ public class GuiData {
         updateWidget();
     }
 
-
     public void updateWidget(){
         for(int i = 0; i < screen.children().size(); i++) {
             widgetArrayList.get(i).abstractWidget = (AbstractWidget) screen.children().get(i);
             widgetArrayList.get(i).widgetUpdate();
-            System.out.println(widgetArrayList.get(i).getMessage() + "에 위젯 객체 추가 및 업데이트");
+
+            System.out.println(widgetArrayList.get(i).getMessage() + "에 위젯 객체 추가 및 업데이트" +((AbstractWidget) screen.children().get(i)).isActive() + ((AbstractWidget) screen.children().get(i)).visible);
         }
         ICustomBackground customBackground = (ICustomBackground) screen;
-        customBackground.setBackground(new ResourceLocation("customclient", background));
+        customBackground.setBackground(new ResourceLocation(getBackground()));
 
         if(screen.children().isEmpty() || widgetArrayList.isEmpty())
             throw new NullPointerException(filePath.toString() + "의 커스텀 위젯과 화면의 위젯이 존재하지 않음");
+    }
+    public String getBackground() {
+        if (dynamicBackground != null)
+            return dynamicBackground;
+        else
+            return background;
     }
 
     public void updateData(){

@@ -8,13 +8,13 @@ import java.nio.file.Path;
 import java.util.List;
 
 public class FilesDropEvent extends ScreenEvent implements ICancellableEvent {
-    private List<Path> pPacks;
-    public FilesDropEvent(Screen screen, List<Path> pPacks) {
+    private Path pPacks;
+    public FilesDropEvent(Screen screen, Path pPacks) {
         super(screen);
         this.pPacks = pPacks;
     }
 
-    public List<Path> getFiles(){
+    public Path getFile(){
         return pPacks;
     }
 }
