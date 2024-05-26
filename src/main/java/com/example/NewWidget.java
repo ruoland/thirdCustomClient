@@ -3,7 +3,7 @@ package com.example;
 import net.minecraft.client.gui.components.AbstractWidget;
 
 public abstract class NewWidget {
-    protected int id =0;
+    protected int id = 0;
     protected transient AbstractWidget abstractWidget;
     protected int x, y, width, height, color;
     protected String texture;

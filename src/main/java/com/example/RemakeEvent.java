@@ -30,8 +30,6 @@ public class RemakeEvent {
     public void screenOpenEvent(ScreenEvent.Opening event){
         if(event.getNewScreen().getClass().getSimpleName().equals("TitleScreen")){
             event.setNewScreen(new ScreenNewTitle());
-
-
         }
     }
 

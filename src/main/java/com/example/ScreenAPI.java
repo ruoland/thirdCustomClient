@@ -22,10 +22,7 @@ public class ScreenAPI {
     private static boolean editMode = false;
     private static AbstractWidget selectWidget, lastSelectWidget;
     private static SwingButton selectSwingButton;
-
-    public static AbstractWidget getSelectWidget() {
-        return selectWidget;
-    }
+    private static SwingImage selectImage;
 
     public static void addWidth(int i){
         lastSelectWidget.setWidth(lastSelectWidget.getWidth() + i);
@@ -42,6 +39,7 @@ public class ScreenAPI {
         if(isEditMode()) {
             ScreenAPI.selectWidget = selectWidget;
             ScreenAPI.lastSelectWidget = selectWidget;
+
         }
     }
 
@@ -61,6 +59,14 @@ public class ScreenAPI {
                     if (widgetImage.isMouseOver(mouseX, mouseY)) {
                         setSelectWidget(widgetImage.getAbstractWidget());
                         System.out.println("위젯 이미지 선택됨");
+                        if(selectImage != null ) {
+                            if(selectImage.widgetImage != widgetImage)
+                                selectImage.dispose();
+                            else
+                                return true;
+                        }
+
+                        selectImage = new SwingImage(widgetImage);
                         return true;
                     }
                 }
@@ -88,6 +94,8 @@ public class ScreenAPI {
         }
         return false;
     }
+
+
     public static void changeEditMode(Screen screen){
         editMode = !editMode;
         if(!editMode){
@@ -103,10 +111,6 @@ public class ScreenAPI {
     }
     public static boolean isEditMode() {
         return editMode;
-    }
-
-    public static void setEditMode(boolean editMode) {
-        ScreenAPI.editMode = editMode;
     }
 
 
@@ -135,9 +139,13 @@ public class ScreenAPI {
         }
         if(select == JOptionPane.YES_OPTION)
             NeoForge.EVENT_BUS.post(new ImageWidgetEvent.Background(screen, resourceLocation, pPacks));
-        else
-            guiData.addImage(new GuiData.WidgetImage(resourceLocation, pPacks.getFileName().toString(), 0,0, screen.width, screen.height, 1));
-
+        else {
+            GuiData.WidgetImage image =new GuiData.WidgetImage(resourceLocation, pPacks.getFileName().toString(), 0, 0, screen.width, screen.height, 1);
+            if(selectImage != null)
+                selectImage.dispose();
+            selectImage = new SwingImage(image);
+            guiData.addImage(image);
+        }
     }
     public static ResourceLocation getDynamicTexture(Path dropFile){
 

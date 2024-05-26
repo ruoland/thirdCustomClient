@@ -42,8 +42,6 @@ public class SwingButton extends JFrame implements ActionListener, KeyListener {
         widthField.setText(guiButton.width+"");
         heightField.addKeyListener(this);
         heightField.setText(guiButton.height+"");
-
-
         visibleButton.addActionListener(this);
         actionComboBox.addActionListener(this);
         actionField.addKeyListener(this);
@@ -98,7 +96,6 @@ public class SwingButton extends JFrame implements ActionListener, KeyListener {
 
     @Override
     public void keyTyped(KeyEvent e) {
-
         if(e.getSource() == nameField){
             guiButton.setMessage(nameField.getText());
             guiButton.setAction(actionField.getText());
