@@ -1,17 +1,13 @@
 package com.example;
 
-import com.example.wrapper.CustomWidgetWrapper;
+import com.example.wrapper.WidgetButtonWrapper;
 import com.example.wrapper.WidgetHandler;
+import com.example.wrapper.WidgetImageWrapper;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import customclient.CustomClient;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 import java.io.IOException;
@@ -19,34 +15,27 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
+//스크린 데이터를 저장하고 관리하는 클래스
 public class CustomScreenData {
     protected static final ResourceLocation DEFAULT_BACKGROUND_IMAGE = new ResourceLocation(CustomClient.MODID, "textures/screenshot.png");
-
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private final Screen currentScreen;
+    private final ScreenFlow screenFlow;
+    private final WidgetHandler widgetHandler;
     private final JsonObject widgetObject = new JsonObject();
-
-    private ArrayList<CustomWidgetWrapper.WidgetButtonWrapper> widgetButtonList = new ArrayList<>();
-    private ArrayList<CustomWidgetWrapper.WidgetImageWrapper> widgetImageList = new ArrayList<>();
-    private WidgetHandler widgetHandler = new WidgetHandler();
 
     protected String background = "customclient:textures/screenshot.png";
     private Path screenDataPath;
 
 
-    public CustomScreenData(Screen screen, String screenName){
-        this.currentScreen = screen;
+    public CustomScreenData(ScreenFlow screenFlow, String screenName){
+
+        this.screenFlow = screenFlow;
+        this.widgetHandler = screenFlow.getScreenWidgets();
         screenDataPath = Path.of("./customclient/").resolve(screenName+".json");
-
-        //저장된 커스텀 위젯 불러오기
-
     }
 
-    public Screen getCurrentScreen() {
-        return currentScreen;
-    }
     public WidgetHandler getWidgetHandler() {
-        return widgetHandler;
+        return screenFlow.getScreenWidgets();
     }
 
     /**
@@ -58,7 +47,7 @@ public class CustomScreenData {
             if(!Files.exists(customClient))
                 Files.createDirectories(customClient);
             if(!Files.exists(screenDataPath))
-                Files.writeString(screenDataPath, GSON.toJson(widgetObject.isEmpty() ? widgetButtonList : widgetObject));
+                Files.writeString(screenDataPath, GSON.toJson(widgetObject.isEmpty() ? getWidgetHandler().getWidgetButtonList() : widgetObject));
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -66,24 +55,18 @@ public class CustomScreenData {
     public void save(){
         try {
             widgetObject.addProperty("background", background);
-            widgetObject.add("widgetButton", GSON.toJsonTree(widgetButtonList));
-            widgetObject.add("widgetImage", GSON.toJsonTree(widgetImageList));
+            widgetObject.add("widgetButton", GSON.toJsonTree(getWidgetHandler().getWidgetButtonList()));
+            widgetObject.add("widgetImage", GSON.toJsonTree(getWidgetHandler().getWidgetImageList()));
             Files.writeString(screenDataPath, GSON.toJson(widgetObject));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
-
     public void setBackground(String background) {
         this.background = background;
     }
 
-    public void loadDefaultWidgets(){
-        for(int i = 0; i < currentScreen.children().size();i++){
-            AbstractWidget widget = (AbstractWidget) currentScreen.children().get(i);
-            widgetButtonList.add(i, new CustomWidgetWrapper.WidgetButtonWrapper(widget));
-        }
-    }
+
     public void loadCustomWidgets(){
         try {
             String json = new String(Files.readAllBytes(screenDataPath));
@@ -92,58 +75,13 @@ public class CustomScreenData {
             JsonObject jsonObject = GSON.fromJson(json, JsonObject.class);
 
             setBackground(jsonObject.get("background").getAsString());
-            widgetButtonList.addAll(GSON.fromJson(jsonObject.get("widgetButton"), new TypeToken<ArrayList<CustomWidgetWrapper.WidgetButtonWrapper>>(){}.getType()));
-            widgetImageList = GSON.fromJson(jsonObject.get("widgetImage"), new TypeToken<ArrayList<CustomWidgetWrapper.WidgetImageWrapper>>(){}.getType());
+            widgetHandler.getWidgetButtonList().addAll(GSON.fromJson(jsonObject.get("widgetButton"), new TypeToken<ArrayList<WidgetButtonWrapper>>(){}.getType()));
+            widgetHandler.getWidgetImageList().add(GSON.fromJson(jsonObject.get("widgetImage"), new TypeToken<ArrayList<WidgetImageWrapper>>(){}.getType()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
     }
 
-    public void makeCustomButtons(){
-        for(CustomWidgetWrapper.WidgetButtonWrapper data : widgetButtonList){
-            currentScreen.renderables.add(new Button.Builder(Component.literal(data.getMessage()), (Button.OnPress) pButton -> {
-            }).size(data.getWidth(), data.getHeight()).pos(data.getX(), data.getY()).build());
-        }
-    }
-    /**
-     * 불러온 위젯의 정보를 동기화 하기(SwingWidget에서 값을 변경 했을 때 사용 되는 메서드)
-     */
-    public void update(){
-        for(int i = 0; i < widgetButtonList.size(); i++){
 
-        }
-    }
-
-    public ArrayList<CustomWidgetWrapper.WidgetButtonWrapper> getWidgetButtonList() {
-        return widgetButtonList;
-    }
-
-    public ArrayList<CustomWidgetWrapper.WidgetImageWrapper> getWidgetImageList() {
-        return widgetImageList;
-    }
-
-
-    public void addTextfield(CustomWidgetWrapper.WidgetButtonWrapper data){
-        data.isTextField = true;
-        widgetButtonList.add(data);
-        ICustomRenderable customRenderable = (ICustomRenderable) currentScreen;
-        customRenderable.addRenderableWidget(data.abstractWidget);
-    }
-    public void addButton(CustomWidgetWrapper.WidgetButtonWrapper data){
-        widgetButtonList.add(data);
-        ICustomRenderable customRenderable = (ICustomRenderable) currentScreen;
-        customRenderable.addRenderableWidget(data.abstractWidget);
-    }
-
-    public void addImage(CustomWidgetWrapper.WidgetImageWrapper widgetImage){
-        widgetImage.texture = "customclient:"+widgetImage.texture;
-        widgetImageList.add(widgetImage);
-    }
-
-    public void renderImage(GuiGraphics guiGraphics){
-        for(CustomWidgetWrapper.WidgetImageWrapper image : widgetImageList){
-            image.render(guiGraphics);
-        }
-    }
 }

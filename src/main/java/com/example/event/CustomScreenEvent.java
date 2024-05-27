@@ -1,6 +1,6 @@
 package com.example.event;
 
-import com.example.ScreenAPI;
+import com.example.CustomScreenMod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -13,9 +13,9 @@ public class CustomScreenEvent {
     public void screenRender(ScreenEvent.Render.Post render){
         Minecraft mc = Minecraft.getInstance();
         GuiGraphics pGuiGraphics = render.getGuiGraphics();
-        if(ScreenAPI.isEditMode()) {
+        if(CustomScreenMod.isEditMode()) {
             pGuiGraphics.drawString(mc.font, Component.literal("편집 모드 실행 중"), 0, 0, 0xFFFFFF, false);
         }
-        ScreenAPI.renderImage(pGuiGraphics);
+        CustomScreenMod.getRecntlyScreen().getScreenWidgets().renderImage(pGuiGraphics);
     }
 }

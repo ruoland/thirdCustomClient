@@ -2,6 +2,7 @@ package com.example.swing;
 
 
 import com.example.wrapper.CustomWidgetWrapper;
+import com.example.wrapper.WidgetImageWrapper;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
@@ -9,9 +10,9 @@ import java.awt.event.KeyEvent;
 public class SwingImage extends SwingCustom {
     private JTextField nameField = new JTextField(20);
 
-    public CustomWidgetWrapper.WidgetImageWrapper widgetImage;
+    public WidgetImageWrapper widgetImage;
 
-    public SwingImage(CustomWidgetWrapper.WidgetImageWrapper widgetImage){
+    public SwingImage(WidgetImageWrapper widgetImage){
         super(widgetImage, "이미지 설정");
 
         this.widgetImage = widgetImage;

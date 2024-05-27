@@ -1,11 +1,7 @@
 package com.example.wrapper;
 
-import com.example.ScreenNewTitle;
-import customclient.FakeTextureWidget;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 
 public abstract class CustomWidgetWrapper {
     private transient AbstractWidget abstractWidget;
@@ -136,9 +132,10 @@ public abstract class CustomWidgetWrapper {
         this.abstractWidget = abstractWidget;
     }
 
-    public AbstractWidget getAbstractWidget() {
+    public AbstractWidget getWidget() {
         return abstractWidget;
     }
+
     public String getMessage() {
         return message;
     }
@@ -161,75 +158,5 @@ public abstract class CustomWidgetWrapper {
                 '}';
     }
 
-    public static class WidgetImageWrapper extends CustomWidgetWrapper {
-        private transient ResourceLocation resourceLocation;
-        private String resource;
-        private boolean isVisible = true;
 
-        WidgetImageWrapper(ResourceLocation resourceLocation, String fileName, int x, int y, int width, int height, float alpha){
-            setX(x);
-            setY(y);
-            setWidth(width);
-            setHeight(height);
-            this.resource = fileName;
-            this.resourceLocation = resourceLocation;
-            setAlpha(alpha);
-            createFakeWidget();
-        }
-
-        public ResourceLocation getResource() {
-            return resourceLocation == null ? resourceLocation = new ResourceLocation("customclient", resource) : resourceLocation;
-        }
-
-        protected void render(GuiGraphics pGuiGraphics) {
-            if(isVisible)
-                ScreenNewTitle.renderTexture(pGuiGraphics, getResource(), getX(), getY(), getWidth(), getHeight(), getAlpha());
-        }
-
-        public FakeTextureWidget createFakeWidget(){
-            if(getAbstractWidget() == null) {
-                FakeTextureWidget fakeTextureWidget = new FakeTextureWidget(getX(), getY(), getWidth(), getHeight(), Component.literal(resource));
-                setAbstractWidget(fakeTextureWidget);
-            }
-            return (FakeTextureWidget) getAbstractWidget();
-
-        }
-
-    }
-    public static class WidgetButtonWrapper extends CustomWidgetWrapper {
-        protected boolean isTextField = false;
-
-        public WidgetButtonWrapper(AbstractWidget widget){
-            super(widget);
-
-            dataUpdate();
-        }
-
-        public void dataUpdate(){
-            x = abstractWidget.getX();
-            y = abstractWidget.getY();
-            width = abstractWidget.getWidth();
-            height = abstractWidget.getHeight();
-            visible = abstractWidget.visible;
-            message = abstractWidget.getMessage().getString();
-        }
-
-        /**
-         * 위젯에 불러온 정보를 부여함
-         */
-
-        public void loadToMCWidget(){
-            abstractWidget.setX(x);
-            abstractWidget.setY(y);
-            abstractWidget.setWidth(width);
-            abstractWidget.setHeight(height);
-            abstractWidget.visible = visible;
-            abstractWidget.setMessage(Component.literal(message));
-        }
-
-
-        public boolean isTextField() {
-            return isTextField;
-        }
-    }
 }

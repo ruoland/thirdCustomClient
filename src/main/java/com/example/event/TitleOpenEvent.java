@@ -13,15 +13,14 @@ public class TitleOpenEvent {
         if (event.getNewScreen().getClass().getSimpleName().equals("TitleScreen")) {
             ScreenNewTitle newTitle = new ScreenNewTitle();
             event.setNewScreen(newTitle);
-
-            CustomScreen.getScreen("ScreenNewTitle").openScreen(event.getNewScreen()); //스크린 열림
+            CustomScreenMod.getScreen("ScreenNewTitle").openScreen(event.getNewScreen()); //스크린 열림
         }
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void screenPostInitEvent(ScreenEvent.Init.Post event){
         if(isTitle(event.getScreen())) {
-            CustomScreen.getScreen("ScreenNewTitle").loadScreenData();
+            CustomScreenMod.getScreen("ScreenNewTitle").loadScreenData();
         }
     }
 

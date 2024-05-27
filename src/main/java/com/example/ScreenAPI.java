@@ -1,13 +1,10 @@
 package com.example;
 
 import com.example.gui.event.ImageWidgetEvent;
-import com.example.swing.SwingButton;
-import com.example.swing.SwingImage;
-import com.example.wrapper.CustomWidgetWrapper;
 import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
@@ -19,92 +16,18 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 public class ScreenAPI {
-    private static CustomScreenData customScreenData;
-    private static boolean editMode = false;
 
+    public static void renderTexture(GuiGraphics pGuiGraphics, ResourceLocation pShaderLocation, int x, int y, int width, int height, float pAlpha) {
+        RenderSystem.disableDepthTest();
+        RenderSystem.depthMask(false);
+        RenderSystem.enableBlend();
+        pGuiGraphics.setColor(1.0F, 1.0F, 1.0F, pAlpha);
 
-    public static void addSelectWidth(int i){
-        customScreenData.getWidgetHandler.(lastSelectWidget.getWidth() + i);
-    }
-
-    public static void addSelectHeight(int i){
-        lastSelectWidget.setHeight(lastSelectWidget.getHeight() + i);
-    }
-
-    public static CustomScreenData getCustomScreenData() {
-        return customScreenData;
-    }
-
-    public static void addTextfield(CustomWidgetWrapper.WidgetButtonWrapper text){
-        customScreenData.addTextfield(text);
-    }
-
-    public static void addButton(CustomWidgetWrapper.WidgetButtonWrapper button){
-        customScreenData.addButton(button);
-
-    }
-    public static void update(){
-        customScreenData.update();
-    }
-
-    public static void dragWidget(double mouseX, double mouseY, double dragX, double dragY){
-
-    }
-    public static boolean mousePressed(int mouseButton, double mouseX, double mouseY){
-        if(editMode){
-            if(mouseButton == 0) {
-                for (CustomWidgetWrapper.WidgetImageWrapper widgetImage : customScreenData.getWidgetImageList()) {
-                    if (widgetImage.isMouseOver(mouseX, mouseY)) {
-                        customScreenData.getWidgetHandler().selectWidget(widgetImage);
-                        return true;
-                    }
-                }
-                for (CustomWidgetWrapper.WidgetButtonWrapper widgetData : customScreenData.getWidgetList()) {
-                    if (widgetData.isMouseOver(mouseX, mouseY)) {
-                        if(selectSwing instanceof SwingButton){
-                           customScreenData.getWidgetHandler().selectWidget(widgetData);
-                           return true;
-                        }
-                        if(widgetData.abstractWidget instanceof Button){
-                            selectSwing = new SwingButton(widgetData);
-                        }
-                        setSelectWidget(widgetData.getAbstractWidget());
-
-                        return true;
-                    }
-                }
-
-            }
-
-        }
-        return false;
-    }
-
-
-    public static void changeEditMode(Screen screen){
-        editMode = !editMode;
-        if(!editMode){
-            customScreenData.update();
-            customScreenData.save();
-            if(selectSwing != null)
-                selectSwing.dispose();
-        }
-        else {
-            guiData = new GuiData((Screen) screen, screen.getClass().getSimpleName());
-            guiData.syncWithDefaultWidget();
-            if(screen instanceof ICustomBackground background)
-                background.setBackground(new ResourceLocation(guiData.getBackground()));
-        }
-    }
-    public static boolean isEditMode() {
-        return editMode;
-    }
-
-
-    public static void renderImage(GuiGraphics guiGraphics)
-    {
-        if(editMode)
-            guiData.renderImage(guiGraphics);
+        pGuiGraphics.blit(pShaderLocation, x, y, -90, 0.0F, 0.0F, width, height, width, height);
+        RenderSystem.disableBlend();
+        RenderSystem.depthMask(true);
+        RenderSystem.enableDepthTest();
+        pGuiGraphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
     public static void fileDrops(Screen screen, Path pPacks){
@@ -124,11 +47,8 @@ public class ScreenAPI {
         if(select == JOptionPane.YES_OPTION)
             NeoForge.EVENT_BUS.post(new ImageWidgetEvent.Background(screen, resourceLocation, pPacks));
         else {
-            GuiData.WidgetImage image =new GuiData.WidgetImage(resourceLocation, pPacks.getFileName().toString(), 0, 0, screen.width, screen.height, 1);
-            if(selectSwing != null)
-                selectSwing.dispose();
-            selectSwing = new SwingImage(image);
-            guiData.addImage(image);
+            WidgetImage image =new WidgetImage(resourceLocation, pPacks.getFileName().toString(), 0, 0, screen.width, screen.height, 1);
+
         }
     }
     public static ResourceLocation getDynamicTexture(Path dropFile){

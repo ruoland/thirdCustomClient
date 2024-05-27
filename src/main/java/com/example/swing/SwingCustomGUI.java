@@ -45,25 +45,9 @@ public class SwingCustomGUI extends JFrame implements ActionListener {
         setVisible(true);
     }
 
+
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == fileSelectButton){
-            JFileChooser fileChooser = new JFileChooser();
-            fileChooser.showOpenDialog(this);
-        }
-        if(e.getSource() == mcButtonButton){
-            ScreenAPI.addButton(new CustomWidgetWrapper.WidgetButtonWrapper(new Button.Builder(Component.literal("ㅌ테스트"), new Button.OnPress() {
-                @Override
-                public void onPress(Button pButton) {
 
-                }
-            }).size(40,20)
-                    .pos(0,0).build()));
-
-        }
-        if(e.getSource() == addTextField){
-            ScreenAPI.addTextfield(new GuiData.WidgetData(new EditBox(Minecraft.getInstance().font, 200, 20, Component.literal("기본값"))));
-        }
     }
-
 }

@@ -51,7 +51,7 @@ public class ScreenNewTitle extends TitleScreen implements ICustomBackground, IC
     public void renderBackground(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         if(hasBackground()) {
             renderBlurredBackground(pPartialTick);
-            renderTexture(pGuiGraphics, BACKGROUND_IMAGE, 0, 0, width, height, 1);
+            ScreenAPI.renderTexture(pGuiGraphics, BACKGROUND_IMAGE, 0, 0, width, height, 1);
         }
     }
 
@@ -66,18 +66,6 @@ public class ScreenNewTitle extends TitleScreen implements ICustomBackground, IC
     }
 
 
-    protected static void renderTexture(GuiGraphics pGuiGraphics, ResourceLocation pShaderLocation, int x, int y, int width, int height, float pAlpha) {
-        RenderSystem.disableDepthTest();
-        RenderSystem.depthMask(false);
-        RenderSystem.enableBlend();
-        pGuiGraphics.setColor(1.0F, 1.0F, 1.0F, pAlpha);
-
-        pGuiGraphics.blit(pShaderLocation, x, y, -90, 0.0F, 0.0F, width, height, width, height);
-        RenderSystem.disableBlend();
-        RenderSystem.depthMask(true);
-        RenderSystem.enableDepthTest();
-        pGuiGraphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
-    }
 
     @Override
     public ResourceLocation getBackground() {

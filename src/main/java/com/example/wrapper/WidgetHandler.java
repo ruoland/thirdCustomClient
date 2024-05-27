@@ -1,48 +1,77 @@
 package com.example.wrapper;
 
-import com.example.swing.SwingButton;
-import com.example.swing.SwingCustom;
-import com.example.swing.SwingImage;
-import com.example.wrapper.CustomWidgetWrapper;
+import com.example.ICustomRenderable;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
+import java.util.ArrayList;
+
+//한 스크린의 위젯들을 관리하는 클래스
 public class WidgetHandler {
-    private AbstractWidget selectWidget, lastSelectWidget;
-    private SwingCustom selectSwing;
-    public void setPosition(int x, int y){
-        selectWidget.setPosition(x,y);
-        updateSwingData();
+    private Screen screen;
+    private ArrayList<WidgetButtonWrapper> widgetButtonList = new ArrayList<>();
+    private ArrayList<WidgetImageWrapper> widgetImageList = new ArrayList<>();
+
+    public WidgetHandler(Screen screen){
+        this.screen = screen;
     }
 
-    public void setSize(int width, int height){
-        selectWidget.setSize(width, height);
-        updateSwingData();
-    }
-    public void updateSwingData(){
-        selectSwing.update();
-    }
+    /**
+     * 불러온 위젯의 정보를 동기화 하기(SwingWidget에서 값을 변경 했을 때 사용 되는 메서드)
+     */
+    public void update(){
+        for(int i = 0; i < widgetButtonList.size(); i++){
 
-    public void selectWidget(@Nullable CustomWidgetWrapper customWidgetWrapper) {
-        if(this.selectWidget == customWidgetWrapper.abstractWidget)
-            return;
-
-        this.selectWidget = customWidgetWrapper.abstractWidget;
-        lastSelectWidget = customWidgetWrapper.abstractWidget;
-        openSwing(customWidgetWrapper);
-
-    }
-
-    public void openSwing(CustomWidgetWrapper customWidgetWrapper){
-        if(selectSwing != null)
-            selectSwing.dispose();
-        if(customWidgetWrapper instanceof CustomWidgetWrapper.WidgetImageWrapper widgetImage ) {
-            selectSwing = new SwingImage(widgetImage);
         }
-        if(customWidgetWrapper instanceof CustomWidgetWrapper.WidgetButtonWrapper widgetButton){
-            selectSwing = new SwingButton(widgetButton);
+    }
+
+
+    public ArrayList<WidgetButtonWrapper> getWidgetButtonList() {
+        return widgetButtonList;
+    }
+
+    public ArrayList<WidgetImageWrapper> getWidgetImageList() {
+        return widgetImageList;
+    }
+
+    public void loadDefaultWidgets(){
+        for(int i = 0; i < screen.children().size();i++){
+            AbstractWidget widget = (AbstractWidget) screen.children().get(i);
+            widgetButtonList.add(new WidgetButtonWrapper(widget));
         }
-        updateSwingData();
+    }
+
+    public void addTextfield(WidgetButtonWrapper data){
+        //TODO
+        widgetButtonList.add(data);
+        ICustomRenderable customRenderable = (ICustomRenderable) screen ;
+        customRenderable.addRenderableWidget(data.getWidget());
+    }
+
+    public void addButton(WidgetButtonWrapper data){
+        //TODO
+        widgetButtonList.add(data);
+        ICustomRenderable customRenderable = (ICustomRenderable) screen ;
+        customRenderable.addRenderableWidget(data.getWidget());
+    }
+    public void makeCustomButtons(){
+        for(WidgetButtonWrapper data : widgetButtonList){
+            screen.renderables.add(new Button.Builder(Component.literal(data.getMessage()), (Button.OnPress) pButton -> {
+            }).size(data.getWidth(), data.getHeight()).pos(data.getX(), data.getY()).build());
+        }
+    }
+    public void addImage(WidgetImageWrapper widgetImage){
+        widgetImage.setTexture("customclient:"+widgetImage.getResource());
+        widgetImageList.add(widgetImage);
+    }
+
+    public void renderImage(GuiGraphics guiGraphics){
+        for(WidgetImageWrapper image : widgetImageList){
+            image.render(guiGraphics);
+        }
     }
 
 }

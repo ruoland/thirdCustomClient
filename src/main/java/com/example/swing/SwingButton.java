@@ -2,6 +2,7 @@ package com.example.swing;
 
 
 import com.example.wrapper.CustomWidgetWrapper;
+import com.example.wrapper.WidgetButtonWrapper;
 
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -10,7 +11,7 @@ import java.awt.event.KeyListener;
 public class SwingButton extends SwingCustom implements ActionListener, KeyListener {
   
 
-    public SwingButton(CustomWidgetWrapper.WidgetButtonWrapper guiButton){
+    public SwingButton(WidgetButtonWrapper guiButton){
         super(guiButton, "버튼 설정");
     }
 
