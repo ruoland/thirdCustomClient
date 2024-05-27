@@ -10,6 +10,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.NeoForge;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.io.FileInputStream;
@@ -20,9 +21,21 @@ public class ScreenAPI {
     private static GuiData guiData;
     private static boolean editMode = false;
     private static AbstractWidget selectWidget, lastSelectWidget;
-    private static SwingButton selectSwingButton;
-    private static SwingImage selectImage;
+    private static SwingCustom selectSwing;
 
+
+    public static void setSelectSwing(SwingCustom selectSwing) {
+        ScreenAPI.selectSwing = selectSwing;
+    }
+
+    public static SwingCustom getSelectSwing() {
+        return selectSwing;
+    }
+
+    public static void swingUpdate(){
+        System.out.println(ScreenAPI.getSelectSwing() + " 안에서");
+        selectSwing.update();
+    }
     public static void addSelectWidth(int i){
         lastSelectWidget.setWidth(lastSelectWidget.getWidth() + i);
     }
@@ -42,10 +55,11 @@ public class ScreenAPI {
     public static void update(){
         guiData.syncWithDefault();
     }
-    public static void setSelectWidget(AbstractWidget selectWidget) {
+    public static void setSelectWidget(@Nullable AbstractWidget selectWidget) {
         if(isEditMode()) {
             ScreenAPI.selectWidget = selectWidget;
-            ScreenAPI.lastSelectWidget = selectWidget;
+            if(selectWidget != null)
+                ScreenAPI.lastSelectWidget = selectWidget;
 
         }
     }
@@ -55,7 +69,10 @@ public class ScreenAPI {
             if(selectWidget != null){
                 selectWidget.setX((int) (mouseX +dragX));
                 selectWidget.setY((int) (mouseY +dragY));
+                System.out.println("드래그 중?");
                 guiData.syncWithDefault();
+
+                ScreenAPI.swingUpdate();
             }
         }
     }
@@ -66,29 +83,31 @@ public class ScreenAPI {
                     if (widgetImage.isMouseOver(mouseX, mouseY)) {
                         setSelectWidget(widgetImage.getAbstractWidget());
                         System.out.println("위젯 이미지 선택됨");
-                        if(selectImage != null ) {
-                            if(selectImage.widgetImage != widgetImage)
-                                selectImage.dispose();
+                        if(selectSwing instanceof SwingImage image) {
+                            if(image.widgetImage != widgetImage)
+                                image.dispose();
                             else
                                 return true;
                         }
 
-                        selectImage = new SwingImage(widgetImage);
+                        selectSwing = new SwingImage(widgetImage);
                         return true;
                     }
                 }
                 for (GuiData.WidgetData widgetData : guiData.getWidgetArrayList()) {
+                    System.out.println("버튼 확인 " +widgetData.message + " - "+widgetData.isMouseOver(mouseX, mouseY));
                     if (widgetData.isMouseOver(mouseX, mouseY)) {
-                        if(selectSwingButton != null){
-                            if(selectSwingButton.guiButton.abstractWidget == widgetData.abstractWidget) {
+                        if(selectSwing instanceof SwingButton){
+                            if(selectSwing.guiButton.abstractWidget == widgetData.abstractWidget) {
                                 setSelectWidget(widgetData.getAbstractWidget());
+                                System.out.println("선택 위젯이 같음");
                                 return true;
                             }
                             else
-                                selectSwingButton.dispose();
+                                selectSwing.dispose();
                         }
                         if(widgetData.abstractWidget instanceof Button){
-                            selectSwingButton = new SwingButton(widgetData);
+                            selectSwing = new SwingButton(widgetData);
                         }
                         setSelectWidget(widgetData.getAbstractWidget());
 
@@ -108,12 +127,14 @@ public class ScreenAPI {
         if(!editMode){
             guiData.syncWithDefault();
             guiData.save();
+            if(selectSwing != null)
+                selectSwing.dispose();
         }
         else {
             guiData = new GuiData((Screen) screen, screen.getClass().getSimpleName());
             guiData.syncWithDefaultWidget();
             if(screen instanceof ICustomBackground background)
-                background.setBackground(new ResourceLocation(guiData.background));
+                background.setBackground(new ResourceLocation(guiData.getBackground()));
         }
     }
     public static boolean isEditMode() {
@@ -139,7 +160,7 @@ public class ScreenAPI {
         switch (select) {
             case JOptionPane.YES_OPTION -> {
                 guiData.dynamicBackground = resourceLocation.toString();
-                guiData.background = pPacks.getFileName().toString();
+                guiData.background = "customclient:"+ pPacks.getFileName().toString();
             }
             case JOptionPane.NO_OPTION -> {
             }
@@ -148,9 +169,9 @@ public class ScreenAPI {
             NeoForge.EVENT_BUS.post(new ImageWidgetEvent.Background(screen, resourceLocation, pPacks));
         else {
             GuiData.WidgetImage image =new GuiData.WidgetImage(resourceLocation, pPacks.getFileName().toString(), 0, 0, screen.width, screen.height, 1);
-            if(selectImage != null)
-                selectImage.dispose();
-            selectImage = new SwingImage(image);
+            if(selectSwing != null)
+                selectSwing.dispose();
+            selectSwing = new SwingImage(image);
             guiData.addImage(image);
         }
     }

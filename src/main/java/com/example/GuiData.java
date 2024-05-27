@@ -8,6 +8,7 @@ import customclient.CustomClient;
 import customclient.FakeTextureWidget;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
@@ -34,20 +35,28 @@ public class GuiData {
         this.screen = screen;
         filePath = Path.of("./customclient/").resolve(screenName+".json");
         makeFiles();
+
+        //Screen에 기본 위젯, 불러오기
+        loadDefaultWidget();
+        //위젯과 정보 동기화
+        syncWithDefaultWidget();
+        //저장된 커스텀 위젯 불러오기
         loadWidgetList();
+
+    }
+
+    public void loadDefaultWidget(){
         if(widgetArrayList == null || widgetArrayList.isEmpty()) {
             for(int i = 0; i < screen.children().size();i++) {
                 widgetArrayList.add(new WidgetData((AbstractWidget) screen.children().get(i)));
             }
         }
-        syncWithDefaultWidget();
     }
 
     public void syncWithDefaultWidget(){
-        for(int i = 0; i < screen.children().size(); i++) {
+        for(int i = 0; i < 9; i++) {
             widgetArrayList.get(i).abstractWidget = (AbstractWidget) screen.children().get(i);
             widgetArrayList.get(i).widgetUpdate();
-
             System.out.println(widgetArrayList.get(i).getMessage() + "에 위젯 객체 추가 및 업데이트" +((AbstractWidget) screen.children().get(i)).isActive() + ((AbstractWidget) screen.children().get(i)).visible);
         }
         ICustomBackground customBackground = (ICustomBackground) screen;
@@ -57,11 +66,11 @@ public class GuiData {
         if (dynamicBackground != null)
             return dynamicBackground;
         else
-            return background;
+            return background.contains(":") ? background : "customclient:"+background;
     }
 
     public void syncWithDefault(){
-        for(int i = 0; i < screen.children().size(); i++) {
+        for(int i = 0; i < 9; i++) {
             widgetArrayList.get(i).abstractWidget = (AbstractWidget) screen.children().get(i);
             widgetArrayList.get(i).dataUpdate();
         }
@@ -101,6 +110,10 @@ public class GuiData {
                 widgetImageList = GSON.fromJson(jsonObject.get("widgetImage"), new TypeToken<ArrayList<WidgetImage>>(){}.getType());
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+        for(WidgetData data : widgetArrayList){
+            screen.renderables.add(new Button.Builder(Component.literal(data.message), (Button.OnPress) pButton -> {
+            }).size(data.width, data.height).pos(data.x, data.y).build());
         }
     }
     public void addTextfield(WidgetData data){
@@ -170,10 +183,8 @@ public class GuiData {
 
     }
     public static class WidgetData extends NewWidget {
-
-        private String action;
         protected boolean isTextField = false;
-        private String message;
+
         WidgetData(AbstractWidget widget){
             super(widget);
 
@@ -187,7 +198,6 @@ public class GuiData {
             height = abstractWidget.getHeight();
             visible = abstractWidget.visible;
             message = abstractWidget.getMessage().getString();
-
         }
 
         public void widgetUpdate(){
@@ -200,26 +210,12 @@ public class GuiData {
         }
 
 
-        public void setMessage(String message) {
-            this.message = message;
-            abstractWidget.setMessage(Component.literal(message));
-        }
-
         public boolean isTextField() {
             return isTextField;
         }
 
-        public String getMessage() {
-            return message;
-        }
 
-        public String getAction() {
-            return action;
-        }
 
-        public void setAction(String action) {
-            this.action = action;
-        }
     }
 
 }

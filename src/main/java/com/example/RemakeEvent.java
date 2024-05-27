@@ -2,6 +2,7 @@ package com.example;
 
 import com.example.gui.event.FilesDropEvent;
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -30,15 +31,8 @@ public class RemakeEvent {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void screenPostInitEvent(ScreenEvent.Init.Post event){
         if(canEdit(event.getScreen())) {
-            ScreenAPI.setGui(event.getScreen(), "Mainmenu");
-            ScreenAPI.addTextfield(new GuiData.WidgetData(new EditBox(Minecraft.getInstance().font, 30, 40, 400, 20, Component.literal("안녕"))));
-            ScreenAPI.addButton(new GuiData.WidgetData(new Button.Builder(Component.literal("ㅌ테스트"), new Button.OnPress() {
-                @Override
-                public void onPress(Button pButton) {
+            ScreenAPI.setGui(event.getScreen(), "ScreenNewTitle");
 
-                }
-            }).size(40,20)
-                    .pos(0,0).build()));
             System.out.println("데이터 업데이트 됨");
         }
     }
@@ -63,20 +57,33 @@ public class RemakeEvent {
     public void sizeEditEvent(ScreenEvent.KeyPressed.Pre event){
         if(ScreenAPI.isEditMode() && event.getKeyCode() != GLFW.GLFW_KEY_LEFT_ALT){
             Minecraft mc = Minecraft.getInstance();
-
-            if(InputConstants.isKeyDown(mc.getWindow().getWindow(), InputConstants.KEY_LEFT)) {
+            Window window = mc.getWindow();
+            long windowLong = window.getWindow();
+            System.out.println("키 입력 ");
+            if(InputConstants.isKeyDown(windowLong, InputConstants.KEY_LEFT)) {
                 ScreenAPI.addSelectWidth(-1);
             }
-            if(InputConstants.isKeyDown(mc.getWindow().getWindow(), InputConstants.KEY_RIGHT)) {
+            if(InputConstants.isKeyDown(windowLong, InputConstants.KEY_RIGHT)) {
                 ScreenAPI.addSelectWidth(1);
             }
-            if(InputConstants.isKeyDown(mc.getWindow().getWindow(), InputConstants.KEY_UP)) {
+            if(InputConstants.isKeyDown(windowLong, InputConstants.KEY_UP)) {
                 ScreenAPI.addSelectHeight(-1);
             }
-            if(InputConstants.isKeyDown(mc.getWindow().getWindow(), InputConstants.KEY_DOWN)) {
+            if(InputConstants.isKeyDown(windowLong, InputConstants.KEY_DOWN)) {
                 ScreenAPI.addSelectHeight(1);
             }
+            if(InputConstants.isKeyDown(windowLong, InputConstants.KEY_LCONTROL) && InputConstants.isKeyDown(windowLong, InputConstants.KEY_B)) {
+                GuiData.WidgetData button = new GuiData.WidgetData(new Button.Builder(Component.literal("새로운 버튼"), pButton -> {}).size(100, 20).pos(0,0).build());
+                ScreenAPI.addButton(button);
+                ScreenAPI.setSelectWidget(button.getAbstractWidget());
+                ScreenAPI.setSelectSwing(new SwingButton(button));
+
+
+            }
+
             ScreenAPI.update();
+            if(ScreenAPI.getSelectSwing() != null)
+                ScreenAPI.swingUpdate();
             event.setCanceled(true);
         }
     }
@@ -97,11 +104,13 @@ public class RemakeEvent {
 
     @SubscribeEvent
     public void screenButton(ScreenEvent.MouseDragged.Post opening){
+        System.out.println(opening.getDragX());
         ScreenAPI.dragWidget(opening.getMouseX(), opening.getMouseY(), opening.getDragX(), opening.getDragX());
     }
 
     @SubscribeEvent
     public void screenButton(ScreenEvent.MouseButtonPressed.Pre opening){
+
         opening.setCanceled(ScreenAPI.mousePressed(opening.getButton(), opening.getMouseX(), opening.getMouseY()));
     }
 

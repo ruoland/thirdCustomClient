@@ -1,14 +1,16 @@
 package com.example;
 
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.network.chat.Component;
 
 public abstract class NewWidget {
     protected int id = 0;
     protected transient AbstractWidget abstractWidget;
     protected int x, y, width, height, color;
-    protected String texture;
+    protected String texture, message;
     protected float alpha = 1;
     protected boolean visible = true, lock = false;
+    private String action;
 
     public NewWidget() {
     }
@@ -112,6 +114,8 @@ public abstract class NewWidget {
         this.setAlpha(getAlpha());
     }
     public boolean isMouseOver(double mouseX, double mouseY ){
+        if(abstractWidget ==null)
+            return true;
         return abstractWidget.isMouseOver(mouseX, mouseY);
     }
     public boolean canSelectByMouse(double mouseX, double mouseY ){
@@ -123,6 +127,14 @@ public abstract class NewWidget {
         abstractWidget.active = false;
         abstractWidget.visible = false;
     }
+
+    public void setMessage(String message){
+        this.message = message;
+        abstractWidget.setMessage(Component.literal(message));
+    }
+    public void setAction(String action){
+        this.action = action;
+    }
     public void setAbstractWidget(AbstractWidget abstractWidget) {
         this.abstractWidget = abstractWidget;
     }
@@ -130,7 +142,13 @@ public abstract class NewWidget {
     public AbstractWidget getAbstractWidget() {
         return abstractWidget;
     }
+    public String getMessage() {
+        return message;
+    }
 
+    public String getAction() {
+        return action;
+    }
     @Override
     public String toString() {
         return "NewWidget{" +
