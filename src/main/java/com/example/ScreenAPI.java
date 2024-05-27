@@ -24,7 +24,7 @@ public class ScreenAPI {
 
 
     public static void addSelectWidth(int i){
-        customScreenData.setWidth(lastSelectWidget.getWidth() + i);
+        customScreenData.getWidgetHandler.(lastSelectWidget.getWidth() + i);
     }
 
     public static void addSelectHeight(int i){
@@ -106,10 +106,7 @@ public class ScreenAPI {
         if(editMode)
             guiData.renderImage(guiGraphics);
     }
-    public static void setGui(Screen screen, String name){
-        guiData = new GuiData(screen, name);
-        guiData.syncWithDefaultWidget();
-    }
+
     public static void fileDrops(Screen screen, Path pPacks){
         ResourceLocation resourceLocation = ScreenAPI.getDynamicTexture(pPacks);
         if(resourceLocation == null) {

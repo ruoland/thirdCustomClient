@@ -181,7 +181,6 @@ public abstract class CustomWidgetWrapper {
             return resourceLocation == null ? resourceLocation = new ResourceLocation("customclient", resource) : resourceLocation;
         }
 
-
         protected void render(GuiGraphics pGuiGraphics) {
             if(isVisible)
                 ScreenNewTitle.renderTexture(pGuiGraphics, getResource(), getX(), getY(), getWidth(), getHeight(), getAlpha());
