@@ -20,7 +20,7 @@ public class KeyEvent {
     public void sizeEditEvent(ScreenEvent.KeyPressed.Pre event){
         if(CustomScreenMod.isEditMode() && event.getKeyCode() != GLFW.GLFW_KEY_LEFT_ALT){
             Minecraft mc = Minecraft.getInstance();
-            SelectWidgetHandler selectWidgetHandler = CustomScreenMod.getRecntlyScreen().getSelectWidget();
+            SelectWidgetHandler selectWidgetHandler = CustomScreenMod.getScreen(event.getScreen()).getSelectWidget();
             long windowLong = mc.getWindow().getWindow();
 
             if(InputConstants.isKeyDown(windowLong, InputConstants.KEY_LEFT)) {
@@ -42,7 +42,7 @@ public class KeyEvent {
 
     @SubscribeEvent
     public void editModeEvent(ScreenEvent.KeyPressed.Post event){
-        if(isCustomGui(event.getScreen()) && event.getKeyCode() == GLFW.GLFW_KEY_LEFT_ALT) {
+        if(CustomScreenMod.hasScreen(event.getScreen()) && event.getKeyCode() == GLFW.GLFW_KEY_LEFT_ALT) {
             CustomScreenMod.changeEditMode(event.getScreen());
         }
     }
@@ -50,7 +50,7 @@ public class KeyEvent {
     public void createButton(ScreenEvent.KeyPressed.Post event){
         Minecraft mc = Minecraft.getInstance();
         long windowLong =mc.getWindow().getWindow();
-        WidgetHandler widgetHandler = CustomScreenMod.getRecntlyScreen().getScreenWidgets();
+        WidgetHandler widgetHandler = CustomScreenMod.getScreen(event.getScreen()).getScreenWidgets();
         if(InputConstants.isKeyDown(windowLong, InputConstants.KEY_LCONTROL) && InputConstants.isKeyDown(windowLong, InputConstants.KEY_B)) {
             WidgetButtonWrapper button = new WidgetButtonWrapper(new Button.Builder(Component.literal("새로운 버튼"), pButton -> {}).size(100, 20).pos(0,0).build());
             widgetHandler.addButton(button);
@@ -59,7 +59,4 @@ public class KeyEvent {
 
 
 
-    public boolean isCustomGui(Screen screen){
-        return screen.getClass().getSimpleName().equals("ScreenNewTitle") || screen.getClass().getSimpleName().equals("ScreenUserCustom");
-    }
 }

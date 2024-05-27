@@ -19,9 +19,11 @@ public class SwingHandler {
             selectSwing.dispose();
         if(customWidgetWrapper instanceof WidgetImageWrapper widgetImage ) {
             selectSwing = new SwingImage(widgetImage);
+            updateSwingData();
         }
         else if(customWidgetWrapper instanceof WidgetButtonWrapper widgetButton){
             selectSwing = new SwingButton(widgetButton);
+            updateSwingData();
         }
         else if(customWidgetWrapper == null) {
             if (selectSwing != null) {
@@ -29,7 +31,7 @@ public class SwingHandler {
                 selectSwing = null;
             }
         }
-        updateSwingData();
+
     }
     public boolean isSwingOpen(){
         return swingButton != null || swingImage != null;

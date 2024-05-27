@@ -9,9 +9,14 @@ import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 
-//한 스크린의 위젯들을 관리하는 클래스
+/*
+    한 스크린의 위젯들을 관리하는 클래스
+    위젯을 추가하거나 특정 위젯을 가져오려 할 때 여기서 가져옴
+ */
 public class WidgetHandler {
     private Screen screen;
+    private ArrayList<WidgetButtonWrapper> widgetDefaultButtonList = new ArrayList<>();
+
     private ArrayList<WidgetButtonWrapper> widgetButtonList = new ArrayList<>();
     private ArrayList<WidgetImageWrapper> widgetImageList = new ArrayList<>();
 
@@ -28,6 +33,9 @@ public class WidgetHandler {
         }
     }
 
+    public ArrayList<WidgetButtonWrapper> getWidgetDefaultButtonList() {
+        return widgetDefaultButtonList;
+    }
 
     public ArrayList<WidgetButtonWrapper> getWidgetButtonList() {
         return widgetButtonList;
@@ -40,19 +48,19 @@ public class WidgetHandler {
     public void loadDefaultWidgets(){
         for(int i = 0; i < screen.children().size();i++){
             AbstractWidget widget = (AbstractWidget) screen.children().get(i);
-            widgetButtonList.add(new WidgetButtonWrapper(widget));
+            widgetDefaultButtonList.add(new WidgetButtonWrapper(widget));
+
         }
+        widgetButtonList.addAll(widgetDefaultButtonList);
     }
 
     public void addTextfield(WidgetButtonWrapper data){
-        //TODO
         widgetButtonList.add(data);
         ICustomRenderable customRenderable = (ICustomRenderable) screen ;
         customRenderable.addRenderableWidget(data.getWidget());
     }
 
     public void addButton(WidgetButtonWrapper data){
-        //TODO
         widgetButtonList.add(data);
         ICustomRenderable customRenderable = (ICustomRenderable) screen ;
         customRenderable.addRenderableWidget(data.getWidget());

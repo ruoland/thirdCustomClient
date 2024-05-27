@@ -1,24 +1,30 @@
 package com.example;
 
+import com.example.gui.event.ImageWidgetEvent;
 import com.example.wrapper.*;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.common.NeoForge;
+
+import javax.swing.*;
+import java.nio.file.Path;
 
 public class ScreenFlow {
     private Screen screen;
     private String screenName;
     private CustomScreenData data;
+
     private SwingHandler swingHandler = new SwingHandler();
-    private WidgetHandler widgetHandler;
-    private SelectWidgetHandler selectWidgetHandler;
+    private WidgetHandler widgetHandler ;//loadScreenData 메서드에서 초기화됨
+    private SelectWidgetHandler selectWidgetHandler = new SelectWidgetHandler();
 
     ScreenFlow(){
-        widgetHandler = new WidgetHandler(screen);
+
     }
 
     public WidgetHandler getScreenWidgets() {
         return widgetHandler;
     }
-
 
     public SelectWidgetHandler getSelectWidget() {
         return selectWidgetHandler;
@@ -36,7 +42,8 @@ public class ScreenFlow {
     }
 
     public void save(){
-        data.save();;
+        if(data != null)
+            data.save();
     }
 
 
@@ -45,12 +52,15 @@ public class ScreenFlow {
      * 왜냐면 초기화 메서드 호출 이전에 이 메서드 호출시 기본 GUI 위젯을 불러올 수 없음
      */
     public void loadScreenData(){
-        data = new CustomScreenData(screen, this, screenName);
+        data = new CustomScreenData(this, screenName);
         data.initFiles(); //기본 파일 생성
+        widgetHandler = new WidgetHandler(screen);
         if(!screen.children().isEmpty())
             widgetHandler.loadDefaultWidgets();
         data.loadCustomWidgets();
         widgetHandler.makeCustomButtons();
+        if(screen instanceof ICustomBackground background)//백그라운드 설정 가능한 GUI라면
+            background.setBackground(new ResourceLocation(data.background));
     }
 
 
@@ -60,20 +70,45 @@ public class ScreenFlow {
         {
             if(buttonWrapper.isMouseOver(mouseX, mouseY)){
                 clickedWidget = buttonWrapper;
+                System.out.println(buttonWrapper +"  - 클릭됨");
             }
         }
-
         for(WidgetImageWrapper imageWrapper : widgetHandler.getWidgetImageList())
         {
             if(imageWrapper.isMouseOver(mouseX, mouseY)){
                 clickedWidget = imageWrapper;
             }
         }
-
+        System.out.println(clickedWidget +"  - 클릭됨");
         selectWidgetHandler.selectWidget(clickedWidget);
         swingHandler.openSwing(clickedWidget);
     }
     public void dragWidget(double mouseX, double mouseY){
-        selectWidgetHandler.addSelectWidth();
+        selectWidgetHandler.setPosition((int) mouseX, (int) mouseY);
     }
+
+    public void fileDropEvent(Path path){
+        ResourceLocation resourceLocation = ScreenAPI.getDynamicTexture(path);
+        if(resourceLocation == null) {
+            return;
+        }
+        int select = JOptionPane.showOptionDialog(null, "어떤 걸로 설정할까요?", "이미지 불러오기", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]{"배경화면", "이미지", "취소"}, "취소");
+        switch (select) {
+            case JOptionPane.YES_OPTION -> {
+                data.dynamicBackground = resourceLocation.toString();
+                data.setBackground("customclient:"+ path.getFileName().toString());
+                if(screen instanceof ICustomBackground background)//백그라운드 설정 가능한 GUI라면
+                    background.setBackground(new ResourceLocation(data.background));
+            }
+            case JOptionPane.NO_OPTION -> {
+            }
+        }
+        if(select == JOptionPane.YES_OPTION)
+            NeoForge.EVENT_BUS.post(new ImageWidgetEvent.Background(screen, resourceLocation, path));
+        else {
+            WidgetImageWrapper image = new WidgetImageWrapper(resourceLocation, path.getFileName().toString(), 0, 0, screen.width, screen.height, 1);
+            widgetHandler.addImage(image);
+        }
+    }
+
 }

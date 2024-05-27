@@ -11,7 +11,7 @@ public class WidgetImageWrapper extends CustomWidgetWrapper {
         private String resource;
         private boolean isVisible = true;
 
-        WidgetImageWrapper(ResourceLocation resourceLocation, String fileName, int x, int y, int width, int height, float alpha){
+        public WidgetImageWrapper(ResourceLocation resourceLocation, String fileName, int x, int y, int width, int height, float alpha){
             setX(x);
             setY(y);
             setWidth(width);

@@ -30,27 +30,6 @@ public class ScreenAPI {
         pGuiGraphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
-    public static void fileDrops(Screen screen, Path pPacks){
-        ResourceLocation resourceLocation = ScreenAPI.getDynamicTexture(pPacks);
-        if(resourceLocation == null) {
-            return;
-        }
-        int select = JOptionPane.showOptionDialog(null, "어떤 걸로 설정할까요?", "이미지 불러오기", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]{"배경화면", "이미지", "취소"}, "취소");
-        switch (select) {
-            case JOptionPane.YES_OPTION -> {
-                guiData.dynamicBackground = resourceLocation.toString();
-                guiData.background = "customclient:"+ pPacks.getFileName().toString();
-            }
-            case JOptionPane.NO_OPTION -> {
-            }
-        }
-        if(select == JOptionPane.YES_OPTION)
-            NeoForge.EVENT_BUS.post(new ImageWidgetEvent.Background(screen, resourceLocation, pPacks));
-        else {
-            WidgetImage image =new WidgetImage(resourceLocation, pPacks.getFileName().toString(), 0, 0, screen.width, screen.height, 1);
-
-        }
-    }
     public static ResourceLocation getDynamicTexture(Path dropFile){
 
         try {

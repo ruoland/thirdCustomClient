@@ -14,8 +14,11 @@ public class SelectWidgetHandler {
     }
 
     public void selectWidget(@Nullable CustomWidgetWrapper customWidgetWrapper) {
-        if(this.selectWidget == customWidgetWrapper.getWidget())
+        if(customWidgetWrapper == null || this.selectWidget == customWidgetWrapper.getWidget()) {
+            if(customWidgetWrapper == null)
+                selectWidget = null;
             return;
+        }
         this.selectWidget = customWidgetWrapper.getWidget();
         lastSelectWidget = customWidgetWrapper.getWidget();
     }
@@ -28,5 +31,8 @@ public class SelectWidgetHandler {
         lastSelectWidget.setHeight(lastSelectWidget.getHeight() + i);
     }
 
-    dra
+    public boolean hasSelectWidget(){
+        return selectWidget != null;
+    }
+
 }

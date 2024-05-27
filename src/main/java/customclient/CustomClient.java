@@ -1,7 +1,10 @@
 package customclient;
 
 
+import com.example.event.CustomScreenEvent;
 import com.example.event.KeyEvent;
+import com.example.event.ScreenMouseEvent;
+import com.example.event.TitleInitEvent;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -33,6 +36,9 @@ public class CustomClient
     {
         modEventBus.addListener(this::commonSetup);
         NeoForge.EVENT_BUS.register(new KeyEvent());
+        NeoForge.EVENT_BUS.register(new CustomScreenEvent());
+        NeoForge.EVENT_BUS.register(new ScreenMouseEvent());
+        NeoForge.EVENT_BUS.register(new TitleInitEvent());
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
 
     }

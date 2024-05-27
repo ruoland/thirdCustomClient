@@ -10,7 +10,6 @@ public class WidgetButtonWrapper extends CustomWidgetWrapper {
 
         public WidgetButtonWrapper(AbstractWidget widget){
             super(widget);
-
             dataUpdate();
         }
 

@@ -7,6 +7,7 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import customclient.CustomClient;
 import net.minecraft.resources.ResourceLocation;
 
@@ -23,12 +24,11 @@ public class CustomScreenData {
     private final WidgetHandler widgetHandler;
     private final JsonObject widgetObject = new JsonObject();
 
-    protected String background = "customclient:textures/screenshot.png";
+    protected String background = "customclient:textures/screenshot.png", dynamicBackground;
     private Path screenDataPath;
 
 
     public CustomScreenData(ScreenFlow screenFlow, String screenName){
-
         this.screenFlow = screenFlow;
         this.widgetHandler = screenFlow.getScreenWidgets();
         screenDataPath = Path.of("./customclient/").resolve(screenName+".json");
@@ -43,11 +43,14 @@ public class CustomScreenData {
      */
     public void initFiles(){
         Path customClient = Path.of("./customclient");
+
+        System.out.println("사이즈" + widgetObject.size());
         try {
             if(!Files.exists(customClient))
                 Files.createDirectories(customClient);
             if(!Files.exists(screenDataPath))
-                Files.writeString(screenDataPath, GSON.toJson(widgetObject.isEmpty() ? getWidgetHandler().getWidgetButtonList() : widgetObject));
+                Files.writeString(screenDataPath, GSON.toJson(widgetObject));
+
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -55,6 +58,7 @@ public class CustomScreenData {
     public void save(){
         try {
             widgetObject.addProperty("background", background);
+            widgetObject.add("widgetDefaultButton", GSON.toJsonTree(getWidgetHandler().getWidgetDefaultButtonList()));
             widgetObject.add("widgetButton", GSON.toJsonTree(getWidgetHandler().getWidgetButtonList()));
             widgetObject.add("widgetImage", GSON.toJsonTree(getWidgetHandler().getWidgetImageList()));
             Files.writeString(screenDataPath, GSON.toJson(widgetObject));
@@ -70,13 +74,15 @@ public class CustomScreenData {
     public void loadCustomWidgets(){
         try {
             String json = new String(Files.readAllBytes(screenDataPath));
-            if(json.equals("[]"))
+            if(json.equals("[]") || json.equals("{}"))
                 return;
             JsonObject jsonObject = GSON.fromJson(json, JsonObject.class);
-
+            System.out.println("사이즈 "+jsonObject.get("widgetImage").getAsJsonArray().size());
             setBackground(jsonObject.get("background").getAsString());
+
             widgetHandler.getWidgetButtonList().addAll(GSON.fromJson(jsonObject.get("widgetButton"), new TypeToken<ArrayList<WidgetButtonWrapper>>(){}.getType()));
-            widgetHandler.getWidgetImageList().add(GSON.fromJson(jsonObject.get("widgetImage"), new TypeToken<ArrayList<WidgetImageWrapper>>(){}.getType()));
+            if(!jsonObject.get("widgetImage").getAsJsonArray().isEmpty())
+                widgetHandler.getWidgetImageList().add(GSON.fromJson(jsonObject.get("widgetImage"), new TypeToken<ArrayList<WidgetImageWrapper>>(){}.getType()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -8,9 +8,11 @@ import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.NeoForge;
 
+import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -19,22 +21,22 @@ public class ScreenNewTitle extends TitleScreen implements ICustomBackground, IC
     protected ResourceLocation BACKGROUND_IMAGE = new ResourceLocation(CustomClient.MODID, "textures/screenshot.png");
 
     public ScreenNewTitle(){
+        try {
+            System.out.println(getClass().getSuperclass().getSuperclass());
+            Field field = getClass().getSuperclass().getSuperclass().getDeclaredField("title");
+            field.setAccessible(true);
+            field.set(this, Component.literal("ScreenNewTitle"));
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         System.setProperty("java.awt.headless", "false");
     }
-    @Override
-    public void onFilesDrop(List<Path> pPacks) {
-        super.onFilesDrop(pPacks);
-        if(!NeoForge.EVENT_BUS.post(new FilesDropEvent(this, pPacks.get(0))).isCanceled()) {
-            ScreenAPI.fileDrops(this, pPacks.get(0));
 
-        }
-
-    }
 
     @Override
     protected void init() {
         super.init();
-
     }
 
     @Override
@@ -62,7 +64,7 @@ public class ScreenNewTitle extends TitleScreen implements ICustomBackground, IC
     }
 
     public boolean hasBackground(){
-        return (BACKGROUND_IMAGE != GuiData.DEFAULT_BACKGROUND_IMAGE);
+        return (BACKGROUND_IMAGE != CustomScreenMod.DEFAULT_BACKGROUND_IMAGE);
     }
 
 
