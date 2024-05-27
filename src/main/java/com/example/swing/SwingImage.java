@@ -1,27 +1,21 @@
-package com.example;
+package com.example.swing;
 
 
-import com.mojang.blaze3d.platform.Window;
-import net.minecraft.client.Minecraft;
+import com.example.wrapper.CustomWidgetWrapper;
 
 import javax.swing.*;
-import javax.swing.text.NumberFormatter;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
 public class SwingImage extends SwingCustom {
     private JTextField nameField = new JTextField(20);
 
-    protected GuiData.WidgetImage widgetImage;
+    public CustomWidgetWrapper.WidgetImageWrapper widgetImage;
 
-    SwingImage(GuiData.WidgetImage widgetImage){
+    public SwingImage(CustomWidgetWrapper.WidgetImageWrapper widgetImage){
         super(widgetImage, "이미지 설정");
 
         this.widgetImage = widgetImage;
-        nameField.setText(widgetImage.texture);
+        nameField.setText(widgetImage.getResource().toString());
 
         setFocusableWindowState(false);
         setVisible(true);

@@ -1,5 +1,6 @@
-package com.example;
+package com.example.swing;
 
+import com.example.wrapper.CustomWidgetWrapper;
 import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
 
@@ -20,25 +21,25 @@ public abstract class SwingCustom extends JFrame implements KeyListener, ActionL
     protected JButton visibleButton = new JButton("버튼 표시: 켜짐");
     protected JComboBox<String> actionComboBox = new JComboBox<String>();
 
-    protected NewWidget guiButton;
-    SwingCustom(NewWidget guiButton, String title){
+    protected CustomWidgetWrapper customWidgetWrapper;
+    SwingCustom(CustomWidgetWrapper customWidgetWrapper, String title){
         setTitle(title);
         setSize(500, 200);
         Window window = Minecraft.getInstance().getWindow();
         setLocation(window.getX() - 400, window.getY());
         setLayout(new FlowLayout(FlowLayout.LEADING));
 
-        this.guiButton = guiButton;
+        this.customWidgetWrapper = customWidgetWrapper;
         nameField.addKeyListener(this);
-        nameField.setText(guiButton.abstractWidget.getMessage().getString());
+        nameField.setText(customWidgetWrapper.getMessage());
         xField.addKeyListener(this);
-        xField.setText(guiButton.x+"");
+        xField.setText(customWidgetWrapper.getX()+"");
         yField.addKeyListener(this);
-        yField.setText(guiButton.y+"");
+        yField.setText(customWidgetWrapper.getY()+"");
         widthField.addKeyListener(this);
-        widthField.setText(guiButton.width+"");
+        widthField.setText(customWidgetWrapper.getWidth()+"");
         heightField.addKeyListener(this);
-        heightField.setText(guiButton.height+"");
+        heightField.setText(customWidgetWrapper.getHeight()+"");
         visibleButton.addActionListener(this);
 
         actionField.addKeyListener(this);
@@ -70,15 +71,9 @@ public abstract class SwingCustom extends JFrame implements KeyListener, ActionL
     @Override
     public void keyTyped(KeyEvent e) {
         if (e.getSource() == nameField) {
-            guiButton.setMessage(nameField.getText());
+            customWidgetWrapper.setMessage(nameField.getText());
             return;
         }
-        if(e.getExtendedKeyCode() == KeyEvent.VK_ESCAPE)
-        {
-            dispose();
-            ScreenAPI.setSelectWidget(null);
-        }
-
     }
 
 
@@ -88,19 +83,19 @@ public abstract class SwingCustom extends JFrame implements KeyListener, ActionL
         if (e.getKeyChar() != KeyEvent.CHAR_UNDEFINED && !e.isActionKey() && (e.getKeyChar() == KeyEvent.VK_BACK_SPACE || checkNumber(e.getKeyChar()))) {
             if (e.getSource() == xField) {
                 if(!xField.getText().isEmpty())
-                    guiButton.setX(Integer.parseInt(xField.getText()));
+                    customWidgetWrapper.setX(Integer.parseInt(xField.getText()));
             }
             if (e.getSource() == yField) {
                 if(!yField.getText().isEmpty())
-                    guiButton.setY(Integer.parseInt(yField.getText()));
+                    customWidgetWrapper.setY(Integer.parseInt(yField.getText()));
             }
             if (e.getSource() == widthField) {
                 if(!widthField.getText().isEmpty())
-                    guiButton.setWidth(Integer.parseInt(widthField.getText()));
+                    customWidgetWrapper.setWidth(Integer.parseInt(widthField.getText()));
             }
             if (e.getSource() == heightField) {
                 if(!heightField.getText().isEmpty())
-                    guiButton.setHeight(Integer.parseInt(heightField.getText()));
+                    customWidgetWrapper.setHeight(Integer.parseInt(heightField.getText()));
             }
 
         } else {
@@ -109,10 +104,10 @@ public abstract class SwingCustom extends JFrame implements KeyListener, ActionL
     }
 
     public void update(){
-        xField.setText(""+guiButton.getX());
-        yField.setText(""+guiButton.getY());
-        widthField.setText(""+guiButton.getWidth());
-        heightField.setText(""+guiButton.getHeight());
+        xField.setText(""+ customWidgetWrapper.getX());
+        yField.setText(""+ customWidgetWrapper.getY());
+        widthField.setText(""+ customWidgetWrapper.getWidth());
+        heightField.setText(""+ customWidgetWrapper.getHeight());
     }
 
     public boolean checkNumber(char key){
@@ -127,8 +122,8 @@ public abstract class SwingCustom extends JFrame implements KeyListener, ActionL
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == visibleButton) {
-            guiButton.setVisible(!guiButton.isVisible());
-            visibleButton.setText(guiButton.isVisible() ? "버튼 표시: 켜짐" : "버튼 표시: 꺼짐");
+            customWidgetWrapper.setVisible(!customWidgetWrapper.isVisible());
+            visibleButton.setText(customWidgetWrapper.isVisible() ? "버튼 표시: 켜짐" : "버튼 표시: 꺼짐");
         }
 
     }
@@ -141,6 +136,6 @@ public abstract class SwingCustom extends JFrame implements KeyListener, ActionL
             comboBox.append(actionField.getText());
         }
 
-        guiButton.setAction(comboBox.toString());
+        customWidgetWrapper.setAction(comboBox.toString());
     }
 }

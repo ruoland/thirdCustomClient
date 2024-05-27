@@ -1,26 +1,27 @@
-package com.example;
+package com.example.wrapper;
 
+import com.example.ScreenNewTitle;
+import customclient.FakeTextureWidget;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 
-public abstract class NewWidget {
-    protected int id = 0;
-    protected transient AbstractWidget abstractWidget;
-    protected int x, y, width, height, color;
-    protected String texture, message;
-    protected float alpha = 1;
-    protected boolean visible = true, lock = false;
+public abstract class CustomWidgetWrapper {
+    private transient AbstractWidget abstractWidget;
+    private int x, y, width, height, color;
+    private String texture, message;
+    private float alpha = 1;
+    private boolean visible = true, lock = false;
     private String action;
 
-    public NewWidget() {
+    public CustomWidgetWrapper() {
     }
 
-    NewWidget(AbstractWidget widget) {
+    CustomWidgetWrapper(AbstractWidget widget) {
         this.abstractWidget = widget;
         abstractWidget.active =true;
-    }
-    public void setID(int ID) {
-        this.id = ID;
+        update();
     }
 
     public int getColor() {
@@ -102,10 +103,6 @@ public abstract class NewWidget {
         return alpha;
     }
 
-    public int getID() {
-        return id;
-    }
-
     public void update(){
         this.setPosition(x, y);
         this.setHeight(height);
@@ -115,7 +112,7 @@ public abstract class NewWidget {
     }
     public boolean isMouseOver(double mouseX, double mouseY ){
         if(abstractWidget ==null)
-            return true;
+            return false;
         return abstractWidget.isMouseOver(mouseX, mouseY);
     }
     public boolean canSelectByMouse(double mouseX, double mouseY ){
@@ -151,8 +148,7 @@ public abstract class NewWidget {
     }
     @Override
     public String toString() {
-        return "NewWidget{" +
-                "id=" + id +
+        return "CustomWidgetWrapper{" +
                 ", x=" + x +
                 ", y=" + y +
                 ", width=" + width +
@@ -163,5 +159,78 @@ public abstract class NewWidget {
                 ", visible=" + visible +
                 ", lock=" + lock +
                 '}';
+    }
+
+    public static class WidgetImageWrapper extends CustomWidgetWrapper {
+        private transient ResourceLocation resourceLocation;
+        private String resource;
+        private boolean isVisible = true;
+
+        WidgetImageWrapper(ResourceLocation resourceLocation, String fileName, int x, int y, int width, int height, float alpha){
+            setX(x);
+            setY(y);
+            setWidth(width);
+            setHeight(height);
+            this.resource = fileName;
+            this.resourceLocation = resourceLocation;
+            setAlpha(alpha);
+            createFakeWidget();
+        }
+
+        public ResourceLocation getResource() {
+            return resourceLocation == null ? resourceLocation = new ResourceLocation("customclient", resource) : resourceLocation;
+        }
+
+
+        protected void render(GuiGraphics pGuiGraphics) {
+            if(isVisible)
+                ScreenNewTitle.renderTexture(pGuiGraphics, getResource(), getX(), getY(), getWidth(), getHeight(), getAlpha());
+        }
+
+        public FakeTextureWidget createFakeWidget(){
+            if(getAbstractWidget() == null) {
+                FakeTextureWidget fakeTextureWidget = new FakeTextureWidget(getX(), getY(), getWidth(), getHeight(), Component.literal(resource));
+                setAbstractWidget(fakeTextureWidget);
+            }
+            return (FakeTextureWidget) getAbstractWidget();
+
+        }
+
+    }
+    public static class WidgetButtonWrapper extends CustomWidgetWrapper {
+        protected boolean isTextField = false;
+
+        public WidgetButtonWrapper(AbstractWidget widget){
+            super(widget);
+
+            dataUpdate();
+        }
+
+        public void dataUpdate(){
+            x = abstractWidget.getX();
+            y = abstractWidget.getY();
+            width = abstractWidget.getWidth();
+            height = abstractWidget.getHeight();
+            visible = abstractWidget.visible;
+            message = abstractWidget.getMessage().getString();
+        }
+
+        /**
+         * 위젯에 불러온 정보를 부여함
+         */
+
+        public void loadToMCWidget(){
+            abstractWidget.setX(x);
+            abstractWidget.setY(y);
+            abstractWidget.setWidth(width);
+            abstractWidget.setHeight(height);
+            abstractWidget.visible = visible;
+            abstractWidget.setMessage(Component.literal(message));
+        }
+
+
+        public boolean isTextField() {
+            return isTextField;
+        }
     }
 }

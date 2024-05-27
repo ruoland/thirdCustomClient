@@ -1,19 +1,19 @@
-package com.example;
+package com.example.swing;
 
 
 
+import com.example.wrapper.CustomWidgetWrapper;
+import com.example.ScreenAPI;
+import com.example.ScreenUserCustom;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
-import net.minecraft.client.gui.screens.worldselection.EditWorldScreen;
 import net.minecraft.network.chat.Component;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 
 public class SwingCustomGUI extends JFrame implements ActionListener {
     private ScreenUserCustom screenUserCustom;
@@ -52,7 +52,7 @@ public class SwingCustomGUI extends JFrame implements ActionListener {
             fileChooser.showOpenDialog(this);
         }
         if(e.getSource() == mcButtonButton){
-            ScreenAPI.addButton(new GuiData.WidgetData(new Button.Builder(Component.literal("ㅌ테스트"), new Button.OnPress() {
+            ScreenAPI.addButton(new CustomWidgetWrapper.WidgetButtonWrapper(new Button.Builder(Component.literal("ㅌ테스트"), new Button.OnPress() {
                 @Override
                 public void onPress(Button pButton) {
 

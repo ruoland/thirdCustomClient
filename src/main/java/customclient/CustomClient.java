@@ -1,7 +1,7 @@
 package customclient;
 
 
-import com.example.RemakeEvent;
+import com.example.event.KeyEvent;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -32,7 +32,7 @@ public class CustomClient
     public CustomClient(IEventBus modEventBus, ModContainer modContainer)
     {
         modEventBus.addListener(this::commonSetup);
-        NeoForge.EVENT_BUS.register(new RemakeEvent());
+        NeoForge.EVENT_BUS.register(new KeyEvent());
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
 
     }
