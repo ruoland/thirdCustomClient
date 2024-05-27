@@ -1,5 +1,8 @@
-package com.example;
+package com.example.screen;
 
+import com.example.ICustomBackground;
+import com.example.ICustomRenderable;
+import com.example.ScreenAPI;
 import com.example.gui.event.FilesDropEvent;
 import com.mojang.blaze3d.systems.RenderSystem;
 import customclient.CustomClient;

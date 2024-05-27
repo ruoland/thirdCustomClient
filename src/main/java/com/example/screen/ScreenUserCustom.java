@@ -1,5 +1,7 @@
-package com.example;
+package com.example.screen;
 
+import com.example.ICustomRenderable;
+import com.example.ScreenAPI;
 import com.example.gui.event.FilesDropEvent;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -10,7 +12,7 @@ import net.neoforged.neoforge.common.NeoForge;
 import java.nio.file.Path;
 import java.util.List;
 
-public class ScreenUserCustom extends ScreenCustom implements ICustomRenderable{
+public class ScreenUserCustom extends ScreenCustom implements ICustomRenderable {
     protected ScreenUserCustom(Component pTitle) {
         super(pTitle);
         ScreenAPI.setGui(this, getTitle().getString());
