@@ -1,8 +1,5 @@
-package com.example.screen;
+package com.example;
 
-import com.example.ICustomBackground;
-import com.example.swing.SwingCustom;
-import com.example.wrapper.WidgetHandler;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -10,14 +7,11 @@ import net.minecraft.resources.ResourceLocation;
 import java.nio.file.Path;
 import java.util.List;
 
-public class ScreenCustom extends Screen implements ICustomBackground {
+public class ScreenCustom extends Screen implements ICustomBackground{
     private ResourceLocation BACKGROUND_IMAGE = new ResourceLocation("customclient", "textures/screenshot.png");
     private String backgroundFileName;
-
-    private SwingCustom selectSwing;
     protected ScreenCustom(Component pTitle) {
         super(pTitle);
-
     }
 
     @Override

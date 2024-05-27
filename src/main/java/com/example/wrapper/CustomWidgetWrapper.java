@@ -1,18 +1,14 @@
 package com.example.wrapper;
 
-import com.example.screen.ScreenNewTitle;
-import com.example.swing.SwingButton;
-import com.example.swing.SwingImage;
+import com.example.ScreenNewTitle;
 import customclient.FakeTextureWidget;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.Nullable;
 
 public abstract class CustomWidgetWrapper {
     private transient AbstractWidget abstractWidget;
-    private WidgetHandler handler;
     private int x, y, width, height, color;
     private String texture, message;
     private float alpha = 1;
@@ -20,7 +16,6 @@ public abstract class CustomWidgetWrapper {
     private String action;
 
     public CustomWidgetWrapper() {
-        handler = new WidgetHandler(this);
     }
 
     CustomWidgetWrapper(AbstractWidget widget) {
@@ -65,11 +60,6 @@ public abstract class CustomWidgetWrapper {
         abstractWidget.setHeight(height);
     }
 
-    public void setSize(int width, int height)
-    {
-        setWidth(width);
-        setHeight(height);
-    }
     public void setPosition(int x, int y){
         this.x = x;
         this.y = y;
@@ -243,50 +233,4 @@ public abstract class CustomWidgetWrapper {
             return isTextField;
         }
     }
-
-    public class WidgetHandler {
-        private CustomWidgetWrapper selectWidget, lastSelectWidget;
-
-
-        public WidgetHandler(CustomWidgetWrapper widget){
-            this.selectWidget = widget;
-            this.lastSelectWidget = widget;
-        }
-        public void setPosition(int x, int y){
-            selectWidget.setPosition(x,y);
-
-        }
-
-        public void setSize(int width, int height){
-            selectWidget.setSize(width, height);
-
-        }
-        public void updateSwingData(){
-
-            selectSwing.update();
-        }
-
-        public void selectWidget(@Nullable CustomWidgetWrapper customWidgetWrapper) {
-            if(this.selectWidget == customWidgetWrapper.getAbstractWidget())
-                return;
-
-            this.selectWidget = customWidgetWrapper.getAbstractWidget();
-            lastSelectWidget = customWidgetWrapper.getAbstractWidget();
-            openSwing(customWidgetWrapper);
-
-        }
-
-        public void openSwing(CustomWidgetWrapper customWidgetWrapper){
-            if(selectSwing != null)
-                selectSwing.dispose();
-            if(customWidgetWrapper instanceof CustomWidgetWrapper.WidgetImageWrapper widgetImage ) {
-                selectSwing = new SwingImage(widgetImage);
-            }
-            if(customWidgetWrapper instanceof CustomWidgetWrapper.WidgetButtonWrapper widgetButton){
-                selectSwing = new SwingButton(widgetButton);
-            }
-            updateSwingData();
-        }
-
-
 }

@@ -1,7 +1,7 @@
 package com.example.event;
 
 import com.example.ScreenAPI;
-import com.example.screen.ScreenNewTitle;
+import com.example.ScreenNewTitle;
 import net.minecraft.client.gui.screens.Screen;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;

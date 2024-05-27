@@ -4,7 +4,7 @@ package com.example.swing;
 
 import com.example.wrapper.CustomWidgetWrapper;
 import com.example.ScreenAPI;
-import com.example.screen.ScreenUserCustom;
+import com.example.ScreenUserCustom;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
