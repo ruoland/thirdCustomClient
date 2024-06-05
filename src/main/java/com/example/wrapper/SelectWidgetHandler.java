@@ -4,9 +4,15 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import org.jetbrains.annotations.Nullable;
 
 public class SelectWidgetHandler {
-    private AbstractWidget selectWidget, lastSelectWidget;
+    private CustomWidgetWrapper selectWidget;
+    private CustomWidgetWrapper lastSelectWidget;
+
+    public SelectWidgetHandler(CustomWidgetWrapper widgetWrapper){
+        this.selectWidget = widgetWrapper;
+    }
     public void setPosition(int x, int y){
         selectWidget.setPosition(x,y);
+        System.out.println(selectWidget.getMessage() +"  - "+selectWidget.getX() + " -"+selectWidget.getY());
     }
 
     public void setSize(int width, int height){
@@ -14,13 +20,13 @@ public class SelectWidgetHandler {
     }
 
     public void selectWidget(@Nullable CustomWidgetWrapper customWidgetWrapper) {
-        if(customWidgetWrapper == null || this.selectWidget == customWidgetWrapper.getWidget()) {
+        if(customWidgetWrapper == null || this.selectWidget == customWidgetWrapper) {
             if(customWidgetWrapper == null)
                 selectWidget = null;
             return;
         }
-        this.selectWidget = customWidgetWrapper.getWidget();
-        lastSelectWidget = customWidgetWrapper.getWidget();
+        this.selectWidget = customWidgetWrapper;
+        lastSelectWidget = customWidgetWrapper;
     }
 
     public void addSelectWidth(int i){
@@ -31,8 +37,15 @@ public class SelectWidgetHandler {
         lastSelectWidget.setHeight(lastSelectWidget.getHeight() + i);
     }
 
-    public boolean hasSelectWidget(){
-        return selectWidget != null;
+    public String getMessage(){
+        return selectWidget.getMessage();
     }
 
+    @Override
+    public String toString() {
+        return "SelectWidgetHandler{" +
+                "selectWidget=" + selectWidget +
+                ", lastSelectWidget=" + lastSelectWidget +
+                '}';
+    }
 }

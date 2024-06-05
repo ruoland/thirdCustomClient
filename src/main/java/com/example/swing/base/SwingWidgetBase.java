@@ -1,4 +1,4 @@
-package com.example.swing;
+package com.example.swing.base;
 
 import com.example.wrapper.CustomWidgetWrapper;
 import com.mojang.blaze3d.platform.Window;
@@ -11,7 +11,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-public abstract class SwingCustom extends JFrame implements KeyListener, ActionListener {
+public abstract class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener, ActionListener {
     protected JTextField nameField = new JTextField(20);
     protected JTextField actionField = new JTextField(20);
     protected JTextField xField = new JTextField(4);
@@ -22,7 +22,7 @@ public abstract class SwingCustom extends JFrame implements KeyListener, ActionL
     protected JComboBox<String> actionComboBox = new JComboBox<String>();
 
     protected CustomWidgetWrapper customWidgetWrapper;
-    SwingCustom(CustomWidgetWrapper customWidgetWrapper, String title){
+    public SwingWidgetBase(CustomWidgetWrapper customWidgetWrapper, String title){
         setTitle(title);
         setSize(500, 200);
         Window window = Minecraft.getInstance().getWindow();
@@ -72,7 +72,6 @@ public abstract class SwingCustom extends JFrame implements KeyListener, ActionL
     public void keyTyped(KeyEvent e) {
         if (e.getSource() == nameField) {
             customWidgetWrapper.setMessage(nameField.getText());
-            return;
         }
     }
 

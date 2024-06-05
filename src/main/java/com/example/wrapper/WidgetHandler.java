@@ -29,7 +29,8 @@ public class WidgetHandler {
      */
     public void update(){
         for(int i = 0; i < widgetButtonList.size(); i++){
-
+            WidgetButtonWrapper buttonWrapper = widgetButtonList.get(i);
+            buttonWrapper.update();
         }
     }
 
@@ -46,11 +47,12 @@ public class WidgetHandler {
     }
 
     public void loadDefaultWidgets(){
+
         for(int i = 0; i < screen.children().size();i++){
             AbstractWidget widget = (AbstractWidget) screen.children().get(i);
             widgetDefaultButtonList.add(new WidgetButtonWrapper(widget));
-
         }
+
         widgetButtonList.addAll(widgetDefaultButtonList);
     }
 

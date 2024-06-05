@@ -1,29 +1,25 @@
-package com.example.swing;
+package com.example.swing.base;
 
 
 
-import com.example.wrapper.CustomWidgetWrapper;
-import com.example.ScreenAPI;
+import com.example.ICustomBackground;
 import com.example.ScreenUserCustom;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.network.chat.Component;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class SwingCustomGUI extends JFrame implements ActionListener {
-    private ScreenUserCustom screenUserCustom;
+public abstract class SwingCustomGuiBase extends JFrame implements ActionListener {
+
     private JButton fileSelectButton = new JButton("배경 파일 선택");
     private JButton addImageButton = new JButton("이미지 추가하기");
     private JButton mcButtonButton = new JButton("버튼 추가하기");
     private JButton addTextField = new JButton("텍스트필드 추가하기");
 
-    public SwingCustomGUI(ScreenUserCustom userCustom) {
-        this.screenUserCustom = userCustom;
+    public SwingCustomGuiBase() {
+
         setTitle("유저 스크린 설정");
         setSize(300, 200);
         setLocation(Minecraft.getInstance().getWindow().getX() - 300, Minecraft.getInstance().getWindow().getY());

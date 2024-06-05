@@ -28,9 +28,11 @@ public class ScreenMouseEvent {
         if(CustomScreenMod.hasScreen(opening.getScreen()) && CustomScreenMod.isEditMode()){
             int mouseX = (int) (opening.getMouseX() + opening.getDragX());
             int mouseY = (int) (opening.getMouseY() + opening.getDragY());
+
             ScreenFlow screenFlow = CustomScreenMod.getScreen(opening.getScreen());
-            if(screenFlow.getSelectWidget().hasSelectWidget())
-            screenFlow.dragWidget(mouseX, mouseY);
+            System.out.println("드래그 중?" + screenFlow.getSelectWidget());
+            if(screenFlow.hasSelectWidget())
+                screenFlow.dragWidget(mouseX, mouseY);
         }
 
     }
@@ -42,7 +44,7 @@ public class ScreenMouseEvent {
             if (CustomScreenMod.isEditMode()) {
                 event.setCanceled(true);
                 CustomScreenMod.getScreen(event.getScreen()).clickWidget(event.getMouseX(), event.getMouseY());
-                System.out.println("선택됨" + CustomScreenMod.getScreenName(event.getScreen()));
+                System.out.println("선택됨" +CustomScreenMod.getCurrentScreen());
             }
         }
     }
@@ -53,8 +55,9 @@ public class ScreenMouseEvent {
     @SubscribeEvent
     public void mouseClick(ScreenEvent.MouseButtonReleased.Post event){
         if(CustomScreenMod.hasScreen(event.getScreen())) {
-            System.out.println();
-            CustomScreenMod.getScreen(event.getScreen()).getSelectWidget().selectWidget(null);
+            ScreenFlow screenFlow = CustomScreenMod.getScreen(event.getScreen());
+            if(screenFlow.hasSelectWidget())
+                 screenFlow.reset();
         }
     }
 

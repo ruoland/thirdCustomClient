@@ -44,6 +44,7 @@ public class KeyEvent {
     public void editModeEvent(ScreenEvent.KeyPressed.Post event){
         if(CustomScreenMod.hasScreen(event.getScreen()) && event.getKeyCode() == GLFW.GLFW_KEY_LEFT_ALT) {
             CustomScreenMod.changeEditMode(event.getScreen());
+
         }
     }
     @SubscribeEvent

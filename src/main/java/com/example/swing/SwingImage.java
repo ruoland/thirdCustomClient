@@ -1,13 +1,14 @@
 package com.example.swing;
 
 
-import com.example.wrapper.CustomWidgetWrapper;
+import com.example.swing.base.ICustomSwing;
+import com.example.swing.base.SwingWidgetBase;
 import com.example.wrapper.WidgetImageWrapper;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
 
-public class SwingImage extends SwingCustom {
+public class SwingImage extends SwingWidgetBase implements ICustomSwing {
     private JTextField nameField = new JTextField(20);
 
     public WidgetImageWrapper widgetImage;

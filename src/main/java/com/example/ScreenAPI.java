@@ -31,11 +31,9 @@ public class ScreenAPI {
     }
 
     public static ResourceLocation getDynamicTexture(Path dropFile){
-
         try {
             NativeImage nativeImage = NativeImage.read(new FileInputStream(dropFile.toString()));
             DynamicTexture dynamicTexture = new DynamicTexture(nativeImage);
-
             return Minecraft.getInstance().getTextureManager().register("customclient", dynamicTexture);
         }
         catch (IOException e){

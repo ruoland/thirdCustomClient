@@ -1,14 +1,14 @@
 package com.example.swing;
 
 
-import com.example.wrapper.CustomWidgetWrapper;
+import com.example.swing.base.SwingWidgetBase;
 import com.example.wrapper.WidgetButtonWrapper;
 
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-public class SwingButton extends SwingCustom implements ActionListener, KeyListener {
+public class SwingButton extends SwingWidgetBase implements ActionListener, KeyListener {
   
 
     public SwingButton(WidgetButtonWrapper guiButton){

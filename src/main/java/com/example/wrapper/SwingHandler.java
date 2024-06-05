@@ -1,14 +1,17 @@
 package com.example.wrapper;
 
+import com.example.swing.SwingCustomGui;
+import com.example.swing.base.ICustomSwing;
 import com.example.swing.SwingButton;
-import com.example.swing.SwingCustom;
 import com.example.swing.SwingImage;
+import com.example.swing.base.SwingCustomGuiBase;
 
 public class SwingHandler {
     private SwingButton swingButton;
     private SwingImage swingImage;
+    private SwingCustomGuiBase swingGui;
 
-    private SwingCustom selectSwing;
+    private ICustomSwing selectSwing;
 
     public void updateSwingData(){
         selectSwing.update();
@@ -31,7 +34,10 @@ public class SwingHandler {
                 selectSwing = null;
             }
         }
+    }
 
+    public void openSwingGui(){
+        swingGui = new SwingCustomGui();
     }
     public boolean isSwingOpen(){
         return swingButton != null || swingImage != null;

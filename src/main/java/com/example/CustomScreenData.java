@@ -4,10 +4,7 @@ import com.example.wrapper.WidgetButtonWrapper;
 import com.example.wrapper.WidgetHandler;
 import com.example.wrapper.WidgetImageWrapper;
 import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import customclient.CustomClient;
 import net.minecraft.resources.ResourceLocation;
 
@@ -23,10 +20,9 @@ public class CustomScreenData {
     private final ScreenFlow screenFlow;
     private final WidgetHandler widgetHandler;
     private final JsonObject widgetObject = new JsonObject();
-
+    private JsonObject customObject = new JsonObject();
     protected String background = "customclient:textures/screenshot.png", dynamicBackground;
     private Path screenDataPath;
-
 
     public CustomScreenData(ScreenFlow screenFlow, String screenName){
         this.screenFlow = screenFlow;
@@ -38,13 +34,16 @@ public class CustomScreenData {
         return screenFlow.getScreenWidgets();
     }
 
+    public JsonObject getCustomObject() {
+        return customObject;
+    }
+
     /**
      * 데이터가 저장될 폴더를 만들고, 파일들 초기화
      */
     public void initFiles(){
         Path customClient = Path.of("./customclient");
 
-        System.out.println("사이즈" + widgetObject.size());
         try {
             if(!Files.exists(customClient))
                 Files.createDirectories(customClient);
@@ -61,6 +60,7 @@ public class CustomScreenData {
             widgetObject.add("widgetDefaultButton", GSON.toJsonTree(getWidgetHandler().getWidgetDefaultButtonList()));
             widgetObject.add("widgetButton", GSON.toJsonTree(getWidgetHandler().getWidgetButtonList()));
             widgetObject.add("widgetImage", GSON.toJsonTree(getWidgetHandler().getWidgetImageList()));
+            widgetObject.add("customObject", customObject);
             Files.writeString(screenDataPath, GSON.toJson(widgetObject));
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -72,17 +72,23 @@ public class CustomScreenData {
 
 
     public void loadCustomWidgets(){
+        System.out.println(widgetHandler);
         try {
             String json = new String(Files.readAllBytes(screenDataPath));
             if(json.equals("[]") || json.equals("{}"))
                 return;
             JsonObject jsonObject = GSON.fromJson(json, JsonObject.class);
-            System.out.println("사이즈 "+jsonObject.get("widgetImage").getAsJsonArray().size());
             setBackground(jsonObject.get("background").getAsString());
 
             widgetHandler.getWidgetButtonList().addAll(GSON.fromJson(jsonObject.get("widgetButton"), new TypeToken<ArrayList<WidgetButtonWrapper>>(){}.getType()));
             if(!jsonObject.get("widgetImage").getAsJsonArray().isEmpty())
                 widgetHandler.getWidgetImageList().add(GSON.fromJson(jsonObject.get("widgetImage"), new TypeToken<ArrayList<WidgetImageWrapper>>(){}.getType()));
+            if(jsonObject.has("customObject")) {
+                customObject = jsonObject.get("customObject").getAsJsonObject();
+            }else{
+                jsonObject.add("customObject", new JsonPrimitive(true));
+            }
+            System.out.println(screenFlow.getScreenName()+" 데이터 불러옴");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

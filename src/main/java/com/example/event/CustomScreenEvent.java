@@ -20,6 +20,7 @@ public class CustomScreenEvent {
             if (CustomScreenMod.isEditMode()) {
                 pGuiGraphics.drawString(mc.font, Component.literal("편집 모드 실행 중"), 0, 0, 0xFFFFFF, false);
             }
+            if(CustomScreenMod.getScreen(render.getScreen()).getScreenWidgets() != null)
             CustomScreenMod.getScreen(render.getScreen()).getScreenWidgets().renderImage(pGuiGraphics);
         }
     }

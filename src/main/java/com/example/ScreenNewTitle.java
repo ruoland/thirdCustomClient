@@ -4,6 +4,7 @@ import com.example.gui.event.FilesDropEvent;
 import com.mojang.blaze3d.systems.RenderSystem;
 import customclient.CustomClient;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
@@ -11,8 +12,10 @@ import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.NeoForge;
+import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -22,7 +25,7 @@ public class ScreenNewTitle extends TitleScreen implements ICustomBackground, IC
 
     public ScreenNewTitle(){
         try {
-            System.out.println(getClass().getSuperclass().getSuperclass());
+
             Field field = getClass().getSuperclass().getSuperclass().getDeclaredField("title");
             field.setAccessible(true);
             field.set(this, Component.literal("ScreenNewTitle"));
@@ -35,8 +38,8 @@ public class ScreenNewTitle extends TitleScreen implements ICustomBackground, IC
 
 
     @Override
-    protected void init() {
-        super.init();
+    public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
+        return super.mouseClicked(pMouseX, pMouseY, pButton);
     }
 
     @Override
@@ -68,6 +71,11 @@ public class ScreenNewTitle extends TitleScreen implements ICustomBackground, IC
     }
 
 
+    @Override
+    public void onFilesDrop(List<Path> pPacks) {
+        super.onFilesDrop(pPacks);
+        setBackground(ScreenAPI.getDynamicTexture(pPacks.get(0)));
+    }
 
     @Override
     public ResourceLocation getBackground() {

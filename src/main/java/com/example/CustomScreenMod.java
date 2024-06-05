@@ -1,6 +1,7 @@
 package com.example;
 
 import customclient.CustomClient;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 
@@ -13,6 +14,10 @@ public class CustomScreenMod {
     private static final LinkedHashMap<String, ScreenFlow> screenMap = new LinkedHashMap<>();
     private static String recntlyName;
     private static boolean editMode;
+    private static boolean mcLogoVisible = true;
+    public static ScreenFlow getCurrentScreen(){
+        return getScreen(Minecraft.getInstance().screen);
+    }
     public static ScreenFlow getScreen(Screen screen){
         return getScreen(screen.getTitle().getString());
     }
@@ -25,7 +30,6 @@ public class CustomScreenMod {
             ScreenFlow screenFlow = new ScreenFlow();
             screenFlow.setScreenName(name);
             screenMap.put(name, screenFlow);
-            System.out.println("경고 스크린 새로 만들었음. 만든 스크린:" + name +"  데이터가 제대로 로드 되었는지 확인할 것.");
             return screenMap.get(name);
         }
     }
@@ -48,22 +52,30 @@ public class CustomScreenMod {
         return null;
     }
 
+    public static boolean isLogoVisible() {
+        return mcLogoVisible;
+    }
+
+    public static void setLogoVisible(boolean mcLogoVisible) {
+        CustomScreenMod.mcLogoVisible = mcLogoVisible;
+    }
+
     public static ScreenFlow getRecntlyScreen() {
         return screenMap.get(recntlyName);
     }
 
     public static void changeEditMode(Screen screen){
         editMode = !editMode;
+
         ScreenFlow screenFlow = getScreen(screen);
         if(!editMode){ //편집 모드 종료, 파일 저장 후 스윙 정리
-
+            System.out.println("에디트 모드 변경");
             screenFlow.save();
             if(screenFlow.getSwingHandler().isSwingOpen())
                 screenFlow.getSwingHandler().swingClose();
         }
         else {//편집 모드 실행, GUI 데이터 불러옴
             screenFlow.loadScreenData();
-
         }
     }
     public static boolean isEditMode() {

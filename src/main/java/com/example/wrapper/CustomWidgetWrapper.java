@@ -17,7 +17,6 @@ public abstract class CustomWidgetWrapper {
     CustomWidgetWrapper(AbstractWidget widget) {
         this.abstractWidget = widget;
         abstractWidget.active =true;
-        update();
     }
 
     public int getColor() {
@@ -40,6 +39,11 @@ public abstract class CustomWidgetWrapper {
 
         abstractWidget.visible = visible;
         this.visible = visible;
+    }
+
+    public void setSize(int width, int height){
+        this.width = width;
+        this.height = height;
     }
 
     public void setWidth(int width) {

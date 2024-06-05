@@ -2,6 +2,7 @@ package com.example;
 
 import com.example.gui.event.ImageWidgetEvent;
 import com.example.wrapper.*;
+import com.google.gson.JsonObject;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.NeoForge;
@@ -16,7 +17,7 @@ public class ScreenFlow {
 
     private SwingHandler swingHandler = new SwingHandler();
     private WidgetHandler widgetHandler ;//loadScreenData 메서드에서 초기화됨
-    private SelectWidgetHandler selectWidgetHandler = new SelectWidgetHandler();
+    private SelectWidgetHandler selectWidgetHandler;
 
     ScreenFlow(){
 
@@ -30,6 +31,23 @@ public class ScreenFlow {
         return selectWidgetHandler;
     }
 
+    public void reset(){
+        selectWidgetHandler = null;
+
+    }
+
+    public boolean hasSelectWidget(){
+        return selectWidgetHandler != null;
+    }
+    public boolean hasImageWidget(String resouce){
+        for(WidgetImageWrapper widgetImageWrapper : widgetHandler.getWidgetImageList()){
+            if(widgetImageWrapper.getResource().toString().equals(resouce)){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public SwingHandler getSwingHandler() {
         return swingHandler;
     }
@@ -37,6 +55,11 @@ public class ScreenFlow {
     public void setScreenName(String name){
         this.screenName = name;
     }
+
+    public String getScreenName() {
+        return screenName;
+    }
+
     public void openScreen(Screen screen){
         this.screen = screen;
     }
@@ -44,25 +67,34 @@ public class ScreenFlow {
     public void save(){
         if(data != null)
             data.save();
+        else
+            throw new NullPointerException("스크린의 데이터 없음");
     }
 
-
+    public JsonObject getCustomData(){
+        return this.data.getCustomObject();
+    }
     /**
      * GUI 초기화 이후에 호출되어야 함
      * 왜냐면 초기화 메서드 호출 이전에 이 메서드 호출시 기본 GUI 위젯을 불러올 수 없음
      */
     public void loadScreenData(){
+        widgetHandler = new WidgetHandler(screen);
+
         data = new CustomScreenData(this, screenName);
         data.initFiles(); //기본 파일 생성
-        widgetHandler = new WidgetHandler(screen);
-        if(!screen.children().isEmpty())
-            widgetHandler.loadDefaultWidgets();
         data.loadCustomWidgets();
-        widgetHandler.makeCustomButtons();
+        if(!(screen instanceof ScreenNewTitle)) {
+            widgetHandler.loadDefaultWidgets();
+
+            widgetHandler.makeCustomButtons();
+        }
+        widgetHandler.update();
+
+
         if(screen instanceof ICustomBackground background)//백그라운드 설정 가능한 GUI라면
             background.setBackground(new ResourceLocation(data.background));
     }
-
 
     public void clickWidget(double mouseX, double mouseY){
         CustomWidgetWrapper clickedWidget = null;
@@ -70,18 +102,21 @@ public class ScreenFlow {
         {
             if(buttonWrapper.isMouseOver(mouseX, mouseY)){
                 clickedWidget = buttonWrapper;
-                System.out.println(buttonWrapper +"  - 클릭됨");
+                selectWidgetHandler = new SelectWidgetHandler((clickedWidget));
+                swingHandler.openSwing(clickedWidget);
+                return;
             }
         }
         for(WidgetImageWrapper imageWrapper : widgetHandler.getWidgetImageList())
         {
             if(imageWrapper.isMouseOver(mouseX, mouseY)){
                 clickedWidget = imageWrapper;
+                selectWidgetHandler = new SelectWidgetHandler((clickedWidget));
+                swingHandler.openSwing(clickedWidget);
+                return;
             }
         }
-        System.out.println(clickedWidget +"  - 클릭됨");
-        selectWidgetHandler.selectWidget(clickedWidget);
-        swingHandler.openSwing(clickedWidget);
+        System.out.println(clickedWidget +"  - 위젯을 찾지 못함" + widgetHandler.getWidgetButtonList());
     }
     public void dragWidget(double mouseX, double mouseY){
         selectWidgetHandler.setPosition((int) mouseX, (int) mouseY);
