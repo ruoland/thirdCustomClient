@@ -30,7 +30,10 @@ public class ScreenMouseEvent {
             int mouseY = (int) (opening.getMouseY() + opening.getDragY());
 
             ScreenFlow screenFlow = CustomScreenMod.getScreen(opening.getScreen());
-            System.out.println("드래그 중?" + screenFlow.getSelectWidget());
+            if(screenFlow.hasSelectWidget())
+                System.out.println("드래그 중!" + screenFlow.getSelectWidget());
+            else
+                System.out.println("선택된 위젯이 없어 드래그 할 수 없습니다.");
             if(screenFlow.hasSelectWidget())
                 screenFlow.dragWidget(mouseX, mouseY);
         }
@@ -44,7 +47,7 @@ public class ScreenMouseEvent {
             if (CustomScreenMod.isEditMode()) {
                 event.setCanceled(true);
                 CustomScreenMod.getScreen(event.getScreen()).clickWidget(event.getMouseX(), event.getMouseY());
-                System.out.println("선택됨" +CustomScreenMod.getCurrentScreen());
+
             }
         }
     }
@@ -57,7 +60,7 @@ public class ScreenMouseEvent {
         if(CustomScreenMod.hasScreen(event.getScreen())) {
             ScreenFlow screenFlow = CustomScreenMod.getScreen(event.getScreen());
             if(screenFlow.hasSelectWidget())
-                 screenFlow.reset();
+                 screenFlow.getSelectWidget();
         }
     }
 

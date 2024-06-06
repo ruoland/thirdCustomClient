@@ -36,6 +36,15 @@ public class ScreenNewTitle extends TitleScreen implements ICustomBackground, IC
         System.setProperty("java.awt.headless", "false");
     }
 
+    @Override
+    public void rebuildWidgets() {
+        super.rebuildWidgets();
+    }
+
+    @Override
+    public  <T extends GuiEventListener & NarratableEntry> T addWidget(T pListener) {
+        return super.addWidget(pListener);
+    }
 
     @Override
     public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {

@@ -68,11 +68,14 @@ public class CustomScreenMod {
         editMode = !editMode;
 
         ScreenFlow screenFlow = getScreen(screen);
+
         if(!editMode){ //편집 모드 종료, 파일 저장 후 스윙 정리
             System.out.println("에디트 모드 변경");
             screenFlow.save();
             if(screenFlow.getSwingHandler().isSwingOpen())
                 screenFlow.getSwingHandler().swingClose();
+            screenFlow.reset();
+
         }
         else {//편집 모드 실행, GUI 데이터 불러옴
             screenFlow.loadScreenData();

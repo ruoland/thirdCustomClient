@@ -33,6 +33,9 @@ public class ScreenFlow {
 
     public void reset(){
         selectWidgetHandler = null;
+        swingHandler.swingClose();
+        swingHandler = new SwingHandler();
+        data = null;
 
     }
 
@@ -74,21 +77,15 @@ public class ScreenFlow {
     public JsonObject getCustomData(){
         return this.data.getCustomObject();
     }
-    /**
-     * GUI 초기화 이후에 호출되어야 함
-     * 왜냐면 초기화 메서드 호출 이전에 이 메서드 호출시 기본 GUI 위젯을 불러올 수 없음
-     */
+
     public void loadScreenData(){
         widgetHandler = new WidgetHandler(screen);
-
         data = new CustomScreenData(this, screenName);
         data.initFiles(); //기본 파일 생성
-        data.loadCustomWidgets();
-        if(!(screen instanceof ScreenNewTitle)) {
-            widgetHandler.loadDefaultWidgets();
 
-            widgetHandler.makeCustomButtons();
-        }
+        data.loadCustomWidgets();
+        widgetHandler.loadDefaultWidgets();
+        widgetHandler.makeCustomButtons();
         widgetHandler.update();
 
 
@@ -98,25 +95,44 @@ public class ScreenFlow {
 
     public void clickWidget(double mouseX, double mouseY){
         CustomWidgetWrapper clickedWidget = null;
-        for(WidgetButtonWrapper buttonWrapper : widgetHandler.getWidgetButtonList())
+        for(WidgetButtonWrapper buttonWrapper : widgetHandler.getWidgetDefaultButtonList())
         {
             if(buttonWrapper.isMouseOver(mouseX, mouseY)){
                 clickedWidget = buttonWrapper;
+                if(selectWidgetHandler != null && selectWidgetHandler.getSelectWidget() == buttonWrapper)
+                    return;
                 selectWidgetHandler = new SelectWidgetHandler((clickedWidget));
                 swingHandler.openSwing(clickedWidget);
+                System.out.println("기본 버튼에서ㅏ 선택됨" +clickedWidget);
+                return;
+            }
+        }
+        for(WidgetButtonWrapper buttonWrapper : widgetHandler.getWidgetButtonList())
+        {
+            if(buttonWrapper.isMouseOver(mouseX, mouseY)){
+                if(selectWidgetHandler != null && selectWidgetHandler.getSelectWidget() == buttonWrapper)
+                    return;
+                clickedWidget = buttonWrapper;
+                selectWidgetHandler = new SelectWidgetHandler((clickedWidget));
+                swingHandler.openSwing(clickedWidget);
+                System.out.println("버튼 선택됨" +clickedWidget);
                 return;
             }
         }
         for(WidgetImageWrapper imageWrapper : widgetHandler.getWidgetImageList())
         {
             if(imageWrapper.isMouseOver(mouseX, mouseY)){
+                if(selectWidgetHandler != null && selectWidgetHandler.getSelectWidget() == imageWrapper)
+                    return;
                 clickedWidget = imageWrapper;
                 selectWidgetHandler = new SelectWidgetHandler((clickedWidget));
                 swingHandler.openSwing(clickedWidget);
+                System.out.println("이미지 선택됨" +clickedWidget);
                 return;
             }
         }
         System.out.println(clickedWidget +"  - 위젯을 찾지 못함" + widgetHandler.getWidgetButtonList());
+        swingHandler.swingClose();
     }
     public void dragWidget(double mouseX, double mouseY){
         selectWidgetHandler.setPosition((int) mouseX, (int) mouseY);

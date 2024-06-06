@@ -41,6 +41,10 @@ public class SelectWidgetHandler {
         return selectWidget.getMessage();
     }
 
+    public CustomWidgetWrapper getSelectWidget() {
+        return selectWidget;
+    }
+
     @Override
     public String toString() {
         return "SelectWidgetHandler{" +

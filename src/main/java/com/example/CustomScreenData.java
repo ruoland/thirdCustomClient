@@ -57,7 +57,7 @@ public class CustomScreenData {
     public void save(){
         try {
             widgetObject.addProperty("background", background);
-            widgetObject.add("widgetDefaultButton", GSON.toJsonTree(getWidgetHandler().getWidgetDefaultButtonList()));
+            widgetObject.add("titleWidgetButton", GSON.toJsonTree(getWidgetHandler().getWidgetDefaultButtonList()));
             widgetObject.add("widgetButton", GSON.toJsonTree(getWidgetHandler().getWidgetButtonList()));
             widgetObject.add("widgetImage", GSON.toJsonTree(getWidgetHandler().getWidgetImageList()));
             widgetObject.add("customObject", customObject);
@@ -72,7 +72,6 @@ public class CustomScreenData {
 
 
     public void loadCustomWidgets(){
-        System.out.println(widgetHandler);
         try {
             String json = new String(Files.readAllBytes(screenDataPath));
             if(json.equals("[]") || json.equals("{}"))
@@ -80,7 +79,11 @@ public class CustomScreenData {
             JsonObject jsonObject = GSON.fromJson(json, JsonObject.class);
             setBackground(jsonObject.get("background").getAsString());
 
+            if(jsonObject.has("titleWidgetButton"))
+                widgetHandler.getWidgetDefaultButtonList().addAll(GSON.fromJson(jsonObject.get("titleWidgetButton"), new TypeToken<ArrayList<WidgetButtonWrapper>>(){}.getType()));
+
             widgetHandler.getWidgetButtonList().addAll(GSON.fromJson(jsonObject.get("widgetButton"), new TypeToken<ArrayList<WidgetButtonWrapper>>(){}.getType()));
+
             if(!jsonObject.get("widgetImage").getAsJsonArray().isEmpty())
                 widgetHandler.getWidgetImageList().add(GSON.fromJson(jsonObject.get("widgetImage"), new TypeToken<ArrayList<WidgetImageWrapper>>(){}.getType()));
             if(jsonObject.has("customObject")) {
@@ -88,7 +91,7 @@ public class CustomScreenData {
             }else{
                 jsonObject.add("customObject", new JsonPrimitive(true));
             }
-            System.out.println(screenFlow.getScreenName()+" 데이터 불러옴");
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

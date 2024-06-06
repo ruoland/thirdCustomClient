@@ -1,6 +1,7 @@
 package com.example.wrapper;
 
 import com.example.ICustomRenderable;
+import com.example.ScreenNewTitle;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
@@ -32,6 +33,11 @@ public class WidgetHandler {
             WidgetButtonWrapper buttonWrapper = widgetButtonList.get(i);
             buttonWrapper.update();
         }
+        for(int i = 0; i < widgetDefaultButtonList.size(); i++){
+            WidgetButtonWrapper buttonWrapper = widgetDefaultButtonList.get(i);
+            buttonWrapper.update();
+
+        }
     }
 
     public ArrayList<WidgetButtonWrapper> getWidgetDefaultButtonList() {
@@ -47,13 +53,15 @@ public class WidgetHandler {
     }
 
     public void loadDefaultWidgets(){
-
         for(int i = 0; i < screen.children().size();i++){
             AbstractWidget widget = (AbstractWidget) screen.children().get(i);
-            widgetDefaultButtonList.add(new WidgetButtonWrapper(widget));
+            if(widgetDefaultButtonList.size() <= i)
+                widgetDefaultButtonList.add(new WidgetButtonWrapper(widget));
+            else
+                widgetDefaultButtonList.get(i).setAbstractWidget(widget);
         }
 
-        widgetButtonList.addAll(widgetDefaultButtonList);
+        System.out.println("불러온 기본 위젯들:"+screen.children());
     }
 
     public void addTextfield(WidgetButtonWrapper data){
@@ -69,8 +77,10 @@ public class WidgetHandler {
     }
     public void makeCustomButtons(){
         for(WidgetButtonWrapper data : widgetButtonList){
-            screen.renderables.add(new Button.Builder(Component.literal(data.getMessage()), (Button.OnPress) pButton -> {
-            }).size(data.getWidth(), data.getHeight()).pos(data.getX(), data.getY()).build());
+            AbstractWidget abstractWidget = new Button.Builder(Component.literal(data.getMessage()), (Button.OnPress) pButton -> {
+            }).size(data.getWidth(), data.getHeight()).pos(data.getX(), data.getY()).build();
+            screen.renderables.add(abstractWidget);
+            data.setAbstractWidget(abstractWidget);
         }
     }
     public void addImage(WidgetImageWrapper widgetImage){

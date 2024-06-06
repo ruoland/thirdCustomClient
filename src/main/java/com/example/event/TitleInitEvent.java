@@ -5,6 +5,7 @@ import com.example.swing.SwingNewTitle;
 import com.example.wrapper.WidgetImageWrapper;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
@@ -24,35 +25,41 @@ public class TitleInitEvent {
     @SubscribeEvent
     public void screenOpenEvent(ScreenEvent.Opening event) {
         String screenName = CustomScreenMod.getScreenName(event.getNewScreen());
-
-
         if (screenName != null && screenName.equals("TitleScreen")) {
-
             setFinalStatic("MINECRAFT_LOGO", new ResourceLocation("customclient:textures/logo.png"));
             setFinalStatic("MINECRAFT_EDITION", new ResourceLocation("customclient:textures/logo.png"));
             ScreenNewTitle newTitle = new ScreenNewTitle();
             event.setNewScreen(newTitle);
             ScreenFlow screenFlow =  CustomScreenMod.getScreen("ScreenNewTitle");
             screenFlow.openScreen(event.getNewScreen()); //스크린 열림
-
+        }
+        else if(screenName != null && !screenName.equals("ScreenNewTitle")){
+            isLoad = -1;
+            System.out.println("초기화됨");
+            ScreenFlow screenFlow =  CustomScreenMod.getScreen("ScreenNewTitle");
+            screenFlow.reset();
         }
     }
-    int count= 0;
+    private static int isLoad = -1;
     @SubscribeEvent
     public void screenPostInitEvent(ScreenEvent.Init.Post event){
         ScreenFlow screenFlow =  CustomScreenMod.getScreen("ScreenNewTitle");
+        if(isLoad == 1) {
+            System.out.println("이미 로딩됨");
+            return;
+        }
 
         if(isTitle(event.getScreen())) {
+            isLoad = 1;
+
             screenFlow.loadScreenData();
-            System.out.println("실행 카운트"+count++);
+
             if( screenFlow.getCustomData().has("logoVisible")){
                 CustomScreenMod.setLogoVisible( screenFlow.getCustomData().getAsJsonPrimitive("logoVisible").getAsBoolean());
-                System.out.println("이미 있음");
             }
             else{
                 screenFlow.getCustomData().add("logoVisible", new JsonPrimitive(CustomScreenMod.isLogoVisible()));
-                System.out.println("추가됨" + CustomScreenMod.isLogoVisible());
-
+                System.out.println("로고 상태: " + CustomScreenMod.isLogoVisible());
             }
 
             if(!CustomScreenMod.isLogoVisible()){
@@ -65,8 +72,10 @@ public class TitleInitEvent {
 
                 if (screenFlow.hasImageWidget("customclient:textures/edition.png"))
                     screenFlow.getScreenWidgets().addImage(new WidgetImageWrapper(new ResourceLocation("customclient:textures/edition.png"), "textures/edition.png", j,k,LogoRenderer.LOGO_WIDTH,LogoRenderer.LOGO_HEIGHT,1));
-
             }
+        }
+        if(screenFlow.getScreenWidgets() != null){
+            screenFlow.getScreenWidgets().update();
         }
 
     }

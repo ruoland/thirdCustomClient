@@ -24,15 +24,15 @@ public abstract class CustomWidgetWrapper {
     }
 
     public int getHeight() {
-        return abstractWidget.getHeight();
+        return abstractWidget == null ? height: abstractWidget.getHeight();
     }
 
     public int getWidth() {
-        return abstractWidget.getWidth();
+        return abstractWidget == null ? width : abstractWidget.getWidth();
     }
 
     public boolean isVisible() {
-        return abstractWidget.visible;
+        return abstractWidget == null ? visible: abstractWidget.visible;
     }
 
     public void setVisible(boolean visible) {
@@ -92,11 +92,11 @@ public abstract class CustomWidgetWrapper {
     }
 
     public int getX() {
-        return abstractWidget.getX();
+        return abstractWidget == null ? x:  abstractWidget.getX();
     }
 
     public int getY() {
-        return abstractWidget.getY();
+        return abstractWidget == null ? y:  abstractWidget.getY();
     }
 
     public float getAlpha() {
@@ -147,6 +147,7 @@ public abstract class CustomWidgetWrapper {
     public String getAction() {
         return action;
     }
+
     @Override
     public String toString() {
         return "CustomWidgetWrapper{" +
@@ -156,11 +157,11 @@ public abstract class CustomWidgetWrapper {
                 ", height=" + height +
                 ", color=" + color +
                 ", texture='" + texture + '\'' +
+                ", message='" + message + '\'' +
                 ", alpha=" + alpha +
                 ", visible=" + visible +
                 ", lock=" + lock +
+                ", action='" + action + '\'' +
                 '}';
     }
-
-
 }
