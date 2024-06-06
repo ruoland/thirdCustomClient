@@ -1,9 +1,10 @@
-package com.example.wrapper;
+package com.example.wrapper.widget;
 
+import customclient.FakeTextureWidget;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.network.chat.Component;
 
-public abstract class CustomWidgetWrapper {
+public abstract class WidgetWrapper {
     private transient AbstractWidget abstractWidget;
     private int x, y, width, height, color;
     private String texture, message;
@@ -11,10 +12,10 @@ public abstract class CustomWidgetWrapper {
     private boolean visible = true, lock = false;
     private String action;
 
-    public CustomWidgetWrapper() {
+    public WidgetWrapper() {
     }
 
-    CustomWidgetWrapper(AbstractWidget widget) {
+    WidgetWrapper(AbstractWidget widget) {
         this.abstractWidget = widget;
         abstractWidget.active =true;
     }
@@ -36,7 +37,6 @@ public abstract class CustomWidgetWrapper {
     }
 
     public void setVisible(boolean visible) {
-
         abstractWidget.visible = visible;
         this.visible = visible;
     }
@@ -63,6 +63,7 @@ public abstract class CustomWidgetWrapper {
     public void setPosition(int x, int y){
         this.x = x;
         this.y = y;
+
         abstractWidget.setPosition(x, y);
     }
     public void setX(int x) {
@@ -73,6 +74,7 @@ public abstract class CustomWidgetWrapper {
     public void setY(int y) {
         this.y = y;
         abstractWidget.setY(y);
+        System.out.println("업데이트됨"+y);
     }
 
     public void setAlpha(float alpha) {
@@ -104,6 +106,7 @@ public abstract class CustomWidgetWrapper {
     }
 
     public void update(){
+        createFakeWidget(getX(), getY(), getWidth(), getHeight(), getMessage());
         this.setPosition(x, y);
         this.setHeight(height);
         this.setWidth(width);
@@ -150,7 +153,7 @@ public abstract class CustomWidgetWrapper {
 
     @Override
     public String toString() {
-        return "CustomWidgetWrapper{" +
+        return "WidgetWrapper{" +
                 ", x=" + x +
                 ", y=" + y +
                 ", width=" + width +
@@ -164,4 +167,10 @@ public abstract class CustomWidgetWrapper {
                 ", action='" + action + '\'' +
                 '}';
     }
+
+    public FakeTextureWidget createFakeWidget(int x, int y, int width, int height, String resource){
+        return null;
+    }
+
+
 }

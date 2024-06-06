@@ -1,4 +1,4 @@
-package com.example.wrapper;
+package com.example.wrapper.widget;
 
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.network.chat.Component;
@@ -6,9 +6,9 @@ import net.minecraft.network.chat.Component;
 /**
  * 마인크래프트 버튼에 대한 데이터를 저장하고 연동하기 위해 Wrapper로 감싸두었음
  */
-public class WidgetButtonWrapper extends CustomWidgetWrapper {
+public class ButtonWrapper extends WidgetWrapper {
 
-        public WidgetButtonWrapper(AbstractWidget widget){
+        public ButtonWrapper(AbstractWidget widget){
             super(widget);
             dataUpdate();
         }

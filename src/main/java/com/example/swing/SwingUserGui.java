@@ -2,18 +2,15 @@ package com.example.swing;
 
 
 
-import com.example.ICustomBackground;
-import com.example.swing.base.SwingCustomGuiBase;
+import com.example.swing.base.SwingUserGuiBase;
 import net.minecraft.client.Minecraft;
 
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class SwingCustomGui extends SwingCustomGuiBase implements ActionListener {
+public class SwingUserGui extends SwingUserGuiBase implements ActionListener {
 
-    public SwingCustomGui() {
+    public SwingUserGui() {
         super();
         setTitle("유저 스크린 설정");
         setSize(300, 200);

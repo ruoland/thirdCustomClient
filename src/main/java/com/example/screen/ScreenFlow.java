@@ -1,54 +1,64 @@
-package com.example;
+package com.example.screen;
 
+import com.example.ICustomBackground;
 import com.example.gui.event.ImageWidgetEvent;
-import com.example.wrapper.*;
+import com.example.swing.SwingHandler;
+import com.example.wrapper.widget.ButtonWrapper;
+import com.example.wrapper.widget.ImageWrapper;
+import com.example.wrapper.widget.WidgetWrapper;
 import com.google.gson.JsonObject;
+import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.NeoForge;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.nio.file.Path;
 
+/**
+ * Handler로 직접 접근 하지 않고도 여기서 처리할 수 있도록
+ */
 public class ScreenFlow {
     private Screen screen;
     private String screenName;
     private CustomScreenData data;
 
     private SwingHandler swingHandler = new SwingHandler();
-    private WidgetHandler widgetHandler ;//loadScreenData 메서드에서 초기화됨
-    private SelectWidgetHandler selectWidgetHandler;
+    private ScreenHandler screenHandler;//loadScreenData 메서드에서 초기화됨
+    private SelectHandler selectHandler;
 
     ScreenFlow(){
 
     }
 
-    public WidgetHandler getScreenWidgets() {
-        return widgetHandler;
-    }
-
-    public SelectWidgetHandler getSelectWidget() {
-        return selectWidgetHandler;
-    }
-
     public void reset(){
-        selectWidgetHandler = null;
+        selectHandler = null;
+        if(swingHandler != null)
         swingHandler.swingClose();
         swingHandler = new SwingHandler();
         data = null;
-
     }
 
     public boolean hasSelectWidget(){
-        return selectWidgetHandler != null;
+        return selectHandler != null;
     }
+
     public boolean hasImageWidget(String resouce){
-        for(WidgetImageWrapper widgetImageWrapper : widgetHandler.getWidgetImageList()){
-            if(widgetImageWrapper.getResource().toString().equals(resouce)){
+        for(ImageWrapper imageWrapper : screenHandler.getImageList()){
+            if(imageWrapper.getResource().toString().equals(resouce)){
                 return true;
             }
         }
         return false;
+    }
+
+    public Screen getScreen() {
+        return screen;
     }
 
     public SwingHandler getSwingHandler() {
@@ -79,63 +89,46 @@ public class ScreenFlow {
     }
 
     public void loadScreenData(){
-        widgetHandler = new WidgetHandler(screen);
+        screenHandler = new ScreenHandler(screen);
         data = new CustomScreenData(this, screenName);
         data.initFiles(); //기본 파일 생성
 
         data.loadCustomWidgets();
-        widgetHandler.loadDefaultWidgets();
-        widgetHandler.makeCustomButtons();
-        widgetHandler.update();
-
+        screenHandler.loadDefaultWidgets();
+        screenHandler.makeCustomButtons();
+        screenHandler.update();
 
         if(screen instanceof ICustomBackground background)//백그라운드 설정 가능한 GUI라면
             background.setBackground(new ResourceLocation(data.background));
     }
 
     public void clickWidget(double mouseX, double mouseY){
-        CustomWidgetWrapper clickedWidget = null;
-        for(WidgetButtonWrapper buttonWrapper : widgetHandler.getWidgetDefaultButtonList())
-        {
-            if(buttonWrapper.isMouseOver(mouseX, mouseY)){
-                clickedWidget = buttonWrapper;
-                if(selectWidgetHandler != null && selectWidgetHandler.getSelectWidget() == buttonWrapper)
-                    return;
-                selectWidgetHandler = new SelectWidgetHandler((clickedWidget));
-                swingHandler.openSwing(clickedWidget);
-                System.out.println("기본 버튼에서ㅏ 선택됨" +clickedWidget);
+        for(WidgetWrapper clickedWidget : screenHandler.getAllWidget()) {
+            if (clickedWidget.isMouseOver(mouseX, mouseY)) {
+                this.swingHandler.openSwing(clickedWidget);
+                selectHandler = new SelectHandler(clickedWidget);
+                System.out.println("선택된 위젯: "+selectWidget().getMessage());
                 return;
             }
+            
         }
-        for(WidgetButtonWrapper buttonWrapper : widgetHandler.getWidgetButtonList())
-        {
-            if(buttonWrapper.isMouseOver(mouseX, mouseY)){
-                if(selectWidgetHandler != null && selectWidgetHandler.getSelectWidget() == buttonWrapper)
-                    return;
-                clickedWidget = buttonWrapper;
-                selectWidgetHandler = new SelectWidgetHandler((clickedWidget));
-                swingHandler.openSwing(clickedWidget);
-                System.out.println("버튼 선택됨" +clickedWidget);
-                return;
-            }
-        }
-        for(WidgetImageWrapper imageWrapper : widgetHandler.getWidgetImageList())
-        {
-            if(imageWrapper.isMouseOver(mouseX, mouseY)){
-                if(selectWidgetHandler != null && selectWidgetHandler.getSelectWidget() == imageWrapper)
-                    return;
-                clickedWidget = imageWrapper;
-                selectWidgetHandler = new SelectWidgetHandler((clickedWidget));
-                swingHandler.openSwing(clickedWidget);
-                System.out.println("이미지 선택됨" +clickedWidget);
-                return;
-            }
-        }
-        System.out.println(clickedWidget +"  - 위젯을 찾지 못함" + widgetHandler.getWidgetButtonList());
+        System.out.println("선택된 위젯을 찾지 못함: "+screenHandler.getAllWidget());
+        selectHandler = null;
         swingHandler.swingClose();
     }
+
+    @Nullable
+    public SelectHandler selectWidget(){
+        return selectHandler;
+    }
+
+    public ScreenHandler getWidget() {
+        return screenHandler;
+    }
+
+
     public void dragWidget(double mouseX, double mouseY){
-        selectWidgetHandler.setPosition((int) mouseX, (int) mouseY);
+        selectHandler.setPosition((int) mouseX, (int) mouseY);
     }
 
     public void fileDropEvent(Path path){
@@ -157,9 +150,28 @@ public class ScreenFlow {
         if(select == JOptionPane.YES_OPTION)
             NeoForge.EVENT_BUS.post(new ImageWidgetEvent.Background(screen, resourceLocation, path));
         else {
-            WidgetImageWrapper image = new WidgetImageWrapper(resourceLocation, path.getFileName().toString(), 0, 0, screen.width, screen.height, 1);
-            widgetHandler.addImage(image);
+            ImageWrapper image = new ImageWrapper(resourceLocation, path.getFileName().toString(), 0, 0, screen.width, screen.height, 1);
+            screenHandler.addImage(image);
         }
     }
 
+    public void renderImageWidget(GuiGraphics pGuiGraphics){
+        if(!screenHandler.getImageList().isEmpty()) {
+            for (ImageWrapper imageWrapper : screenHandler.getImageList()) {
+                imageWrapper.render(pGuiGraphics);
+            }
+        }
+    }
+
+    public void addButton(String name, int width, int height, int x, int y){
+        ButtonWrapper button = new ButtonWrapper(new Button.Builder(Component.literal(name), pButton -> {
+        }).size(width, height).pos(x, y).build());
+        screenHandler.addButton(button);
+    }
+
+    public static boolean isKeyDown(int key){
+        Minecraft mc = Minecraft.getInstance();
+        long windowLong = mc.getWindow().getWindow();
+        return InputConstants.isKeyDown(windowLong, key);
+    }
 }

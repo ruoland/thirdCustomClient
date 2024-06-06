@@ -1,17 +1,13 @@
-package com.example;
+package com.example.userscreen;
 
-import com.example.gui.event.FilesDropEvent;
+import com.example.ICustomRenderable;
+import com.example.screen.CustomScreenMod;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.common.NeoForge;
 
-import java.nio.file.Path;
-import java.util.List;
-
-public class ScreenUserCustom extends ScreenCustom implements ICustomRenderable{
+public class ScreenUserCustom extends ScreenCustom implements ICustomRenderable {
     protected ScreenUserCustom(Component pTitle) {
         super(pTitle);
     }

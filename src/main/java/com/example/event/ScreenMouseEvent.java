@@ -1,8 +1,7 @@
 package com.example.event;
 
-import com.example.CustomScreenMod;
-import com.example.ScreenAPI;
-import com.example.ScreenFlow;
+import com.example.screen.CustomScreenMod;
+import com.example.screen.ScreenFlow;
 import com.example.gui.event.FilesDropEvent;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
@@ -21,7 +20,7 @@ public class ScreenMouseEvent {
     }
 
     /*
-    클릭한 위젯의 위치를 드래그합니다
+    클릭한 위젯을 마우스 따라 이동합니다
      */
     @SubscribeEvent
     public void screenButton(ScreenEvent.MouseDragged.Post opening){
@@ -30,12 +29,12 @@ public class ScreenMouseEvent {
             int mouseY = (int) (opening.getMouseY() + opening.getDragY());
 
             ScreenFlow screenFlow = CustomScreenMod.getScreen(opening.getScreen());
-            if(screenFlow.hasSelectWidget())
-                System.out.println("드래그 중!" + screenFlow.getSelectWidget());
-            else
-                System.out.println("선택된 위젯이 없어 드래그 할 수 없습니다.");
-            if(screenFlow.hasSelectWidget())
+
+            if(screenFlow.hasSelectWidget()) {
+
                 screenFlow.dragWidget(mouseX, mouseY);
+
+            }
         }
 
     }
@@ -47,7 +46,6 @@ public class ScreenMouseEvent {
             if (CustomScreenMod.isEditMode()) {
                 event.setCanceled(true);
                 CustomScreenMod.getScreen(event.getScreen()).clickWidget(event.getMouseX(), event.getMouseY());
-
             }
         }
     }
@@ -60,7 +58,7 @@ public class ScreenMouseEvent {
         if(CustomScreenMod.hasScreen(event.getScreen())) {
             ScreenFlow screenFlow = CustomScreenMod.getScreen(event.getScreen());
             if(screenFlow.hasSelectWidget())
-                 screenFlow.getSelectWidget();
+                 screenFlow.clickWidget(event.getMouseX(), event.getMouseY());
         }
     }
 

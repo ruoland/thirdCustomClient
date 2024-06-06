@@ -1,21 +1,17 @@
 package com.example;
 
-import com.example.gui.event.FilesDropEvent;
-import com.mojang.blaze3d.systems.RenderSystem;
+import com.example.screen.CustomScreenMod;
+import com.example.screen.ScreenAPI;
 import customclient.CustomClient;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.common.NeoForge;
-import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -37,11 +33,6 @@ public class ScreenNewTitle extends TitleScreen implements ICustomBackground, IC
     }
 
     @Override
-    public void rebuildWidgets() {
-        super.rebuildWidgets();
-    }
-
-    @Override
     public  <T extends GuiEventListener & NarratableEntry> T addWidget(T pListener) {
         return super.addWidget(pListener);
     }
@@ -59,6 +50,10 @@ public class ScreenNewTitle extends TitleScreen implements ICustomBackground, IC
     @Override
     public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
+
+        //얘는 별개로 한번 더 아래 코드가 필요함
+        CustomScreenMod.getScreen(this).renderImageWidget(pGuiGraphics);
+
     }
 
     @Override

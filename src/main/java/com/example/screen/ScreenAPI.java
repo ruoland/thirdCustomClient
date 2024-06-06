@@ -1,4 +1,4 @@
-package com.example;
+package com.example.screen;
 
 import com.example.gui.event.ImageWidgetEvent;
 import com.mojang.blaze3d.platform.NativeImage;

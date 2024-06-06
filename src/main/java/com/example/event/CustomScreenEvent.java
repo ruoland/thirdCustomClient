@@ -1,9 +1,6 @@
 package com.example.event;
 
-import com.example.CustomScreenMod;
-import com.example.ScreenCustom;
-import com.example.ScreenFlow;
-import com.example.gui.event.FilesDropEvent;
+import com.example.screen.CustomScreenMod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -20,8 +17,7 @@ public class CustomScreenEvent {
             if (CustomScreenMod.isEditMode()) {
                 pGuiGraphics.drawString(mc.font, Component.literal("편집 모드 실행 중"), 0, 0, 0xFFFFFF, false);
             }
-            if(CustomScreenMod.getScreen(render.getScreen()).getScreenWidgets() != null)
-            CustomScreenMod.getScreen(render.getScreen()).getScreenWidgets().renderImage(pGuiGraphics);
+            CustomScreenMod.getScreen(render.getScreen()).renderImageWidget(pGuiGraphics);
         }
     }
 

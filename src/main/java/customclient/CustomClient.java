@@ -1,6 +1,7 @@
 package customclient;
 
 
+import com.example.MyMenu;
 import com.example.event.CustomScreenEvent;
 import com.example.event.KeyEvent;
 import com.example.event.ScreenMouseEvent;
@@ -8,6 +9,10 @@ import com.example.event.TitleInitEvent;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.flag.FeatureFlags;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -20,12 +25,16 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(CustomClient.MODID)
 public class CustomClient
-{
+{// Of course, all mentions of spells can and should be replaced with whatever your registry actually is.
+    private static final DeferredRegister<MenuType> MY_MENU = DeferredRegister.create(new ResourceLocation("customclient:mymenu"), "customclient");
+    // For some DeferredRegister<MenuType<?>> REGISTER
 
     // Define mod id in a common place for everything to reference
     public static final String MODID = "customclient";
