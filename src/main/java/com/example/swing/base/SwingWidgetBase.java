@@ -22,7 +22,7 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
         protected JTextField heightField = new JTextField(4);
         protected JButton visibleButton = new JButton("버튼 표시: 켜짐");
         protected String visibleText = "버튼 표시: ";
-        protected JComboBox<String> actionComboBox = new JComboBox<String>();
+        protected JComboBox<String> actionComboBox;
 
         protected WidgetWrapper widgetWrapper;
         public SwingWidgetBase(WidgetWrapper widgetWrapper, String title, boolean isNameText, boolean actionField, boolean positionField, boolean sizeField, boolean visibleButton) {
@@ -64,16 +64,20 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
             }
 
             if(actionField) {
+                actionComboBox = new JComboBox<String>();
                 this.actionField.addKeyListener(this);
                 actionComboBox.addActionListener(this);
+                this.actionField.getDocument().addDocumentListener(this);
+
                 add(actionComboBox);
                 add(this.actionField);
+                comboBoxAddItem();
             }
 
             setFocusableWindowState(false);
             setVisible(true);
             setFocusableWindowState(true);
-            comboBoxAddItem();
+
         }
 
         public void comboBoxAddItem() {
@@ -84,7 +88,7 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
             actionComboBox.addItem("열기:모드");
             actionComboBox.addItem("열기:렐름");
             actionComboBox.addItem("접속:");
-            actionComboBox.addItem("종료");
+            actionComboBox.addItem("종료:");
 
         }
 
@@ -110,45 +114,46 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
             yField.setText(""+ widgetWrapper.getY());
             widthField.setText(""+ widgetWrapper.getWidth());
             heightField.setText(""+ widgetWrapper.getHeight());
+
+            if(actionComboBox != null){
+                actionComboBox.setSelectedItem(widgetWrapper.getAction()+":"+widgetWrapper.getValue());
+
+            }
+            if(actionField != null){
+                actionField.setText(widgetWrapper.getValue());
+            }
         }
 
-        public boolean checkNumber(char key){
-            if(!Character.isDigit(key) ){
-                System.out.println(key);
-                JOptionPane.showMessageDialog(this, key+" 대신 숫자만 입력해주세요.");
-                return false;
-            }
-            else
-                return true;
-        }
         @Override
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == visibleButton) {
                 widgetWrapper.setVisible(!widgetWrapper.isVisible());
                 visibleButton.setText(widgetWrapper.isVisible() ? visibleText + ": 켜짐" : visibleText+": 꺼짐");
             }
+            if(e.getSource() == actionComboBox){
+                widgetWrapper.setAction((String) actionComboBox.getSelectedItem());
+            }
+
         }
         @Override
         public void dispose() {
             super.dispose();
-            StringBuffer comboBox = new StringBuffer((String) actionComboBox.getSelectedItem());
 
-            if (comboBox.toString().equals("접속:")) {
-                comboBox.append(actionField.getText());
-            }
-
-            widgetWrapper.setAction(comboBox.toString());
         }
 
         public void dataUpdate(){
             if(!xField.getText().isEmpty())
-            widgetWrapper.setX(Integer.parseInt(xField.getText()));
+                widgetWrapper.setX(Integer.parseInt(xField.getText()));
             if(!yField.getText().isEmpty())
                 widgetWrapper.setY(Integer.parseInt(yField.getText()));
             if(!widthField.getText().isEmpty())
                 widgetWrapper.setWidth(Integer.parseInt(widthField.getText()));
             if(!heightField.getText().isEmpty())
                 widgetWrapper.setHeight(Integer.parseInt(heightField.getText()));
+
+            if(actionComboBox != null){
+                widgetWrapper.setAction((String) actionComboBox.getSelectedItem());
+            }
         }
     @Override
     public void insertUpdate(DocumentEvent e) {

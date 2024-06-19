@@ -39,7 +39,7 @@ public class ScreenFlow {
     public void reset(){
         selectHandler = null;
         if(swingHandler != null)
-        swingHandler.swingClose();
+            swingHandler.swingClose();
         swingHandler = new SwingHandler();
         data = null;
     }
@@ -107,14 +107,11 @@ public class ScreenFlow {
             if (clickedWidget.isMouseOver(mouseX, mouseY)) {
                 this.swingHandler.openSwing(clickedWidget);
                 selectHandler = new SelectHandler(clickedWidget);
-                System.out.println("선택된 위젯: "+selectWidget().getMessage());
                 return;
             }
-            
         }
         System.out.println("선택된 위젯을 찾지 못함: "+screenHandler.getAllWidget());
-        selectHandler = null;
-        swingHandler.swingClose();
+
     }
 
     @Nullable

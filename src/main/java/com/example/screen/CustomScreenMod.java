@@ -74,6 +74,7 @@ public class CustomScreenMod {
             if(screenFlow.getSwingHandler().isSwingOpen())
                 screenFlow.getSwingHandler().swingClose();
             screenFlow.reset();
+            screenFlow.getSwingHandler().swingClose();
         }
         else {//편집 모드 실행, GUI 데이터 불러옴
             screenFlow.loadScreenData();

@@ -45,6 +45,7 @@ public class ScreenMouseEvent {
         if(CustomScreenMod.hasScreen(event.getScreen())) {
             if (CustomScreenMod.isEditMode()) {
                 event.setCanceled(true);
+                System.out.println(""+CustomScreenMod.isEditMode());
                 CustomScreenMod.getScreen(event.getScreen()).clickWidget(event.getMouseX(), event.getMouseY());
             }
         }

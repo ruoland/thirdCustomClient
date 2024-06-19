@@ -1,17 +1,18 @@
 package customclient;
 
 
-import com.example.MyMenu;
+import com.example.ScreenCommand;
 import com.example.event.CustomScreenEvent;
 import com.example.event.KeyEvent;
 import com.example.event.ScreenMouseEvent;
 import com.example.event.TitleInitEvent;
 import com.mojang.logging.LogUtils;
+import customclient.packet.ClientPayloadHandler;
+import customclient.packet.MyData;
+import customclient.packet.ServerPayloadHandler;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.api.distmarker.Dist;
@@ -24,9 +25,12 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.neoforged.neoforge.internal.versions.neoforge.NeoForgeVersion;
+import net.neoforged.neoforge.network.handling.DirectionalPayloadHandler;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
@@ -51,6 +55,7 @@ public class CustomClient
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
 
     }
+
 
     private void commonSetup(final FMLCommonSetupEvent event)
     {
@@ -93,6 +98,13 @@ public class CustomClient
     {
         LOGGER.info("HELLO from server starting");
     }
+
+    @SubscribeEvent
+    public void command(RegisterCommandsEvent event){
+        ScreenCommand.register(event.getDispatcher());
+        System.out.println("이벤트 가입");
+    }
+
 
     @EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
     public static class ClientModEvents

@@ -9,6 +9,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
+import net.neoforged.neoforge.network.registration.NetworkRegistry;
 
 import java.awt.*;
 
@@ -23,6 +24,8 @@ public class ScreenCommand {
         if(command.getSource().getEntity() instanceof Player){
             Player player = (Player) command.getSource().getEntity();
             player.sendSystemMessage(Component.literal("bruh"));
+
+
         }
         return Command.SINGLE_SUCCESS;
     }

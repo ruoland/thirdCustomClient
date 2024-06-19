@@ -8,12 +8,18 @@ import com.example.wrapper.widget.ImageWrapper;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.LogoRenderer;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.inventory.MenuType;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
+import net.neoforged.neoforge.event.entity.item.ItemTossEvent;
 import sun.misc.Unsafe;
 
+import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.lang.reflect.Field;
 
 public class TitleInitEvent {
@@ -39,6 +45,24 @@ public class TitleInitEvent {
             screenFlow.reset();
         }
     }
+
+    @SubscribeEvent
+    public void screenPostInitEvent(ScreenEvent.MouseButtonPressed.Pre event) {
+        if(!CustomScreenMod.isEditMode() && CustomScreenMod.hasScreen(event.getScreen())) {
+            if (event.getButton() == 0) {
+                ScreenFlow screenFlow = CustomScreenMod.getScreen(event.getScreen());
+                screenFlow.loadScreenData();
+                System.out.println(screenFlow.getWidget().getDefaultButtons());
+                for(ButtonWrapper buttonWrapper : screenFlow.getWidget().getDefaultButtons()){
+                    System.out.println(buttonWrapper.getMessage() +" - "+buttonWrapper.isMouseOver(event.getMouseX(), event.getMouseY()));
+                    if(buttonWrapper.isMouseOver(event.getMouseX(), event.getMouseY())){
+                        buttonWrapper.runAction();
+                        event.setCanceled(true);
+                    }
+                }
+            }
+        }
+    }
     private static int isLoad = -1;
 
     @SubscribeEvent
@@ -50,10 +74,8 @@ public class TitleInitEvent {
 
         if(isTitle(event.getScreen())) {
             ScreenFlow screenFlow =  CustomScreenMod.getScreen("ScreenNewTitle");
-
             isLoad = 1;
             screenFlow.loadScreenData();
-
             //타이틀에서는 로고가 있으니까 여기서 로고 정보 저장하고 불러옴
             if(screenFlow.getCustomData().has("logoVisible")){
                 CustomScreenMod.setLogoVisible( screenFlow.getCustomData().getAsJsonPrimitive("logoVisible").getAsBoolean());
@@ -72,12 +94,6 @@ public class TitleInitEvent {
 
     }
 
-
-    @SubscribeEvent
-    public void screenSwingEvent(ScreenEvent.Render.Post event){
-        if(CustomScreenMod.isEditMode()){
-        }
-    }
 
     void setFinalStatic(String field, Object newValue) {
         try {

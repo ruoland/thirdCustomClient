@@ -33,7 +33,7 @@ public class ScreenHandler {
     public void update(){
         LinkedList<WidgetWrapper> wrapperLinkedList = getAllWidget();
         wrapperLinkedList.removeAll(getImageList());
-        for(WidgetWrapper widget :wrapperLinkedList ){
+        for(WidgetWrapper widget : wrapperLinkedList ){
             widget.update();
         }
     }
@@ -53,6 +53,14 @@ public class ScreenHandler {
         allWidget.addAll(getImageList());
         return allWidget;
     }
+    public ButtonWrapper getPressedButton(double mouseX, double mouseY) {
+        for(ButtonWrapper buttonWrapper : getButtons())
+        {
+            if(buttonWrapper.isMouseOver(mouseX, mouseY))
+                return buttonWrapper;
+        }
+        return null;
+    }
 
     public ArrayList<ImageWrapper> getImageList() {
         return images;
@@ -65,7 +73,7 @@ public class ScreenHandler {
                 defaultButtons.add(new ButtonWrapper(widget));
             else
                 defaultButtons.get(i).setAbstractWidget(widget);
-            System.out.println(defaultButtons.get(i) + " 가 추가됨");
+
         }
 
         

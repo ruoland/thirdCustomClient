@@ -1,8 +1,23 @@
 package com.example.wrapper.widget;
 
+import com.example.screen.CustomScreenMod;
+import com.example.screen.ScreenFlow;
+import com.mojang.realmsclient.RealmsMainScreen;
+import customclient.CustomClient;
 import customclient.FakeTextureWidget;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.screens.ConnectScreen;
+import net.minecraft.client.gui.screens.DirectJoinServerScreen;
+import net.minecraft.client.gui.screens.OptionsScreen;
+import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
+import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
+import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.multiplayer.resolver.ServerAddress;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
+import net.neoforged.neoforge.client.gui.ModListScreen;
 
 public abstract class WidgetWrapper {
     private transient AbstractWidget abstractWidget;
@@ -10,7 +25,7 @@ public abstract class WidgetWrapper {
     private String texture, message;
     private float alpha = 1;
     private boolean visible = true, lock = false;
-    private String action;
+    private String action, value;
 
     public WidgetWrapper() {
     }
@@ -134,7 +149,14 @@ public abstract class WidgetWrapper {
     }
     public void setAction(String action){
         this.action = action;
+        if(action.contains(":")) {
+            String[] actionValue = action.split(":");
+            this.action = actionValue[0];
+            this.value = actionValue[1];
+        }
     }
+
+
     public void setAbstractWidget(AbstractWidget abstractWidget) {
         this.abstractWidget = abstractWidget;
     }
@@ -151,6 +173,44 @@ public abstract class WidgetWrapper {
         return action;
     }
 
+    public String getValue() {
+        return value;
+    }
+
+    public boolean runAction(){
+        Minecraft mc = Minecraft.getInstance();
+        ScreenFlow screenFlow =  CustomScreenMod.getScreen(mc.screen);
+        System.out.println("클릭한 버튼 액션 : "+action);
+        if(action.contains("선택안함"))
+            return false;
+
+        if(action.contains("열기")){
+            switch (action) {
+                case ("맵 선택"):
+                    mc.setScreen(new SelectWorldScreen(mc.screen));
+                case ("멀티"):
+                    mc.setScreen(new JoinMultiplayerScreen(mc.screen));
+                case ("설정"):
+                    mc.setScreen(new OptionsScreen(mc.screen, mc.options));
+                case ("모드"):
+                    mc.setScreen(new ModListScreen(mc.screen));
+                case ("렐름"):
+                    mc.setScreen(new RealmsMainScreen(mc.screen));
+
+        }
+
+        if(action.contains("접속")) {
+            String IP = value;
+            ServerData serverData = new ServerData(IP, "", ServerData.Type.OTHER);
+
+            ConnectScreen.startConnecting(mc.screen, mc, ServerAddress.parseString(IP), serverData, false, null);
+        }
+
+         if(action.contains("종료"))
+             mc.stop();
+        }
+        return true;
+    }
     @Override
     public String toString() {
         return "WidgetWrapper{" +
