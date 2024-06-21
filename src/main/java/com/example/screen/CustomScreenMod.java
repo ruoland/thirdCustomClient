@@ -8,6 +8,8 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
+import org.checkerframework.checker.units.qual.N;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -17,25 +19,33 @@ public class CustomScreenMod {
     public static final ResourceLocation DEFAULT_BACKGROUND_IMAGE = new ResourceLocation(CustomClient.MODID, "textures/screenshot.png");
 
     private static final LinkedHashMap<String, ScreenFlow> screenMap = new LinkedHashMap<>();
-    private static String recntlyName;
+
     private static boolean editMode;
     private static boolean mcLogoVisible = true;
 
+    @Nullable
     public static ScreenFlow getScreen(Screen screen){
         return getScreen(screen.getTitle().getString());
     }
 
+    @Nullable
     public static ScreenFlow getScreen(String name){
-        recntlyName = name;
+
         if(screenMap.containsKey(name)) {
             return screenMap.get(name);
         }
-        else {
+        return null;
+    }
+
+    public static ScreenFlow createScreenFlow(String name){
             ScreenFlow screenFlow = new ScreenFlow();
             screenFlow.setScreenName(name);
             screenMap.put(name, screenFlow);
+            System.out.println("스크린 흐름 생성됨"+name);
             return screenMap.get(name);
-        }
+    }
+    public static ScreenFlow createScreenFlow(Screen screen){
+        return createScreenFlow(screen.getTitle().getString());
     }
     public static boolean hasScreen(Screen screen){
         return hasScreen(screen.getTitle().getString());

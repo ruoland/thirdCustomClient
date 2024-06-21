@@ -56,7 +56,7 @@ public class ScreenMouseEvent {
      */
     @SubscribeEvent
     public void mouseClick(ScreenEvent.MouseButtonReleased.Post event){
-        if(CustomScreenMod.hasScreen(event.getScreen())) {
+        if(CustomScreenMod.hasScreen(event.getScreen()) ) {
             ScreenFlow screenFlow = CustomScreenMod.getScreen(event.getScreen());
             if(screenFlow.hasSelectWidget())
                  screenFlow.clickWidget(event.getMouseX(), event.getMouseY());

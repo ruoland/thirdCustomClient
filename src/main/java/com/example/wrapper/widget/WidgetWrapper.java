@@ -7,11 +7,9 @@ import customclient.CustomClient;
 import customclient.FakeTextureWidget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.screens.ConnectScreen;
-import net.minecraft.client.gui.screens.DirectJoinServerScreen;
-import net.minecraft.client.gui.screens.OptionsScreen;
-import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.gui.screens.*;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
+import net.minecraft.client.gui.screens.multiplayer.SafetyScreen;
 import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
@@ -89,7 +87,6 @@ public abstract class WidgetWrapper {
     public void setY(int y) {
         this.y = y;
         abstractWidget.setY(y);
-        System.out.println("업데이트됨"+y);
     }
 
     public void setAlpha(float alpha) {
@@ -127,6 +124,7 @@ public abstract class WidgetWrapper {
         this.setWidth(width);
         this.setVisible(isVisible());
         this.setAlpha(getAlpha());
+
     }
     public boolean isMouseOver(double mouseX, double mouseY ){
         if(abstractWidget ==null)
@@ -153,9 +151,9 @@ public abstract class WidgetWrapper {
             String[] actionValue = action.split(":");
             this.action = actionValue[0];
             this.value = actionValue[1];
+            System.out.println(action+ " - "+value+ " - 값 설정됨");
         }
     }
-
 
     public void setAbstractWidget(AbstractWidget abstractWidget) {
         this.abstractWidget = abstractWidget;
@@ -179,36 +177,46 @@ public abstract class WidgetWrapper {
 
     public boolean runAction(){
         Minecraft mc = Minecraft.getInstance();
-        ScreenFlow screenFlow =  CustomScreenMod.getScreen(mc.screen);
-        System.out.println("클릭한 버튼 액션 : "+action);
-        if(action.contains("선택안함"))
+        if(action == null || action.contains("선택안함"))
             return false;
-
-        if(action.contains("열기")){
-            switch (action) {
+        ScreenFlow screenFlow =  CustomScreenMod.getScreen(mc.screen);
+        if(screenFlow == null)
+            screenFlow = CustomScreenMod.createScreenFlow("null");
+        System.out.println(""+action);
+        if(action.contains("열기")) {
+            switch (value) {
                 case ("맵 선택"):
-                    mc.setScreen(new SelectWorldScreen(mc.screen));
+                    mc.setScreen(new SelectWorldScreen(screenFlow.getScreen()));
+                    break;
                 case ("멀티"):
-                    mc.setScreen(new JoinMultiplayerScreen(mc.screen));
+                    Screen screen = (Screen) (mc.options.skipMultiplayerWarning ? new JoinMultiplayerScreen(screenFlow.getScreen()) : new SafetyScreen(screenFlow.getScreen()));
+                    mc.setScreen(screen);
+                    break;
                 case ("설정"):
-                    mc.setScreen(new OptionsScreen(mc.screen, mc.options));
+                    mc.setScreen(new OptionsScreen(screenFlow.getScreen(), mc.options));
+                    break;
                 case ("모드"):
-                    mc.setScreen(new ModListScreen(mc.screen));
+                    mc.setScreen(new ModListScreen(screenFlow.getScreen()));
+                    break;
                 case ("렐름"):
                     mc.setScreen(new RealmsMainScreen(mc.screen));
+                    break;
 
+            }
         }
 
-        if(action.contains("접속")) {
+        if(action.equals("접속")) {
             String IP = value;
             ServerData serverData = new ServerData(IP, "", ServerData.Type.OTHER);
-
+            System.out.println("접속!" + IP);
             ConnectScreen.startConnecting(mc.screen, mc, ServerAddress.parseString(IP), serverData, false, null);
+            return true;
         }
 
-         if(action.contains("종료"))
-             mc.stop();
-        }
+        if(action.contains("종료"))
+            mc.stop();
+
+
         return true;
     }
     @Override

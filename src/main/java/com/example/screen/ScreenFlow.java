@@ -96,7 +96,8 @@ public class ScreenFlow {
         data.loadCustomWidgets();
         screenHandler.loadDefaultWidgets();
         screenHandler.makeCustomButtons();
-        screenHandler.update();
+
+        //screenHandler.syncWithSwing();
 
         if(screen instanceof ICustomBackground background)//백그라운드 설정 가능한 GUI라면
             background.setBackground(new ResourceLocation(data.background));

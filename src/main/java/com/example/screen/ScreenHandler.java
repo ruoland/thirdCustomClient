@@ -30,7 +30,7 @@ public class ScreenHandler {
     /**
      * 불러온 위젯의 정보를 동기화 하기(SwingWidget에서 값을 변경 했을 때 사용 되는 메서드)
      */
-    public void update(){
+    public void syncWithSwing(){
         LinkedList<WidgetWrapper> wrapperLinkedList = getAllWidget();
         wrapperLinkedList.removeAll(getImageList());
         for(WidgetWrapper widget : wrapperLinkedList ){

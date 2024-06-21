@@ -1,5 +1,6 @@
 package com.example.swing.base;
 
+import com.example.screen.CustomScreenMod;
 import com.example.wrapper.widget.WidgetWrapper;
 import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
@@ -64,9 +65,9 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
             }
 
             if(actionField) {
-                actionComboBox = new JComboBox<String>();
+                this.actionComboBox = new JComboBox<String>();
                 this.actionField.addKeyListener(this);
-                actionComboBox.addActionListener(this);
+                this.actionComboBox.addActionListener(this);
                 this.actionField.getDocument().addDocumentListener(this);
 
                 add(actionComboBox);
@@ -88,7 +89,7 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
             actionComboBox.addItem("열기:모드");
             actionComboBox.addItem("열기:렐름");
             actionComboBox.addItem("접속:");
-            actionComboBox.addItem("종료:");
+            actionComboBox.addItem("종료:종료");
 
         }
 
@@ -116,11 +117,17 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
             heightField.setText(""+ widgetWrapper.getHeight());
 
             if(actionComboBox != null){
-                actionComboBox.setSelectedItem(widgetWrapper.getAction()+":"+widgetWrapper.getValue());
-
+                actionComboBox.setSelectedItem(widgetWrapper.getAction() +widgetWrapper.getValue());
             }
-            if(actionField != null){
-                actionField.setText(widgetWrapper.getValue());
+            if(actionComboBox != null){
+                if(widgetWrapper.getAction().contains("접속")) {
+                    actionComboBox.setSelectedItem("접속:");
+                    actionField.setText(widgetWrapper.getValue());
+                }
+                else {
+                    actionComboBox.setSelectedItem(widgetWrapper.getAction() + ":" + widgetWrapper.getValue());
+                    actionField.setText(widgetWrapper.getValue());
+                }
             }
         }
 
@@ -131,7 +138,16 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
                 visibleButton.setText(widgetWrapper.isVisible() ? visibleText + ": 켜짐" : visibleText+": 꺼짐");
             }
             if(e.getSource() == actionComboBox){
-                widgetWrapper.setAction((String) actionComboBox.getSelectedItem());
+                System.out.println("이벤트 발동됨" + actionComboBox.getSelectedItem());
+                if(actionComboBox.getSelectedItem().equals("접속:"))
+                {
+                    if(actionField.getText() == null ||actionField.getText().equals(""))
+                        actionField.setText("127.0.0.1");
+                    widgetWrapper.setAction(actionComboBox.getSelectedItem() +actionField.getText());
+                    System.out.println("접속 연결 설정함" + widgetWrapper.getAction() + " - "+widgetWrapper.getValue());
+                }
+                else if(!actionComboBox.getSelectedItem().equals("선택안함"))
+                    widgetWrapper.setAction((String) actionComboBox.getSelectedItem());
             }
 
         }
@@ -141,7 +157,10 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
 
         }
 
-        public void dataUpdate(){
+    /**
+     *  swing에 키보드로 뭔가 입력이 된다면 업데이트됨
+     */
+    public void dataUpdate(){
             if(!xField.getText().isEmpty())
                 widgetWrapper.setX(Integer.parseInt(xField.getText()));
             if(!yField.getText().isEmpty())
@@ -150,9 +169,9 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
                 widgetWrapper.setWidth(Integer.parseInt(widthField.getText()));
             if(!heightField.getText().isEmpty())
                 widgetWrapper.setHeight(Integer.parseInt(heightField.getText()));
-
-            if(actionComboBox != null){
-                widgetWrapper.setAction((String) actionComboBox.getSelectedItem());
+            if(!actionField.getText().isEmpty() && actionComboBox.getSelectedItem().equals("접속:")) {
+                widgetWrapper.setAction(actionComboBox.getSelectedItem() + actionField.getText());
+                System.out.println(actionField.getText());
             }
         }
     @Override

@@ -4,22 +4,17 @@ import com.example.*;
 import com.example.screen.CustomScreenMod;
 import com.example.screen.ScreenFlow;
 import com.example.wrapper.widget.ButtonWrapper;
-import com.example.wrapper.widget.ImageWrapper;
 import com.google.gson.JsonPrimitive;
-import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.LogoRenderer;
-import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.MenuProvider;
-import net.minecraft.world.inventory.MenuType;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
-import net.neoforged.neoforge.event.entity.item.ItemTossEvent;
 import sun.misc.Unsafe;
 
-import java.awt.*;
-import java.awt.event.MouseEvent;
 import java.lang.reflect.Field;
 
 public class TitleInitEvent {
@@ -36,28 +31,26 @@ public class TitleInitEvent {
             setFinalStatic("MINECRAFT_EDITION", new ResourceLocation("customclient:textures/logo.png"));
             ScreenNewTitle newTitle = new ScreenNewTitle();
             event.setNewScreen(newTitle);
-            ScreenFlow screenFlow =  CustomScreenMod.getScreen("ScreenNewTitle");
+            ScreenFlow screenFlow =  CustomScreenMod.createScreenFlow("ScreenNewTitle");
+
             screenFlow.openScreen(event.getNewScreen()); //스크린 열림
-        }
-        else if(screenName != null && !screenName.equals("ScreenNewTitle")){
-            isLoad = -1;
-            ScreenFlow screenFlow =  CustomScreenMod.getScreen("ScreenNewTitle");
-            screenFlow.reset();
+            screenFlow.loadScreenData();
         }
     }
 
+
     @SubscribeEvent
-    public void screenPostInitEvent(ScreenEvent.MouseButtonPressed.Pre event) {
+    public void screenMousePressedPost(ScreenEvent.MouseButtonPressed.Post event) {
         if(!CustomScreenMod.isEditMode() && CustomScreenMod.hasScreen(event.getScreen())) {
             if (event.getButton() == 0) {
                 ScreenFlow screenFlow = CustomScreenMod.getScreen(event.getScreen());
                 screenFlow.loadScreenData();
-                System.out.println(screenFlow.getWidget().getDefaultButtons());
                 for(ButtonWrapper buttonWrapper : screenFlow.getWidget().getDefaultButtons()){
-                    System.out.println(buttonWrapper.getMessage() +" - "+buttonWrapper.isMouseOver(event.getMouseX(), event.getMouseY()));
                     if(buttonWrapper.isMouseOver(event.getMouseX(), event.getMouseY())){
                         buttonWrapper.runAction();
-                        event.setCanceled(true);
+
+                        break;
+
                     }
                 }
             }
@@ -68,7 +61,6 @@ public class TitleInitEvent {
     @SubscribeEvent
     public void screenPostInitEvent(ScreenEvent.Init.Post event){
         if(isLoad == 1) {
-            System.out.println("이미 로딩됨");
             return;
         }
 
@@ -87,11 +79,9 @@ public class TitleInitEvent {
             if(CustomScreenMod.isLogoVisible())
                 CustomScreenMod.logoRender(screenFlow);
             screenFlow.save();
-            screenFlow.getWidget().update();
+            screenFlow.getWidget().syncWithSwing();
             CustomScreenMod.loadTitleWidgets();
         }
-
-
     }
 
 
