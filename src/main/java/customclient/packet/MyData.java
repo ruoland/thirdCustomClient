@@ -1,5 +1,6 @@
 package customclient.packet;
 
+import customclient.CustomClient;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -8,7 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public record MyData(String name, int age) implements CustomPacketPayload {
     
-    public static final CustomPacketPayload.Type<MyData> TYPE = new CustomPacketPayload.Type<>(new ResourceLocation("customclient", "my_data"));
+    public static final CustomPacketPayload.Type<MyData> TYPE = new CustomPacketPayload.Type<>(new ResourceLocation(CustomClient.MODID, "mydata"));
 
     // Each pair of elements defines the stream codec of the element to encode/decode and the getter for the element to encode
     // 'name' will be encoded and decoded as a string

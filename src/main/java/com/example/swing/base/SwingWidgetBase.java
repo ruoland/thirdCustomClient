@@ -88,6 +88,8 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
             actionComboBox.addItem("열기:설정");
             actionComboBox.addItem("열기:모드");
             actionComboBox.addItem("열기:렐름");
+            actionComboBox.addItem("열기:언어");
+            actionComboBox.addItem("열기:접근성");
             actionComboBox.addItem("접속:");
             actionComboBox.addItem("종료:종료");
 
@@ -119,16 +121,7 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
             if(actionComboBox != null){
                 actionComboBox.setSelectedItem(widgetWrapper.getAction() +widgetWrapper.getValue());
             }
-            if(actionComboBox != null){
-                if(widgetWrapper.getAction().contains("접속")) {
-                    actionComboBox.setSelectedItem("접속:");
-                    actionField.setText(widgetWrapper.getValue());
-                }
-                else {
-                    actionComboBox.setSelectedItem(widgetWrapper.getAction() + ":" + widgetWrapper.getValue());
-                    actionField.setText(widgetWrapper.getValue());
-                }
-            }
+           
         }
 
         @Override

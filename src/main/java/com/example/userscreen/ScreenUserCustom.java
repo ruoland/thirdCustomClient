@@ -8,14 +8,18 @@ import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
 
 public class ScreenUserCustom extends ScreenCustom implements ICustomRenderable {
-    protected ScreenUserCustom(Component pTitle) {
+    public ScreenUserCustom(Component pTitle) {
         super(pTitle);
+
     }
 
     @Override
     protected void init() {
         super.init();
-        CustomScreenMod.getScreen(getTitle().getString()).loadScreenData();
+        if(!CustomScreenMod.hasScreen(getTitle().getString()))
+            CustomScreenMod.createScreenFlow(getTitle().getString()).loadScreenData();
+        else
+            CustomScreenMod.getScreen(getTitle().getString());
     }
 
     @Override

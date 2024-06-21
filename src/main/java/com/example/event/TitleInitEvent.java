@@ -32,15 +32,22 @@ public class TitleInitEvent {
             ScreenNewTitle newTitle = new ScreenNewTitle();
             event.setNewScreen(newTitle);
             ScreenFlow screenFlow =  CustomScreenMod.createScreenFlow("ScreenNewTitle");
-
             screenFlow.openScreen(event.getNewScreen()); //스크린 열림
+
+        }
+    }
+
+    @SubscribeEvent
+    public void screenOpenPostEvent(ScreenEvent.Init.Post postEvent){
+        if(postEvent.getScreen() instanceof ScreenNewTitle) {
+            ScreenFlow screenFlow = CustomScreenMod.getScreen("ScreenNewTitle");
             screenFlow.loadScreenData();
         }
     }
 
 
     @SubscribeEvent
-    public void screenMousePressedPost(ScreenEvent.MouseButtonPressed.Post event) {
+    public void screenMousePressedPost(ScreenEvent.MouseButtonPressed.Pre event) {
         if(!CustomScreenMod.isEditMode() && CustomScreenMod.hasScreen(event.getScreen())) {
             if (event.getButton() == 0) {
                 ScreenFlow screenFlow = CustomScreenMod.getScreen(event.getScreen());
@@ -48,7 +55,7 @@ public class TitleInitEvent {
                 for(ButtonWrapper buttonWrapper : screenFlow.getWidget().getDefaultButtons()){
                     if(buttonWrapper.isMouseOver(event.getMouseX(), event.getMouseY())){
                         buttonWrapper.runAction();
-
+                        event.setCanceled(true);
                         break;
 
                     }

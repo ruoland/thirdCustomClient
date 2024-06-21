@@ -11,7 +11,7 @@ public class ClientPayloadHandler {
         
         // Do something with the data, on the main thread
         context.enqueueWork(() -> {
-            System.out.println(data.age());
+                    System.out.println(data.age());
         })
         .exceptionally(e -> {
             // Handle exception

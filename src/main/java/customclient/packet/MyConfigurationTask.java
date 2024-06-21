@@ -12,7 +12,7 @@ public record MyConfigurationTask() implements ICustomConfigurationTask {
 
     @Override
     public void run(final Consumer<CustomPacketPayload> sender) {
-        final MyData payload = new MyData("Heelo", 10);
+        final MyData payload = new MyData("Hello", 10);
         sender.accept(payload);
     }
 
@@ -20,5 +20,4 @@ public record MyConfigurationTask() implements ICustomConfigurationTask {
     public ConfigurationTask.Type type() {
         return TYPE;
     }
-
 }

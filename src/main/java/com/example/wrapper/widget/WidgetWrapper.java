@@ -182,7 +182,8 @@ public abstract class WidgetWrapper {
         ScreenFlow screenFlow =  CustomScreenMod.getScreen(mc.screen);
         if(screenFlow == null)
             screenFlow = CustomScreenMod.createScreenFlow("null");
-        System.out.println(""+action);
+
+
         if(action.contains("열기")) {
             switch (value) {
                 case ("맵 선택"):
@@ -200,6 +201,13 @@ public abstract class WidgetWrapper {
                     break;
                 case ("렐름"):
                     mc.setScreen(new RealmsMainScreen(mc.screen));
+                    break;
+
+                case "언어":
+                    mc.setScreen(new LanguageSelectScreen(mc.screen, mc.options, mc.getLanguageManager()));
+                    break;
+                case "접근성":
+                    mc.setScreen(new AccessibilityOptionsScreen(mc.screen, mc.options));
                     break;
 
             }

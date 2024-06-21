@@ -8,6 +8,7 @@ import com.example.event.ScreenMouseEvent;
 import com.example.event.TitleInitEvent;
 import com.mojang.logging.LogUtils;
 import customclient.packet.ClientPayloadHandler;
+import customclient.packet.MyConfigurationTask;
 import customclient.packet.MyData;
 import customclient.packet.ServerPayloadHandler;
 import net.minecraft.client.gui.screens.Screen;
@@ -21,13 +22,13 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
-import net.neoforged.neoforge.internal.versions.neoforge.NeoForgeVersion;
+import net.neoforged.neoforge.network.event.RegisterConfigurationTasksEvent;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.DirectionalPayloadHandler;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -47,12 +48,15 @@ public class CustomClient
 
     public CustomClient(IEventBus modEventBus, ModContainer modContainer)
     {
-        modEventBus.addListener(this::commonSetup);
+        NeoForge.EVENT_BUS.addListener(ClientModEvents::registerConfig);
+        NeoForge.EVENT_BUS.addListener(ClientModEvents::registerPayload);
         NeoForge.EVENT_BUS.register(new KeyEvent());
         NeoForge.EVENT_BUS.register(new CustomScreenEvent());
         NeoForge.EVENT_BUS.register(new ScreenMouseEvent());
         NeoForge.EVENT_BUS.register(new TitleInitEvent());
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
+
+        NeoForge.EVENT_BUS.register(this);
 
     }
 
@@ -92,6 +96,8 @@ public class CustomClient
 
         }
     }
+
+
     // You can use SubscribeEvent and let the Event Bus discover methods to call
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event)
@@ -100,24 +106,29 @@ public class CustomClient
     }
 
     @SubscribeEvent
-    public void command(RegisterCommandsEvent event){
+    public void registerCommands(RegisterCommandsEvent event){
         ScreenCommand.register(event.getDispatcher());
-        System.out.println("이벤트 가입");
     }
 
 
-    @EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    @EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.MOD)
     public static class ClientModEvents
     {
-
-
         @SubscribeEvent
-        public static void onClientSetup(FMLClientSetupEvent event)
-        {
-            // Some client setup code
-            LOGGER.info("HELLO FROM CLIENT SETUP");
+        public static void registerPayload(final RegisterPayloadHandlersEvent event) {
+            final PayloadRegistrar registrar = event.registrar("1");
+            registrar.playBidirectional(
+                    MyData.TYPE,
+                    MyData.STREAM_CODEC,
+                    new DirectionalPayloadHandler<>(
+                            ClientPayloadHandler::handleData,
+                            ServerPayloadHandler::onMyData
+                    )
+            );
         }
-
+        @SubscribeEvent
+        public static void registerConfig(final RegisterConfigurationTasksEvent event) {
+            event.register(new MyConfigurationTask());
+        }
     }
-
 }

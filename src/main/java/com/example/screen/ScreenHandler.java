@@ -66,13 +66,12 @@ public class ScreenHandler {
         return images;
     }
 
+
     public void loadDefaultWidgets(){
-        for(int i = 0; i < screen.children().size();i++){
+        for(int i = 0; i < defaultButtons.size();i++){
             AbstractWidget widget = (AbstractWidget) screen.children().get(i);
-            if(defaultButtons.size() <= i)
-                defaultButtons.add(new ButtonWrapper(widget));
-            else
-                defaultButtons.get(i).setAbstractWidget(widget);
+            System.out.println(defaultButtons);
+            defaultButtons.get(i).setAbstractWidget(widget);
 
         }
 
