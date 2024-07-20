@@ -8,14 +8,17 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
-import org.checkerframework.checker.units.qual.N;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 //스크린을 찾거나, 스크린들의 전반에 걸쳐 관리하는 클래스
 public class CustomScreenMod {
+    private static final Logger logger = LoggerFactory.getLogger(CustomScreenMod.class);
+
     public static final ResourceLocation DEFAULT_BACKGROUND_IMAGE = new ResourceLocation(CustomClient.MODID, "textures/screenshot.png");
 
     private static final LinkedHashMap<String, ScreenFlow> screenMap = new LinkedHashMap<>();
@@ -25,12 +28,14 @@ public class CustomScreenMod {
 
     @Nullable
     public static ScreenFlow getScreen(Screen screen){
+        logger.debug("화면 가져오기 요청: {}", screen.getTitle().getString());
+        //StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+
         return getScreen(screen.getTitle().getString());
     }
 
     @Nullable
     public static ScreenFlow getScreen(String name){
-
         if(screenMap.containsKey(name)) {
             return screenMap.get(name);
         }
@@ -43,9 +48,6 @@ public class CustomScreenMod {
             screenMap.put(name, screenFlow);
             System.out.println("스크린 흐름 생성됨"+name);
             return screenMap.get(name);
-    }
-    public static ScreenFlow createScreenFlow(Screen screen){
-        return createScreenFlow(screen.getTitle().getString());
     }
     public static boolean hasScreen(Screen screen){
         return hasScreen(screen.getTitle().getString());
@@ -83,12 +85,13 @@ public class CustomScreenMod {
             screenFlow.save();
             if(screenFlow.getSwingHandler().isSwingOpen())
                 screenFlow.getSwingHandler().swingClose();
-            screenFlow.reset();
+            screenFlow.reset(true);
             screenFlow.getSwingHandler().swingClose();
         }
         else {//편집 모드 실행, GUI 데이터 불러옴
             screenFlow.loadScreenData();
         }
+        logger.info("편집 모드 변경. 현재 모드: {}", editMode);
     }
     public static boolean isEditMode() {
         return editMode;
@@ -110,7 +113,7 @@ public class CustomScreenMod {
             screenFlow.getWidget().addImage(new ImageWrapper(new ResourceLocation("customclient:textures/minecraft.png"), "textures/minecraft.png", i, 20, LogoRenderer.LOGO_WIDTH, LogoRenderer.LOGO_HEIGHT, 1));
         if(!edition)
             screenFlow.getWidget().addImage(new ImageWrapper(new ResourceLocation("customclient:textures/edition.png"), "textures/edition.png", j, k, 128, 14, 1));
-        }
+    }
 
 
     public static void loadTitleWidgets(){

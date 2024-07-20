@@ -1,23 +1,24 @@
 package com.example.event;
 
-import com.example.*;
+import com.example.ScreenNewTitle;
 import com.example.screen.CustomScreenMod;
 import com.example.screen.ScreenFlow;
 import com.example.wrapper.widget.ButtonWrapper;
 import com.google.gson.JsonPrimitive;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.TitleScreen;
-import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
 
 public class TitleInitEvent {
+    private static final Logger logger = LoggerFactory.getLogger(TitleInitEvent.class);
+
     /**
      * 이 클래스에서 커스터마이징할 스크린을 지정함
      * 현재는 Title Screen 클래스만 지정
@@ -26,7 +27,10 @@ public class TitleInitEvent {
     @SubscribeEvent
     public void screenOpenEvent(ScreenEvent.Opening event) {
         String screenName = CustomScreenMod.getScreenName(event.getNewScreen());
+        logger.info("화면이 열렸습니다. {}",screenName);
+
         if (screenName != null && screenName.equals("TitleScreen")) {
+            logger.debug("화면 열림 이벤트: {}", event.getNewScreen().getTitle().getString());
             setFinalStatic("MINECRAFT_LOGO", new ResourceLocation("customclient:textures/logo.png"));
             setFinalStatic("MINECRAFT_EDITION", new ResourceLocation("customclient:textures/logo.png"));
             ScreenNewTitle newTitle = new ScreenNewTitle();
@@ -37,23 +41,17 @@ public class TitleInitEvent {
         }
     }
 
-    @SubscribeEvent
-    public void screenOpenPostEvent(ScreenEvent.Init.Post postEvent){
-        if(postEvent.getScreen() instanceof ScreenNewTitle) {
-            ScreenFlow screenFlow = CustomScreenMod.getScreen("ScreenNewTitle");
-            screenFlow.loadScreenData();
-        }
-    }
 
 
     @SubscribeEvent
     public void screenMousePressedPost(ScreenEvent.MouseButtonPressed.Pre event) {
+        logger.debug("마우스 클릭 이벤트 - 좌표: ({}, {})", event.getMouseX(), event.getMouseY());
         if(!CustomScreenMod.isEditMode() && CustomScreenMod.hasScreen(event.getScreen())) {
             if (event.getButton() == 0) {
                 ScreenFlow screenFlow = CustomScreenMod.getScreen(event.getScreen());
-                screenFlow.loadScreenData();
                 for(ButtonWrapper buttonWrapper : screenFlow.getWidget().getDefaultButtons()){
                     if(buttonWrapper.isMouseOver(event.getMouseX(), event.getMouseY())){
+                        logger.info("클릭된 버튼 : {}, 액션 : {}",buttonWrapper.getMessage(), buttonWrapper.getAction());
                         buttonWrapper.runAction();
                         event.setCanceled(true);
                         break;
@@ -63,19 +61,14 @@ public class TitleInitEvent {
             }
         }
     }
-    private static int isLoad = -1;
 
     @SubscribeEvent
     public void screenPostInitEvent(ScreenEvent.Init.Post event){
-        if(isLoad == 1) {
-            return;
-        }
-
         if(isTitle(event.getScreen())) {
             ScreenFlow screenFlow =  CustomScreenMod.getScreen("ScreenNewTitle");
-            isLoad = 1;
             screenFlow.loadScreenData();
             //타이틀에서는 로고가 있으니까 여기서 로고 정보 저장하고 불러옴
+            System.out.println("로고 추가함");
             if(screenFlow.getCustomData().has("logoVisible")){
                 CustomScreenMod.setLogoVisible( screenFlow.getCustomData().getAsJsonPrimitive("logoVisible").getAsBoolean());
             }

@@ -1,13 +1,34 @@
 package com.example.event;
 
+import com.example.gui.event.FilesDropEvent;
 import com.example.screen.CustomScreenMod;
 import com.example.screen.ScreenFlow;
-import com.example.gui.event.FilesDropEvent;
+import com.example.wrapper.widget.ButtonWrapper;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ScreenMouseEvent {
+    private static final Logger logger = LoggerFactory.getLogger(ScreenMouseEvent.class);
 
+    @SubscribeEvent
+    public void screenMousePressedPost(ScreenEvent.MouseButtonPressed.Pre event) {
+        logger.debug("마우스 클릭 이벤트 - 좌표: ({}, {})", event.getMouseX(), event.getMouseY());
+        if(!CustomScreenMod.isEditMode() && CustomScreenMod.hasScreen(event.getScreen())) {
+            if (event.getButton() == 0) {
+                ScreenFlow screenFlow = CustomScreenMod.getScreen(event.getScreen());
+                for(ButtonWrapper buttonWrapper : screenFlow.getWidget().getButtons()){
+                    if(buttonWrapper.isMouseOver(event.getMouseX(), event.getMouseY())){
+                        logger.info("클릭된 버튼 : {}, 액션 : {}",buttonWrapper.getMessage(), buttonWrapper.getAction());
+                        buttonWrapper.runAction();
+                        event.setCanceled(true);
+                        break;
+                    }
+                }
+            }
+        }
+    }
     /*
      * 파일을 드롭했을 때 이벤트입니다.
      */
@@ -24,14 +45,14 @@ public class ScreenMouseEvent {
      */
     @SubscribeEvent
     public void screenButton(ScreenEvent.MouseDragged.Post opening){
-        if(CustomScreenMod.hasScreen(opening.getScreen()) && CustomScreenMod.isEditMode()){
+        if(CustomScreenMod.isEditMode() && CustomScreenMod.hasScreen(opening.getScreen())){
             int mouseX = (int) (opening.getMouseX() + opening.getDragX());
             int mouseY = (int) (opening.getMouseY() + opening.getDragY());
 
             ScreenFlow screenFlow = CustomScreenMod.getScreen(opening.getScreen());
 
             if(screenFlow.hasSelectWidget()) {
-
+                screenFlow.getSwingHandler().updateSwingData();
                 screenFlow.dragWidget(mouseX, mouseY);
 
             }
@@ -45,22 +66,14 @@ public class ScreenMouseEvent {
         if(CustomScreenMod.hasScreen(event.getScreen())) {
             if (CustomScreenMod.isEditMode()) {
                 event.setCanceled(true);
-                System.out.println(""+CustomScreenMod.isEditMode());
-                CustomScreenMod.getScreen(event.getScreen()).clickWidget(event.getMouseX(), event.getMouseY());
+                boolean isClickButton = CustomScreenMod.getScreen(event.getScreen()).clickWidget(event.getMouseX(), event.getMouseY());
+                //클릭했는데 버튼이 없는 경우, 리셋
+                if(!isClickButton){
+                    CustomScreenMod.getScreen(event.getScreen()).reset(false);
+                }
             }
         }
     }
 
-    /*
-    마우스 땠을 때 선택한 위젯 제거합니다.
-     */
-    @SubscribeEvent
-    public void mouseClick(ScreenEvent.MouseButtonReleased.Post event){
-        if(CustomScreenMod.hasScreen(event.getScreen()) ) {
-            ScreenFlow screenFlow = CustomScreenMod.getScreen(event.getScreen());
-            if(screenFlow.hasSelectWidget())
-                 screenFlow.clickWidget(event.getMouseX(), event.getMouseY());
-        }
-    }
 
 }

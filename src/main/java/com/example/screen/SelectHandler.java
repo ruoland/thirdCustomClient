@@ -30,7 +30,6 @@ public class SelectHandler {
             setDragX(x - getWidget().getX());
             setDragY(y - getWidget().getY()
             );
-            System.out.println(x+" - " +getWidget().getWidth()+ " - "+y);
         }
         selectWidget.setPosition(x - dragX, y - dragY);
     }

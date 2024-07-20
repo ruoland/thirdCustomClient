@@ -4,11 +4,12 @@ import com.example.ICustomRenderable;
 import com.example.wrapper.widget.ButtonWrapper;
 import com.example.wrapper.widget.ImageWrapper;
 import com.example.wrapper.widget.WidgetWrapper;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -19,9 +20,10 @@ import java.util.LinkedList;
  */
 public class ScreenHandler {
     private Screen screen;
-    private ArrayList<ButtonWrapper> defaultButtons = new ArrayList<>();
-    private ArrayList<ButtonWrapper> buttons = new ArrayList<>();
-    private ArrayList<ImageWrapper> images = new ArrayList<>();
+    private final ArrayList<ButtonWrapper> defaultButtons = new ArrayList<>();
+    private final ArrayList<ButtonWrapper> buttons = new ArrayList<>();
+    private final ArrayList<ImageWrapper> images = new ArrayList<>();
+    private static final Logger logger = LoggerFactory.getLogger(ScreenHandler.class);
 
     public ScreenHandler(Screen screen){
         this.screen = screen;
@@ -49,6 +51,7 @@ public class ScreenHandler {
     public LinkedList<WidgetWrapper> getAllWidget(){
         LinkedList<WidgetWrapper> allWidget = new LinkedList<>();
         allWidget.addAll(getButtons());
+        System.out.println(getButtons() + " --------------------------------");
         allWidget.addAll(getDefaultButtons());
         allWidget.addAll(getImageList());
         return allWidget;
@@ -66,16 +69,20 @@ public class ScreenHandler {
         return images;
     }
 
-
     public void loadDefaultWidgets(){
-        for(int i = 0; i < defaultButtons.size();i++){
+        logger.info("기본 위젯 로딩 중");
+        boolean add = false;
+
+        for(int i = 0; i < 9;i++){
             AbstractWidget widget = (AbstractWidget) screen.children().get(i);
-            System.out.println(defaultButtons);
+            if(defaultButtons.isEmpty())
+                add = true;
+            if(add)
+                defaultButtons.add(new ButtonWrapper(widget));
+
             defaultButtons.get(i).setAbstractWidget(widget);
-
+            logger.debug("스크린 {}에 버튼 추가 됨{}",screen.getTitle().getString(), widget.getMessage().getString());
         }
-
-        
     }
 
     public void addTextfield(ButtonWrapper data){
@@ -90,12 +97,13 @@ public class ScreenHandler {
         customRenderable.addRenderableWidget(data.getWidget());
     }
     public void makeCustomButtons(){
+        logger.info("커스텀 버튼 생성 중");
         for(ButtonWrapper data : buttons){
             AbstractWidget abstractWidget = new Button.Builder(Component.literal(data.getMessage()), (Button.OnPress) pButton -> {
             }).size(data.getWidth(), data.getHeight()).pos(data.getX(), data.getY()).build();
             screen.renderables.add(abstractWidget);
             data.setAbstractWidget(abstractWidget);
-            System.out.println(data+ " 커스텀 데이터가 추가됨");
+            logger.debug("커스텀 버튼 추가됨: {}", data);
         }
     }
     public void addImage(ImageWrapper widgetImage){
@@ -103,13 +111,6 @@ public class ScreenHandler {
         images.add(widgetImage);
     }
 
-    public void renderImage(GuiGraphics guiGraphics){
-        for(ImageWrapper image : images){
-            if(image.getWidget() == null)
-                image.createFakeWidget(image.getX(),image.getY(),image.getWidth(),image.getHeight(), image.getMessage());
-            image.render(guiGraphics);
-        }
-    }
 
 }
 

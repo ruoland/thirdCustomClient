@@ -16,14 +16,19 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.NeoForge;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.nio.file.Path;
+import java.util.LinkedList;
 
 /**
  * Handler로 직접 접근 하지 않고도 여기서 처리할 수 있도록
  */
 public class ScreenFlow {
+    private static final Logger logger = LoggerFactory.getLogger(ScreenFlow.class);
+
     private Screen screen;
     private String screenName;
     private CustomScreenData data;
@@ -36,12 +41,13 @@ public class ScreenFlow {
 
     }
 
-    public void reset(){
+    public void reset(boolean dataToo){
         selectHandler = null;
         if(swingHandler != null)
             swingHandler.swingClose();
         swingHandler = new SwingHandler();
-        data = null;
+        if(dataToo)
+            data = null;
     }
 
     public boolean hasSelectWidget(){
@@ -80,39 +86,53 @@ public class ScreenFlow {
     public void save(){
         if(data != null)
             data.save();
-        else
+        else {
+            logger.error("{}의 스크린에서 오류 발생", getScreenName());
             throw new NullPointerException("스크린의 데이터 없음");
+        }
     }
 
+    public boolean isTitle(){
+        return getScreenName().equals("ScreenNewTitle");
+    }
     public JsonObject getCustomData(){
         return this.data.getCustomObject();
     }
-
     public void loadScreenData(){
+        logger.info("화면 데이터 로딩 중: {}", screenName);
         screenHandler = new ScreenHandler(screen);
         data = new CustomScreenData(this, screenName);
-        data.initFiles(); //기본 파일 생성
+        data.initFiles();
 
         data.loadCustomWidgets();
-        screenHandler.loadDefaultWidgets();
+        if(screenName.equals("ScreenNewTitle"))
+            screenHandler.loadDefaultWidgets();
         screenHandler.makeCustomButtons();
-
         screenHandler.syncWithSwing();
 
-        if(screen instanceof ICustomBackground background)//백그라운드 설정 가능한 GUI라면
+        if(screen instanceof ICustomBackground background)
             background.setBackground(new ResourceLocation(data.background));
+        logger.debug("로드된 기본 버튼: {}", screenHandler.getDefaultButtons());
+        logger.debug("로드된 커스텀 버튼: {}", screenHandler.getButtons());
+        logger.debug("로드된 이미지: {}", screenHandler.getImageList());
     }
+    public boolean clickWidget(double mouseX, double mouseY){
+        logger.debug("위젯 클릭 - 좌표: ({}, {})", mouseX, mouseY);
+        LinkedList<WidgetWrapper> allWidgets = screenHandler.getAllWidget();
 
-    public void clickWidget(double mouseX, double mouseY){
-        for(WidgetWrapper clickedWidget : screenHandler.getAllWidget()) {
-            if (clickedWidget.isMouseOver(mouseX, mouseY)) {
+        for(WidgetWrapper clickedWidget : allWidgets) {
+            if (clickedWidget.isMouseOver(mouseX, mouseY) ) {
+                if(selectHandler != null && selectHandler.getWidget() == clickedWidget)
+                    return true;
                 this.swingHandler.openSwing(clickedWidget);
                 selectHandler = new SelectHandler(clickedWidget);
-                return;
+                return true;
             }
         }
-        System.out.println("선택된 위젯을 찾지 못함: "+screenHandler.getAllWidget());
 
+
+        System.out.println("선택된 위젯을 찾지 못함. 마우스 위치: (" + mouseX + ", " + mouseY + ")");
+        return false;
     }
 
     @Nullable

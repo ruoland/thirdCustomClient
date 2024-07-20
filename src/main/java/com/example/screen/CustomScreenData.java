@@ -3,9 +3,11 @@ package com.example.screen;
 import com.example.wrapper.widget.ButtonWrapper;
 import com.example.wrapper.widget.ImageWrapper;
 import com.google.common.reflect.TypeToken;
-import com.google.gson.*;
-import customclient.CustomClient;
-import net.minecraft.resources.ResourceLocation;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,6 +23,7 @@ public class CustomScreenData {
     private JsonObject customObject = new JsonObject();
     protected String background = "customclient:textures/screenshot.png", dynamicBackground;
     private Path screenDataPath;
+    private static final Logger logger = LoggerFactory.getLogger(CustomScreenData.class);
 
     public CustomScreenData(ScreenFlow screenFlow, String screenName){
         this.screenFlow = screenFlow;
@@ -50,13 +53,18 @@ public class CustomScreenData {
         }
     }
     public void save(){
+        logger.info("화면 데이터 저장 중 - 파일: {}", screenDataPath);
         try {
             widgetObject.addProperty("background", background);
-            widgetObject.add("titleWidgetButton", GSON.toJsonTree(screenFlow.getWidget().getDefaultButtons()));
+            if(widgetObject.has("titleWidgetButton"))
+                logger.warn("경고, 저장하려는데 기본 위젯 버튼이 이미 존재합니다.");
+            else {
+                logger.debug("기본 버튼 저장하는 중 {} ", screenFlow.getWidget().getDefaultButtons());
+                widgetObject.add("titleWidgetButton", GSON.toJsonTree(screenFlow.getWidget().getDefaultButtons()));
+            }
             widgetObject.add("widgetButton", GSON.toJsonTree(screenFlow.getWidget().getButtons()));
             widgetObject.add("widgetImage", GSON.toJsonTree(screenFlow.getWidget().getImageList()));
             widgetObject.add("customObject", customObject);
-            System.out.println(customObject+" : 커스텀 데이터 저장됨");
             Files.writeString(screenDataPath, GSON.toJson(widgetObject));
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -66,8 +74,8 @@ public class CustomScreenData {
         this.background = background;
     }
 
-
     public void loadCustomWidgets(){
+        logger.info("커스텀 위젯 로딩 중 - 파일: {}", screenDataPath);
         try {
             String json = new String(Files.readAllBytes(screenDataPath));
             if(json.equals("[]") || json.equals("{}"))
@@ -75,14 +83,17 @@ public class CustomScreenData {
             JsonObject jsonObject = GSON.fromJson(json, JsonObject.class);
             setBackground(jsonObject.get("background").getAsString());
 
-            if(jsonObject.has("titleWidgetButton"))
-                screenHandler.getDefaultButtons().addAll(GSON.fromJson(jsonObject.get("titleWidgetButton"), new TypeToken<ArrayList<ButtonWrapper>>(){}.getType()));
+            if(jsonObject.has("titleWidgetButton")) {
+                screenHandler.getDefaultButtons().addAll(GSON.fromJson(jsonObject.get("titleWidgetButton"), new TypeToken<ArrayList<ButtonWrapper>>() {
+                }.getType()));
+                logger.info("저장된 기본 버튼을 확인 했습니다. 기본 버튼을 불러옵니다.");
+
+            }
 
             screenHandler.getButtons().addAll(GSON.fromJson(jsonObject.get("widgetButton"), new TypeToken<ArrayList<ButtonWrapper>>(){}.getType()));
 
             if(!jsonObject.get("widgetImage").getAsJsonArray().isEmpty()){
                 screenHandler.getImageList().addAll(GSON.fromJson(jsonObject.get("widgetImage"), new TypeToken<ArrayList<ImageWrapper>>(){}.getType()));
-
             }
             if(jsonObject.has("customObject")) {
                 customObject = jsonObject.get("customObject").getAsJsonObject();
@@ -93,7 +104,9 @@ public class CustomScreenData {
             }
 
         } catch (IOException e) {
+            logger.error("커스텀 위젯 로딩 중 오류 발생", e);
             throw new RuntimeException(e);
+
         }
 
     }

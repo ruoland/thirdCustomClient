@@ -1,9 +1,10 @@
 package com.example.swing.base;
 
-import com.example.screen.CustomScreenMod;
 import com.example.wrapper.widget.WidgetWrapper;
 import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -13,6 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.function.Consumer;
 
 public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener, ActionListener, DocumentListener {
         protected JTextField nameField = new JTextField(20);
@@ -24,9 +26,10 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
         protected JButton visibleButton = new JButton("버튼 표시: 켜짐");
         protected String visibleText = "버튼 표시: ";
         protected JComboBox<String> actionComboBox;
+        private static final Logger logger = LoggerFactory.getLogger(SwingWidgetBase.class);
 
         protected WidgetWrapper widgetWrapper;
-        public SwingWidgetBase(WidgetWrapper widgetWrapper, String title, boolean isNameText, boolean actionField, boolean positionField, boolean sizeField, boolean visibleButton) {
+        public SwingWidgetBase(WidgetWrapper widgetWrapper, String title, boolean isNameText, boolean isAction, boolean positionField, boolean sizeField, boolean visibleButton) {
             setTitle(title);
             setSize(500, 200);
             Window window = Minecraft.getInstance().getWindow();
@@ -38,6 +41,10 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
                 nameField.setText(widgetWrapper.getMessage());
                 nameField.getDocument().addDocumentListener(this);
                 add(nameField);
+            }
+            if(isAction)
+            {
+                actionField.setText(widgetWrapper.getAction());
             }
             if(positionField) {
                 xField.addKeyListener(this);
@@ -64,7 +71,7 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
                 add(this.visibleButton);
             }
 
-            if(actionField) {
+            if(isAction) {
                 this.actionComboBox = new JComboBox<String>();
                 this.actionField.addKeyListener(this);
                 this.actionComboBox.addActionListener(this);
@@ -128,7 +135,10 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == visibleButton) {
                 widgetWrapper.setVisible(!widgetWrapper.isVisible());
-                visibleButton.setText(widgetWrapper.isVisible() ? visibleText + ": 켜짐" : visibleText+": 꺼짐");
+                StringBuilder sb = new StringBuilder(visibleText);
+                sb.append(widgetWrapper.isVisible() ? ": 켜짐" : ": 꺼짐");
+                visibleButton.setText(sb.toString());
+
             }
             if(e.getSource() == actionComboBox){
                 System.out.println("이벤트 발동됨" + actionComboBox.getSelectedItem());
@@ -149,24 +159,34 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
             super.dispose();
 
         }
+    private void setIntegerFieldIfNotEmpty(JTextField field, Consumer<Integer> setter) {
+        if (!field.getText().isEmpty()) {
+            setter.accept(Integer.parseInt(field.getText()));
+
+        }
+    }
+
 
     /**
      *  swing에 키보드로 뭔가 입력이 된다면 업데이트됨
      */
     public void dataUpdate(){
-            if(!xField.getText().isEmpty())
-                widgetWrapper.setX(Integer.parseInt(xField.getText()));
-            if(!yField.getText().isEmpty())
-                widgetWrapper.setY(Integer.parseInt(yField.getText()));
-            if(!widthField.getText().isEmpty())
-                widgetWrapper.setWidth(Integer.parseInt(widthField.getText()));
-            if(!heightField.getText().isEmpty())
-                widgetWrapper.setHeight(Integer.parseInt(heightField.getText()));
-            if(!actionField.getText().isEmpty() && actionComboBox.getSelectedItem().equals("접속:")) {
+        // 사용 예:
+
+        if(isFocused()) {
+            setIntegerFieldIfNotEmpty(xField, widgetWrapper::setX);
+            setIntegerFieldIfNotEmpty(yField, widgetWrapper::setY);
+            setIntegerFieldIfNotEmpty(widthField, widgetWrapper::setWidth);
+            setIntegerFieldIfNotEmpty(heightField, widgetWrapper::setHeight);
+            if (!nameField.getText().equals(""))
+                widgetWrapper.setMessage(nameField.getText());
+
+            if (!actionField.getText().isEmpty() && actionComboBox.getSelectedItem().equals("접속:")) {
                 widgetWrapper.setAction(actionComboBox.getSelectedItem() + actionField.getText());
                 System.out.println(actionField.getText());
             }
         }
+    }
     @Override
     public void insertUpdate(DocumentEvent e) {
         dataUpdate();
@@ -179,6 +199,7 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
 
     @Override
     public void changedUpdate(DocumentEvent e) {
+
         dataUpdate();
     }
 }

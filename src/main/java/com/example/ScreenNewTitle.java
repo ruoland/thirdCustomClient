@@ -2,6 +2,7 @@ package com.example;
 
 import com.example.screen.CustomScreenMod;
 import com.example.screen.ScreenAPI;
+import com.example.screen.ScreenFlow;
 import customclient.CustomClient;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
@@ -18,7 +19,7 @@ import java.util.List;
 public class ScreenNewTitle extends TitleScreen implements ICustomBackground, ICustomRenderable {
 
     protected ResourceLocation BACKGROUND_IMAGE = new ResourceLocation(CustomClient.MODID, "textures/screenshot.png");
-
+    private ScreenFlow screenFlow =  CustomScreenMod.getScreen(this);
     public ScreenNewTitle(){
         try {
 
@@ -52,7 +53,11 @@ public class ScreenNewTitle extends TitleScreen implements ICustomBackground, IC
         super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
 
         //얘는 별개로 한번 더 아래 코드가 필요함
-        CustomScreenMod.getScreen(this).renderImageWidget(pGuiGraphics);
+        if(screenFlow == null) {
+            screenFlow = CustomScreenMod.getScreen(this);
+        }
+
+        screenFlow.renderImageWidget(pGuiGraphics);
 
     }
 

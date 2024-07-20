@@ -3,7 +3,6 @@ package com.example.wrapper.widget;
 import com.example.screen.CustomScreenMod;
 import com.example.screen.ScreenFlow;
 import com.mojang.realmsclient.RealmsMainScreen;
-import customclient.CustomClient;
 import customclient.FakeTextureWidget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -13,7 +12,6 @@ import net.minecraft.client.gui.screens.multiplayer.SafetyScreen;
 import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.neoforged.neoforge.client.gui.ModListScreen;
 
@@ -82,6 +80,7 @@ public abstract class WidgetWrapper {
     public void setX(int x) {
         this.x = x;
         abstractWidget.setX(x);
+
     }
 
     public void setY(int y) {
@@ -190,7 +189,7 @@ public abstract class WidgetWrapper {
                     mc.setScreen(new SelectWorldScreen(screenFlow.getScreen()));
                     break;
                 case ("멀티"):
-                    Screen screen = (Screen) (mc.options.skipMultiplayerWarning ? new JoinMultiplayerScreen(screenFlow.getScreen()) : new SafetyScreen(screenFlow.getScreen()));
+                    Screen screen = (mc.options.skipMultiplayerWarning ? new JoinMultiplayerScreen(screenFlow.getScreen()) : new SafetyScreen(screenFlow.getScreen()));
                     mc.setScreen(screen);
                     break;
                 case ("설정"):

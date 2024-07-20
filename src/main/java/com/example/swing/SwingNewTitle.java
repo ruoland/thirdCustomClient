@@ -5,7 +5,8 @@ import com.example.swing.base.SwingWidgetBase;
 import net.minecraft.client.Minecraft;
 
 import javax.swing.*;
-import java.awt.event.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 public class SwingNewTitle extends SwingWidgetBase implements ItemListener {
 
@@ -13,7 +14,7 @@ public class SwingNewTitle extends SwingWidgetBase implements ItemListener {
     JToggleButton splashToggle = new JToggleButton("스플래시: ");
     public SwingNewTitle(){
         super(null, "메인메뉴", false, false, false, false, false);
-        Minecraft mc = Minecraft.getInstance();
+
         setTitle("메인메뉴");
         logoToggle.addItemListener(this);
         splashToggle.addItemListener(this);
@@ -24,25 +25,20 @@ public class SwingNewTitle extends SwingWidgetBase implements ItemListener {
 
     @Override
     public void itemStateChanged(ItemEvent e) {
-        if(e.getItem() == logoToggle){
-            if(logoToggle.isSelected()) {
-                logoToggle.setText("로고 보이게 하기");
-                CustomScreenMod.setLogoVisible(false);
-            }
-            else {
-                logoToggle.setText("로고 사라지게 하기");
-                CustomScreenMod.setLogoVisible(true);
-            }
+        // 사용 예:
+        if (e.getItem() == logoToggle) {
+            handleToggle(logoToggle, "로고 보이게 하기", "로고 사라지게 하기", true);
+        } else if (e.getItem() == splashToggle) {
+            handleToggle(splashToggle, "스플래시 보이게 하기", "스플래시 사라지게 하기", true);
         }
-        if(e.getItem() == splashToggle){
-            if(splashToggle.isSelected()) {
-                splashToggle.setText("스플래시 보이게 하기");
-                CustomScreenMod.setLogoVisible(false);
-            }
-            else {
-                splashToggle.setText("스플래시 사라지게 하기");
-                CustomScreenMod.setLogoVisible(true);
-            }
-        }
+
+    }
+    private void handleToggle(JToggleButton toggle, String showText, String hideText, boolean visibility) {
+        if (toggle.isSelected()) {
+            toggle.setText(showText);
+            CustomScreenMod.setLogoVisible(!visibility);
+        } else {
+            toggle.setText(hideText);
+            CustomScreenMod.setLogoVisible(visibility);}
     }
 }

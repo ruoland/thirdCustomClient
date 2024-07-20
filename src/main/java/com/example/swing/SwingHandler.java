@@ -1,28 +1,34 @@
 package com.example.swing;
 
-import com.example.swing.SwingNewTitle;
 import com.example.swing.base.EnumSwing;
 import com.example.swing.base.ICustomSwing;
-import com.example.swing.SwingButton;
-import com.example.swing.SwingImage;
 import com.example.swing.base.SwingWidgetBase;
 import com.example.wrapper.widget.ImageWrapper;
 import com.example.wrapper.widget.WidgetWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SwingHandler {
     private SwingButton swingButton;
     private SwingImage swingImage;
+    private static final Logger logger = LoggerFactory.getLogger(SwingHandler.class);
 
     private ICustomSwing selectSwing;
 
     public void updateSwingData(){
-        selectSwing.update();
+        SwingWidgetBase swingWidgetBase = (SwingWidgetBase) selectSwing;
+        //만약 윈도우 포커스가 마인크래프트에 맞춰져 있다면 스윙창 업데이트
+        if(!swingWidgetBase.isFocused())
+            selectSwing.update();
     }
 
     public void openSwing( WidgetWrapper widgetWrapper){
+        logger.debug("위젯용 Swing 창 열기: {}", widgetWrapper);
         EnumSwing enumSwing = EnumSwing.check(widgetWrapper);
-        if(selectSwing != null)
+        if(selectSwing != null) {
             swingClose();
+            logger.debug("위젯용 Swing 창 닫힘: {}", widgetWrapper);
+        }
 
         switch (enumSwing) {
             case IMAGE -> {
@@ -31,7 +37,7 @@ public class SwingHandler {
                 return;
             }
             case BUTTON -> {
-                selectSwing = build(EnumSwing.BUTTON, widgetWrapper, "이미지 위젯");
+                selectSwing = build(EnumSwing.BUTTON, widgetWrapper, "버튼 위젯");
                 updateSwingData();
                 return;
             }
