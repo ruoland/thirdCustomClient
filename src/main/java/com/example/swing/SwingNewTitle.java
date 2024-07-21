@@ -1,8 +1,6 @@
 package com.example.swing;
 
-import com.example.screen.CustomScreenMod;
 import com.example.swing.base.SwingWidgetBase;
-import net.minecraft.client.Minecraft;
 
 import javax.swing.*;
 import java.awt.event.ItemEvent;

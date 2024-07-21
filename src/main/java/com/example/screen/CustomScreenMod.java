@@ -1,15 +1,14 @@
 package com.example.screen;
 
-import com.example.wrapper.widget.ButtonWrapper;
+import com.example.wrapper.widget.WidgetWrapper;
 import customclient.CustomClient;
-import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 //스크린을 찾거나, 스크린들의 전반에 걸쳐 관리하는 클래스
@@ -40,6 +39,7 @@ public class CustomScreenMod {
             ScreenFlow screenFlow = new ScreenFlow();
             screenFlow.setScreenName(name);
             screenMap.put(name, screenFlow);
+        // 초기 위젯 위치의 비율 설정
 
             return screenMap.get(name);
     }

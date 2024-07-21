@@ -1,7 +1,6 @@
 package com.example.screen;
 
 import com.example.wrapper.widget.WidgetWrapper;
-import org.jetbrains.annotations.Nullable;
 
 public class SelectHandler {
     private WidgetWrapper selectWidget;

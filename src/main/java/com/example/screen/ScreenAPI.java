@@ -1,6 +1,5 @@
 package com.example.screen;
 
-import com.example.userscreen.ScreenUserCustom;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;

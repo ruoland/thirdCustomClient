@@ -5,7 +5,7 @@ import com.example.screen.CustomScreenMod;
 import com.example.screen.ScreenFlow;
 import com.example.wrapper.widget.ButtonWrapper;
 import com.example.wrapper.widget.ImageWrapper;
-import net.minecraft.client.gui.components.AbstractWidget;
+import com.example.wrapper.widget.WidgetWrapper;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import org.slf4j.Logger;
@@ -84,6 +84,5 @@ public class ScreenMouseEvent {
             }
         }
     }
-
-
+    
 }

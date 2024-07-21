@@ -40,7 +40,6 @@ public class CustomClient {
         NeoForge.EVENT_BUS.register(new ScreenRenderEvent());
         NeoForge.EVENT_BUS.register(new ScreenMouseEvent());
         NeoForge.EVENT_BUS.register(new TitleInitEvent());
-
         // DeferredRegister 등록
 
     }

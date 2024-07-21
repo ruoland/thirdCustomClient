@@ -10,9 +10,7 @@ import com.google.gson.JsonObject;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.NeoForge;
 import org.jetbrains.annotations.Nullable;
@@ -118,7 +116,6 @@ public class ScreenFlow {
         widgetHandler = new WidgetHandler(screen);
         data = new CustomScreenData(this, screenName);
         data.initFiles();
-
         data.loadCustomWidgets();
         if(screenName.equals("ScreenNewTitle"))
             widgetHandler.loadDefaultWidgets();

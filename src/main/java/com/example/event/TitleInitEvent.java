@@ -19,7 +19,6 @@ import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Map;
 
 public class TitleInitEvent {
     private static final Logger logger = LoggerFactory.getLogger(TitleInitEvent.class);

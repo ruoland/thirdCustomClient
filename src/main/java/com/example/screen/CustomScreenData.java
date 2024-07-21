@@ -2,15 +2,14 @@ package com.example.screen;
 
 import com.example.wrapper.widget.ButtonWrapper;
 import com.example.wrapper.widget.ImageWrapper;
-import com.example.wrapper.widget.WidgetWrapper;
 import com.google.common.reflect.TypeToken;
-import com.google.gson.*;
-import net.minecraft.client.Minecraft;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;

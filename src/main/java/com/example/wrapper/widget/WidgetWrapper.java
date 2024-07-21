@@ -1,5 +1,6 @@
 package com.example.wrapper.widget;
 
+
 import com.example.screen.CustomScreenMod;
 import com.example.screen.ScreenFlow;
 import com.mojang.realmsclient.RealmsMainScreen;
@@ -34,6 +35,7 @@ public abstract class WidgetWrapper implements IWidget {
         this.abstractWidget = widget;
         abstractWidget.active =true;
     }
+    private float xRatio, yRatio;
 
     public int getColor() {
         return abstractWidget.getFGColor();
@@ -81,16 +83,22 @@ public abstract class WidgetWrapper implements IWidget {
 
         abstractWidget.setPosition(x, y);
     }
+
     public void setX(int x) {
         this.x = x;
-        abstractWidget.setX(x);
-
+        if (abstractWidget != null) {
+            abstractWidget.setX(x);
+        }
     }
 
     public void setY(int y) {
         this.y = y;
-        abstractWidget.setY(y);
+        if (abstractWidget != null) {
+            abstractWidget.setY(y);
+        }
     }
+
+
 
     public void setAlpha(float alpha) {
         this.alpha = alpha;
@@ -108,12 +116,24 @@ public abstract class WidgetWrapper implements IWidget {
         this.texture = texture;
     }
 
+    private void applyPosition() {
+        if (abstractWidget != null) {
+            abstractWidget.setX(x);
+            abstractWidget.setY(y);
+        }
+    }
+
     public int getX() {
-        return abstractWidget == null ? x:  abstractWidget.getX();
+        return x;
     }
 
     public int getY() {
-        return abstractWidget == null ? y:  abstractWidget.getY();
+        return y;
+    }
+
+    public void setAbstractWidget(AbstractWidget widget) {
+        this.abstractWidget = widget;
+        applyPosition();
     }
 
     public float getAlpha() {
@@ -148,11 +168,6 @@ public abstract class WidgetWrapper implements IWidget {
     public void setAction(String action){
         logger.debug("1.액션이 {}로 설정 되었습니다.",action);
         this.action = action;
-    }
-
-    public void setAbstractWidget(AbstractWidget abstractWidget) {
-        this.abstractWidget = abstractWidget;
-
     }
 
     public AbstractWidget getWidget() {
