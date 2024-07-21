@@ -17,7 +17,7 @@ import net.neoforged.neoforge.client.gui.ModListScreen;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class WidgetWrapper {
+public abstract class WidgetWrapper implements IWidget {
     private static final Logger logger = LoggerFactory.getLogger(WidgetWrapper.class);
 
     private transient AbstractWidget abstractWidget;
@@ -152,20 +152,9 @@ public abstract class WidgetWrapper {
         abstractWidget.setMessage(Component.literal(message));
     }
     public void setAction(String action){
+        logger.debug("1.액션이 {}로 설정 되었습니다.",action);
         this.action = action;
-        if(action.contains(":")) {
-            String[] actionValue = action.split(":");
-            this.action = actionValue[0];
-            this.value = actionValue[1];
-        }
-    }
 
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public void setCommand(String command){
-        this.value = command;
     }
 
     public void setAbstractWidget(AbstractWidget abstractWidget) {
@@ -198,6 +187,7 @@ public abstract class WidgetWrapper {
 
 
         if(action.contains("열기")) {
+            String value = action.split(":")[1];
             switch (value) {
                 case ("맵 선택"):
                     mc.setScreen(new SelectWorldScreen(screenFlow.getScreen()));
@@ -269,4 +259,7 @@ public abstract class WidgetWrapper {
     }
 
 
+    public void setValue(String text) {
+        this.value = text;
+    }
 }

@@ -105,18 +105,24 @@ public class ScreenFlow {
         screenHandler = new ScreenHandler(screen);
         data = new CustomScreenData(this, screenName);
         data.initFiles();
+        logger.info("-1. 이미지 개수 {}",screenHandler.getImageList().size());
 
         data.loadCustomWidgets();
+        logger.info("0. 이미지 개수 {}",screenHandler.getImageList().size());
+
         if(screenName.equals("ScreenNewTitle"))
             screenHandler.loadDefaultWidgets();
+        logger.info("1. 이미지 개수 {}",screenHandler.getImageList().size());
+
         screenHandler.makeCustomButtons();
+        logger.info("2. 이미지 개수 {}",screenHandler.getImageList().size());
+
         screenHandler.syncWithSwing();
+        logger.info("3. 이미지 개수 {}",screenHandler.getImageList().size());
 
         if(screen instanceof ICustomBackground background)
             background.setBackground(new ResourceLocation(data.background));
-        logger.debug("로드된 기본 버튼: {}", screenHandler.getDefaultButtons());
-        logger.debug("로드된 커스텀 버튼: {}", screenHandler.getButtons());
-        logger.debug("로드된 이미지: {}", screenHandler.getImageList());
+        logger.info("4. 뒷배경 이후 이미지 개수 {}",screenHandler.getImageList().size());
     }
     public boolean clickWidget(double mouseX, double mouseY){
         logger.debug("위젯 클릭 - 좌표: ({}, {})", mouseX, mouseY);
@@ -139,9 +145,6 @@ public class ScreenFlow {
             }
 
         }
-        logger.debug("선택된 위젯을 찾지 못함{} ", screen.renderables);
-
-
         return false;
     }
 
@@ -189,6 +192,8 @@ public class ScreenFlow {
                 imageWrapper.render(pGuiGraphics);
             }
         }
+
+
     }
 
     public void addButton(String name, int width, int height, int x, int y){

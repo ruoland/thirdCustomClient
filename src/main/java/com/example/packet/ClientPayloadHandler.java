@@ -13,7 +13,7 @@ public class ClientPayloadHandler {
         
         // Do something with the data, on the main thread
         context.enqueueWork(() -> {
-            System.out.println("클라잉너트!!"+data.age());
+            System.out.println("클라이언트!!"+data.age());
                     Minecraft.getInstance().setScreen(new ScreenUserCustom(Component.literal(data.name())));
         })
         .exceptionally(e -> {

@@ -181,7 +181,9 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
                     }
 
                     widgetWrapper.setAction(actionComboBox.getSelectedItem().toString());
-                    widgetWrapper.setValue(actionField.getText());
+
+                    if(actionComboBox.getSelectedItem().toString().contains(":") || actionComboBox.getSelectedItem().toString().equals("명령어"))
+                        widgetWrapper.setValue(actionField.getText());
                 }
             }
         }

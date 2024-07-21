@@ -36,9 +36,10 @@ public class SwingNewTitle extends SwingWidgetBase implements ItemListener {
     private void handleToggle(JToggleButton toggle, String showText, String hideText, boolean visibility) {
         if (toggle.isSelected()) {
             toggle.setText(showText);
-            CustomScreenMod.setLogoVisible(!visibility);
+
         } else {
             toggle.setText(hideText);
-            CustomScreenMod.setLogoVisible(visibility);}
+
+        }
     }
 }

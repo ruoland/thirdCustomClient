@@ -109,11 +109,7 @@ public class SwingButton extends SwingComponentBase implements KeyListener {
     @Override
     public void dispose() {
         super.dispose();
-        StringBuffer comboBox = new StringBuffer((String) actionComboBox.getSelectedItem());
 
-        if (comboBox.toString().equals("접속:")) {
-            comboBox.append(actionField.getText());
-        }
 
     }
 }

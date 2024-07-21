@@ -1,6 +1,8 @@
 package com.example.screen;
 
 import com.example.ICustomRenderable;
+import com.example.TrackingList;
+import com.example.userscreen.ScreenUserCustom;
 import com.example.wrapper.widget.ButtonWrapper;
 import com.example.wrapper.widget.ImageWrapper;
 import com.example.wrapper.widget.WidgetWrapper;
@@ -12,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 
 /*
@@ -23,6 +27,7 @@ public class ScreenHandler {
     private final ArrayList<ButtonWrapper> defaultButtons = new ArrayList<>();
     private final ArrayList<ButtonWrapper> buttons = new ArrayList<>();
     private final ArrayList<ImageWrapper> images = new ArrayList<>();
+    private final TrackingList<ImageWrapper> trackingList = new TrackingList<>(images);
     private static final Logger logger = LoggerFactory.getLogger(ScreenHandler.class);
 
     public ScreenHandler(Screen screen){
@@ -65,8 +70,10 @@ public class ScreenHandler {
         return null;
     }
 
-    public ArrayList<ImageWrapper> getImageList() {
-        return images;
+    public TrackingList<ImageWrapper> getImageList() {
+        logger.info("55. 이미지 개수 {}", trackingList.size());
+        trackingList.getModificationLog().forEach(System.out::println);
+        return trackingList;
     }
 
     public void loadDefaultWidgets(){
@@ -125,7 +132,8 @@ public class ScreenHandler {
     }
     public void addImage(ImageWrapper widgetImage){
         widgetImage.setTexture("customclient:"+widgetImage.getResource());
-        images.add(widgetImage);
+        trackingList.add(widgetImage);
+
     }
 
 

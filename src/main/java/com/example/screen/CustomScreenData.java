@@ -75,7 +75,8 @@ public class CustomScreenData {
     }
 
     public void loadCustomWidgets(){
-        logger.info("커스텀 위젯 로딩 중 - 파일: {}", screenDataPath);
+        logger.info("1.커스텀 위젯 로딩 중 - 파일: {}", screenDataPath);
+        logger.info("2.현 이미지 개수 {}",screenHandler.getImageList().size());
         try {
             String json = new String(Files.readAllBytes(screenDataPath));
             if(json.equals("[]") || json.equals("{}"))
@@ -103,6 +104,8 @@ public class CustomScreenData {
             screenHandler.getButtons().addAll(buttonWrappers);
 
             if(!jsonObject.get("widgetImage").getAsJsonArray().isEmpty()){
+                logger.debug("이미지? {} 스크린 이름? {}",jsonObject.get("widgetImage").getAsJsonArray(), screenFlow.getScreenName());
+
                 screenHandler.getImageList().addAll(GSON.fromJson(jsonObject.get("widgetImage"), new TypeToken<ArrayList<ImageWrapper>>(){}.getType()));
             }
             if(jsonObject.has("customObject")) {
@@ -112,7 +115,7 @@ public class CustomScreenData {
                 jsonObject.add("customObject", customObject);
                 System.out.println(customObject+" : 생성됨");
             }
-
+            logger.info("3. 이미지 개수 {}",screenHandler.getImageList().size());
         } catch (IOException e) {
             logger.error("커스텀 위젯 로딩 중 오류 발생", e);
             throw new RuntimeException(e);

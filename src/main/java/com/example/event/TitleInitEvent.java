@@ -4,7 +4,9 @@ import com.example.ScreenNewTitle;
 import com.example.screen.CustomScreenMod;
 import com.example.screen.ScreenFlow;
 import com.example.wrapper.widget.ButtonWrapper;
+import com.example.wrapper.widget.ImageWrapper;
 import com.google.gson.JsonPrimitive;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
@@ -40,6 +42,13 @@ public class TitleInitEvent {
 
         }
     }
+    @SubscribeEvent
+    public void screenCloseEvent(ScreenEvent.Closing event) {
+        String screenName = CustomScreenMod.getScreenName(event.getScreen());
+        if(screenName != null && screenName.equals("ScreenNewTitle")){
+
+        }
+    }
 
 
 
@@ -55,7 +64,6 @@ public class TitleInitEvent {
                         buttonWrapper.runAction();
                         event.setCanceled(true);
                         break;
-
                     }
                 }
             }
@@ -68,7 +76,6 @@ public class TitleInitEvent {
             ScreenFlow screenFlow =  CustomScreenMod.getScreen("ScreenNewTitle");
             screenFlow.loadScreenData();
             //타이틀에서는 로고가 있으니까 여기서 로고 정보 저장하고 불러옴
-            System.out.println("로고 추가함");
             if(screenFlow.getCustomData().has("logoVisible")){
                 CustomScreenMod.setLogoVisible( screenFlow.getCustomData().getAsJsonPrimitive("logoVisible").getAsBoolean());
             }
@@ -77,11 +84,31 @@ public class TitleInitEvent {
             }
 
             if(CustomScreenMod.isLogoVisible())
-                CustomScreenMod.logoRender(screenFlow);
+                logoRender(screenFlow);
             screenFlow.save();
             screenFlow.getWidget().syncWithSwing();
+            logger.info("위젯 동기화 완료 ");
             CustomScreenMod.loadTitleWidgets();
         }
+    }
+
+    private void logoRender(ScreenFlow screenFlow){
+        Screen newTitle = Minecraft.getInstance().screen;
+        int i = newTitle.width / 2 - 128;
+        int j = newTitle.width / 2 - 64;
+        int k = 30 + 44 - 7;
+        boolean logo = false, edition = false;
+        for(ImageWrapper resource : screenFlow.getWidget().getImageList()){
+            if(resource.getResource().toString().equals("customclient:textures/minecraft.png"))
+                logo = true;
+            if(resource.getResource().toString().equals("customclient:textures/edition.png"))
+                edition = true;
+        }
+
+        if(!logo)
+            screenFlow.getWidget().addImage(new ImageWrapper(new ResourceLocation("customclient:textures/minecraft.png"), "textures/minecraft.png", i, 20, LogoRenderer.LOGO_WIDTH, LogoRenderer.LOGO_HEIGHT, 1));
+        if(!edition)
+            screenFlow.getWidget().addImage(new ImageWrapper(new ResourceLocation("customclient:textures/edition.png"), "textures/edition.png", j, k, 128, 14, 1));
     }
 
 
@@ -101,6 +128,6 @@ public class TitleInitEvent {
 
     }
     public boolean isTitle(Screen screen){
-        return screen.getClass().getSimpleName().equals("ScreenNewTitle");
+        return screen instanceof ScreenNewTitle;
     }
 }

@@ -109,6 +109,7 @@ public class CustomScreenMod {
             if(resource.getResource().toString().equals("customclient:textures/edition.png"))
                 edition = true;
         }
+
         if(!logo)
             screenFlow.getWidget().addImage(new ImageWrapper(new ResourceLocation("customclient:textures/minecraft.png"), "textures/minecraft.png", i, 20, LogoRenderer.LOGO_WIDTH, LogoRenderer.LOGO_HEIGHT, 1));
         if(!edition)
@@ -124,7 +125,7 @@ public class CustomScreenMod {
             ArrayList<ButtonWrapper> defaultButtons = screenFlow.getWidget().getDefaultButtons();
             if(defaultButtons.size() <= i){
                 defaultButtons.add(new ButtonWrapper(widget));
-                }
+            }
             else
                 defaultButtons.get(i).setAbstractWidget(widget);
         }

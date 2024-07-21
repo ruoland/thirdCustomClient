@@ -9,11 +9,15 @@ import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.util.List;
 
 public class ScreenUserCustom extends ScreenCustom implements ICustomRenderable {
+    private static final Logger log = LoggerFactory.getLogger(ScreenUserCustom.class);
+    private ScreenFlow screenFlow;
     public ScreenUserCustom(Component pTitle) {
         super(pTitle);
 
@@ -22,20 +26,31 @@ public class ScreenUserCustom extends ScreenCustom implements ICustomRenderable 
     @Override
     protected void init() {
         super.init();
-        if(!CustomScreenMod.hasScreen(getTitle().getString())) {
-            ScreenFlow screenFlow = CustomScreenMod.createScreenFlow(getTitle().getString());
-            screenFlow.openScreen(this);
-            screenFlow.loadScreenData();
+        String screenName = getTitle().getString();
+        if(CustomScreenMod.hasScreen(screenName)){
+            screenFlow = CustomScreenMod.getScreen(screenName);
         }
-        else {
-            ScreenFlow screenFlow =CustomScreenMod.getScreen(getTitle().getString());
-            screenFlow.openScreen(this);
-            screenFlow.loadScreenData();
-
+        else{
+            screenFlow = CustomScreenMod.createScreenFlow(getTitle().getString());
         }
+        screenFlow.reset(true);
+        screenFlow.openScreen(this);
+        screenFlow.loadScreenData();
+        log.debug(screenFlow.getScreenName());
     }
 
+    @Override
+    public boolean isPauseScreen() {
 
+        return false;
+
+    }
+
+    @Override
+    public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+        super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
+        log.debug(screenFlow.getScreenName());
+    }
 
     @Override
     public <T extends GuiEventListener & Renderable & NarratableEntry> T addRenderableWidget(T pWidget) {
