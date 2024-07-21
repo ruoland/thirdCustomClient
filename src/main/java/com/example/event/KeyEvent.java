@@ -20,7 +20,8 @@ public class KeyEvent {
                     case GLFW.GLFW_KEY_DOWN -> selectHandler.addHeight(1);
                     case GLFW.GLFW_KEY_RIGHT -> selectHandler.addWidth(1);
                     case GLFW.GLFW_KEY_LEFT -> selectHandler.addWidth(-1);
-                    case GLFW.GLFW_KEY_DELETE -> selectHandler.visible(false);
+
+                    case GLFW.GLFW_KEY_DELETE -> selectHandler.getWidget().remove();
                 }
                 screenFlow.getSwingHandler().updateSwingData();
                 event.setCanceled(true);
@@ -40,7 +41,6 @@ public class KeyEvent {
         if(CustomScreenMod.isEditMode()) {
             ScreenFlow screenFlow = CustomScreenMod.getScreen(event.getScreen());
             if (!screenFlow.hasSelectWidget() && ScreenFlow.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT) && ScreenFlow.isKeyDown(GLFW.GLFW_KEY_B)) {
-                System.out.println("새 버튼 추가");
                 CustomScreenMod.getScreen(event.getScreen()).addButton("새로운 버튼", 200, 20, 0,0);
             }
         }

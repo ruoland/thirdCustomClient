@@ -33,12 +33,12 @@ public class SwingHandler {
         switch (enumSwing) {
             case IMAGE -> {
                 selectSwing = build(EnumSwing.IMAGE, widgetWrapper, "이미지 위젯");
-                updateSwingData();
+                selectSwing.init();
                 return;
             }
             case BUTTON -> {
                 selectSwing = build(EnumSwing.BUTTON, widgetWrapper, "버튼 위젯");
-                updateSwingData();
+                selectSwing.init();
                 return;
             }
             default -> {

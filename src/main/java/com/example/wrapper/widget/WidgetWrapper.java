@@ -14,14 +14,18 @@ import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
 import net.minecraft.network.chat.Component;
 import net.neoforged.neoforge.client.gui.ModListScreen;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class WidgetWrapper {
+    private static final Logger logger = LoggerFactory.getLogger(WidgetWrapper.class);
+
     private transient AbstractWidget abstractWidget;
     private int x, y, width, height, color;
     private String texture, message;
     private float alpha = 1;
     private boolean visible = true, lock = false;
-    private String action, value;
+    private String action, value, command;
 
     public WidgetWrapper() {
     }
@@ -126,8 +130,10 @@ public abstract class WidgetWrapper {
 
     }
     public boolean isMouseOver(double mouseX, double mouseY ){
-        if(abstractWidget ==null)
+        if(abstractWidget ==null) {
+            logger.error("클릭한 버튼에 위젯이 연결되어 있지 않음 이 위젯 정보:{}", toString());
             return false;
+        }
         return abstractWidget.isMouseOver(mouseX, mouseY);
     }
     public boolean canSelectByMouse(double mouseX, double mouseY ){
@@ -138,6 +144,7 @@ public abstract class WidgetWrapper {
         visible = false;
         abstractWidget.active = false;
         abstractWidget.visible = false;
+
     }
 
     public void setMessage(String message){
@@ -150,8 +157,15 @@ public abstract class WidgetWrapper {
             String[] actionValue = action.split(":");
             this.action = actionValue[0];
             this.value = actionValue[1];
-            System.out.println(action+ " - "+value+ " - 값 설정됨");
         }
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public void setCommand(String command){
+        this.value = command;
     }
 
     public void setAbstractWidget(AbstractWidget abstractWidget) {
@@ -220,6 +234,12 @@ public abstract class WidgetWrapper {
             return true;
         }
 
+        if(action.equals("명령어")){
+            if (Minecraft.getInstance().player != null) {
+                Minecraft.getInstance().player.connection.sendCommand(value);
+            }
+        }
+
         if(action.contains("종료"))
             mc.stop();
 
@@ -240,6 +260,7 @@ public abstract class WidgetWrapper {
                 ", visible=" + visible +
                 ", lock=" + lock +
                 ", action='" + action + '\'' +
+                ", value='" + value + '\'' +
                 '}';
     }
 

@@ -10,7 +10,9 @@ import com.google.gson.JsonObject;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -129,9 +131,17 @@ public class ScreenFlow {
                 return true;
             }
         }
+        for(WidgetWrapper widget : allWidgets) {
+            AbstractWidget widget1 = widget.getWidget();
+
+            if (widget.isMouseOver(mouseX, mouseY)) {
+                logger.debug("위젯 이름 {}이 마우스 오버 됨 ", widget1.getMessage().getString());
+            }
+
+        }
+        logger.debug("선택된 위젯을 찾지 못함{} ", screen.renderables);
 
 
-        System.out.println("선택된 위젯을 찾지 못함. 마우스 위치: (" + mouseX + ", " + mouseY + ")");
         return false;
     }
 

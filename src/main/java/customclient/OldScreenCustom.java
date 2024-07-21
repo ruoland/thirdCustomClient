@@ -2,7 +2,8 @@ package customclient;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
-import customclient.swing.*;
+import customclient.swing.SwingButton;
+import customclient.swing.SwingManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.TitleScreen;

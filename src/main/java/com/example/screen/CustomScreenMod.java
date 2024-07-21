@@ -122,8 +122,9 @@ public class CustomScreenMod {
         for(int i = 0; i < screenFlow.getScreen().children().size();i++){
             AbstractWidget widget = (AbstractWidget) screenFlow.getScreen().children().get(i);
             ArrayList<ButtonWrapper> defaultButtons = screenFlow.getWidget().getDefaultButtons();
-            if(defaultButtons.size() <= i)
+            if(defaultButtons.size() <= i){
                 defaultButtons.add(new ButtonWrapper(widget));
+                }
             else
                 defaultButtons.get(i).setAbstractWidget(widget);
         }

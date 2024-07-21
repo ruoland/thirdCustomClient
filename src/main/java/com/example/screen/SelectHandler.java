@@ -58,6 +58,7 @@ public class SelectHandler {
 
     public void visible(boolean visible){
         lastSelectWidget.setVisible(visible);
+
     }
     public String getMessage(){
         return selectWidget.getMessage();

@@ -5,7 +5,6 @@ import net.neoforged.bus.api.ICancellableEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 
 import java.nio.file.Path;
-import java.util.List;
 
 public class FilesDropEvent extends ScreenEvent implements ICancellableEvent {
     private Path pPacks;

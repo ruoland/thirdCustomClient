@@ -1,14 +1,11 @@
 package com.example.screen;
 
-import com.example.gui.event.ImageWidgetEvent;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.common.NeoForge;
 
 import javax.swing.*;
 import java.io.FileInputStream;

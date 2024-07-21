@@ -14,8 +14,9 @@ public class ScreenMouseEvent {
 
     @SubscribeEvent
     public void screenMousePressedPost(ScreenEvent.MouseButtonPressed.Pre event) {
-        logger.debug("마우스 클릭 이벤트 - 좌표: ({}, {})", event.getMouseX(), event.getMouseY());
         if(!CustomScreenMod.isEditMode() && CustomScreenMod.hasScreen(event.getScreen())) {
+            logger.debug("마우스 클릭 이벤트 - 좌표: ({}, {})", event.getMouseX(), event.getMouseY());
+
             if (event.getButton() == 0) {
                 ScreenFlow screenFlow = CustomScreenMod.getScreen(event.getScreen());
                 for(ButtonWrapper buttonWrapper : screenFlow.getWidget().getButtons()){
@@ -63,12 +64,13 @@ public class ScreenMouseEvent {
     //마우스 클릭시 클릭한 위젯을 수정할 위젯으로 설정합니다
     @SubscribeEvent
     public void screenButton(ScreenEvent.MouseButtonPressed.Pre event){
-        if(CustomScreenMod.hasScreen(event.getScreen())) {
-            if (CustomScreenMod.isEditMode()) {
+        if (CustomScreenMod.isEditMode()) {
+            if(CustomScreenMod.hasScreen(event.getScreen())) {
                 event.setCanceled(true);
                 boolean isClickButton = CustomScreenMod.getScreen(event.getScreen()).clickWidget(event.getMouseX(), event.getMouseY());
                 //클릭했는데 버튼이 없는 경우, 리셋
                 if(!isClickButton){
+                    logger.debug("클릭된 버튼이 없습니다. 선택한 버튼 제거합니다.");
                     CustomScreenMod.getScreen(event.getScreen()).reset(false);
                 }
             }

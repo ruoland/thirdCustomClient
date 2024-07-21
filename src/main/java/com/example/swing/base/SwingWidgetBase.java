@@ -27,7 +27,7 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
         protected String visibleText = "버튼 표시: ";
         protected JComboBox<String> actionComboBox;
         private static final Logger logger = LoggerFactory.getLogger(SwingWidgetBase.class);
-
+        private boolean isInit = false;
         protected WidgetWrapper widgetWrapper;
         public SwingWidgetBase(WidgetWrapper widgetWrapper, String title, boolean isNameText, boolean isAction, boolean positionField, boolean sizeField, boolean visibleButton) {
             setTitle(title);
@@ -88,7 +88,29 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
 
         }
 
-        public void comboBoxAddItem() {
+    @Override
+    public void init() {
+        logger.info("초기화 진행");
+
+        xField.setText(""+ widgetWrapper.getX());
+        yField.setText(""+ widgetWrapper.getY());
+        widthField.setText(""+ widgetWrapper.getWidth());
+        heightField.setText(""+ widgetWrapper.getHeight());
+
+        if(actionComboBox != null) {
+            logger.info("액션 정보 : {}, 값 정보: {} ", widgetWrapper.getAction(), widgetWrapper.getValue());
+            if (widgetWrapper.getAction() != null && widgetWrapper.getAction().equals("명령어")) {
+                actionComboBox.setSelectedItem("명령어");
+                actionField.setText(widgetWrapper.getValue());
+                logger.info("초기화 : 명령어 : {},{} ", widgetWrapper.getAction(), widgetWrapper.getValue());
+
+            } else
+                actionComboBox.setSelectedItem(widgetWrapper.getAction() + ":" + widgetWrapper.getValue());
+        }
+        isInit = true;
+    }
+
+    public void comboBoxAddItem() {
             actionComboBox.addItem("선택안함");
             actionComboBox.addItem("열기:맵 선택");
             actionComboBox.addItem("열기:멀티");
@@ -99,7 +121,8 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
             actionComboBox.addItem("열기:접근성");
             actionComboBox.addItem("접속:");
             actionComboBox.addItem("종료:종료");
-
+            if(Minecraft.getInstance().player != null)
+                actionComboBox.addItem("명령어");
         }
 
 
@@ -125,34 +148,42 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
             widthField.setText(""+ widgetWrapper.getWidth());
             heightField.setText(""+ widgetWrapper.getHeight());
 
-            if(actionComboBox != null){
-                actionComboBox.setSelectedItem(widgetWrapper.getAction() +widgetWrapper.getValue());
+            if(actionComboBox != null && widgetWrapper.getAction() != null){
+                if(widgetWrapper.getAction().equals("명령어"))
+                {
+                    actionComboBox.setSelectedItem("명령어");
+                    actionField.setText(widgetWrapper.getValue());
+                }
+                else
+                    actionComboBox.setSelectedItem(widgetWrapper.getAction() +":"+widgetWrapper.getValue());
+                logger.info("액션 콤보 박스 업데이트 됨 위젯 액션: {}, 스윙 액션: {}, 위젯 값: {}, 스윙 값: {} ", widgetWrapper.getAction(), actionComboBox.getSelectedItem(), widgetWrapper.getValue(), actionField.getText());
             }
            
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (e.getSource() == visibleButton) {
-                widgetWrapper.setVisible(!widgetWrapper.isVisible());
-                StringBuilder sb = new StringBuilder(visibleText);
-                sb.append(widgetWrapper.isVisible() ? ": 켜짐" : ": 꺼짐");
-                visibleButton.setText(sb.toString());
+            if(isInit) {
+                if (e.getSource() == visibleButton) {
+                    widgetWrapper.setVisible(!widgetWrapper.isVisible());
+                    StringBuilder sb = new StringBuilder(visibleText);
+                    sb.append(widgetWrapper.isVisible() ? ": 켜짐" : ": 꺼짐");
+                    visibleButton.setText(sb.toString());
 
-            }
-            if(e.getSource() == actionComboBox){
-                System.out.println("이벤트 발동됨" + actionComboBox.getSelectedItem());
-                if(actionComboBox.getSelectedItem().equals("접속:"))
-                {
-                    if(actionField.getText() == null ||actionField.getText().equals(""))
-                        actionField.setText("127.0.0.1");
-                    widgetWrapper.setAction(actionComboBox.getSelectedItem() +actionField.getText());
-                    System.out.println("접속 연결 설정함" + widgetWrapper.getAction() + " - "+widgetWrapper.getValue());
                 }
-                else if(!actionComboBox.getSelectedItem().equals("선택안함"))
-                    widgetWrapper.setAction((String) actionComboBox.getSelectedItem());
-            }
 
+                if (e.getSource() == actionComboBox) {
+                    logger.info("이벤트 발동됨, 현재 선택된 액션: {}, 액션 필드: {}", actionComboBox.getSelectedItem(), actionField.getText());
+
+                    if (actionComboBox.getSelectedItem().equals("접속:")) {
+                        if (actionField.getText() == null || actionField.getText().equals(""))
+                            actionField.setText("127.0.0.1");
+                    }
+
+                    widgetWrapper.setAction(actionComboBox.getSelectedItem().toString());
+                    widgetWrapper.setValue(actionField.getText());
+                }
+            }
         }
         @Override
         public void dispose() {
@@ -162,7 +193,6 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
     private void setIntegerFieldIfNotEmpty(JTextField field, Consumer<Integer> setter) {
         if (!field.getText().isEmpty()) {
             setter.accept(Integer.parseInt(field.getText()));
-
         }
     }
 
@@ -172,18 +202,26 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
      */
     public void dataUpdate(){
         // 사용 예:
+        if(isInit) {
+            if (isFocused()) {
+                setIntegerFieldIfNotEmpty(xField, widgetWrapper::setX);
+                setIntegerFieldIfNotEmpty(yField, widgetWrapper::setY);
+                setIntegerFieldIfNotEmpty(widthField, widgetWrapper::setWidth);
+                setIntegerFieldIfNotEmpty(heightField, widgetWrapper::setHeight);
+                if (!nameField.getText().equals(""))
+                    widgetWrapper.setMessage(nameField.getText());
 
-        if(isFocused()) {
-            setIntegerFieldIfNotEmpty(xField, widgetWrapper::setX);
-            setIntegerFieldIfNotEmpty(yField, widgetWrapper::setY);
-            setIntegerFieldIfNotEmpty(widthField, widgetWrapper::setWidth);
-            setIntegerFieldIfNotEmpty(heightField, widgetWrapper::setHeight);
-            if (!nameField.getText().equals(""))
-                widgetWrapper.setMessage(nameField.getText());
-
-            if (!actionField.getText().isEmpty() && actionComboBox.getSelectedItem().equals("접속:")) {
-                widgetWrapper.setAction(actionComboBox.getSelectedItem() + actionField.getText());
-                System.out.println(actionField.getText());
+                if (!actionField.getText().isEmpty()) {
+                    if (actionComboBox.getSelectedItem().equals("접속:")) {
+                        widgetWrapper.setAction(actionComboBox.getSelectedItem().toString());
+                        widgetWrapper.setValue(actionField.getText());
+                    }
+                    if (actionComboBox.getSelectedItem().equals("명령어")) {
+                        widgetWrapper.setAction(actionComboBox.getSelectedItem().toString());
+                        widgetWrapper.setValue(actionField.getText());
+                    }
+                    logger.info("액션 업데이트 됨 액션: {}, 값: {}", actionComboBox.getSelectedItem(), actionField.getText());
+                }
             }
         }
     }

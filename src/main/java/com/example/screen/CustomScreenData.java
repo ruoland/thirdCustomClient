@@ -86,11 +86,21 @@ public class CustomScreenData {
             if(jsonObject.has("titleWidgetButton")) {
                 screenHandler.getDefaultButtons().addAll(GSON.fromJson(jsonObject.get("titleWidgetButton"), new TypeToken<ArrayList<ButtonWrapper>>() {
                 }.getType()));
-                logger.info("저장된 기본 버튼을 확인 했습니다. 기본 버튼을 불러옵니다.");
+                logger.info("저장된 기본 버튼을 확인 했습니다. 기본 버튼을 불러옵니다. {}", screenHandler.getDefaultButtons());
 
             }
+            ArrayList<ButtonWrapper> arrayList = GSON.fromJson(jsonObject.get("widgetButton"), new TypeToken<ArrayList<ButtonWrapper>>(){}.getType());
+            ArrayList<ButtonWrapper> buttonWrappers = arrayList;
+            logger.info("버튼의 개수 {}",buttonWrappers.size());
 
-            screenHandler.getButtons().addAll(GSON.fromJson(jsonObject.get("widgetButton"), new TypeToken<ArrayList<ButtonWrapper>>(){}.getType()));
+            for(int i = 0; i < arrayList.size(); i++){
+                ButtonWrapper buttonWrapper = arrayList.get(i);
+                if(!buttonWrapper.isVisible()) {
+                    buttonWrappers.remove(i);
+                    logger.info("버튼 제거 됨{}", buttonWrappers.size());
+                }
+            }
+            screenHandler.getButtons().addAll(buttonWrappers);
 
             if(!jsonObject.get("widgetImage").getAsJsonArray().isEmpty()){
                 screenHandler.getImageList().addAll(GSON.fromJson(jsonObject.get("widgetImage"), new TypeToken<ArrayList<ImageWrapper>>(){}.getType()));

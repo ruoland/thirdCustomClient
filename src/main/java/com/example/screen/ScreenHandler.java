@@ -36,6 +36,7 @@ public class ScreenHandler {
         LinkedList<WidgetWrapper> wrapperLinkedList = getAllWidget();
         wrapperLinkedList.removeAll(getImageList());
         for(WidgetWrapper widget : wrapperLinkedList ){
+            logger.info("동기화 진행 중 {}", widget.getMessage());
             widget.update();
         }
     }
@@ -51,7 +52,6 @@ public class ScreenHandler {
     public LinkedList<WidgetWrapper> getAllWidget(){
         LinkedList<WidgetWrapper> allWidget = new LinkedList<>();
         allWidget.addAll(getButtons());
-        System.out.println(getButtons() + " --------------------------------");
         allWidget.addAll(getDefaultButtons());
         allWidget.addAll(getImageList());
         return allWidget;
@@ -99,11 +99,28 @@ public class ScreenHandler {
     public void makeCustomButtons(){
         logger.info("커스텀 버튼 생성 중");
         for(ButtonWrapper data : buttons){
-            AbstractWidget abstractWidget = new Button.Builder(Component.literal(data.getMessage()), (Button.OnPress) pButton -> {
-            }).size(data.getWidth(), data.getHeight()).pos(data.getX(), data.getY()).build();
-            screen.renderables.add(abstractWidget);
-            data.setAbstractWidget(abstractWidget);
-            logger.debug("커스텀 버튼 추가됨: {}", data);
+            if(data.isVisible()) {
+                if(data.getWidget() == null) {
+                    AbstractWidget abstractWidget = new Button.Builder(Component.literal(data.getMessage()), (Button.OnPress) pButton -> {
+                    }).size(data.getWidth(), data.getHeight()).pos(data.getX(), data.getY()).build();
+                    screen.renderables.add(abstractWidget);
+                    data.setAbstractWidget(abstractWidget);
+                } else {
+                    AbstractWidget widget = data.getWidget();
+                    widget.setWidth(data.getWidth());
+                    widget.setHeight(data.getHeight());
+                    widget.setPosition(data.getX(), data.getY());
+                    widget.setMessage(Component.literal(data.getMessage()));
+                }
+                data.getWidget().visible = true;
+                data.getWidget().active = true;
+            } else {
+                if(data.getWidget() != null) {
+                    data.getWidget().visible = false;
+                    data.getWidget().active = false;
+                }
+            }
+            logger.debug("커스텀 버튼 업데이트됨: {}", data);
         }
     }
     public void addImage(ImageWrapper widgetImage){
