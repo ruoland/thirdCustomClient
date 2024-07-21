@@ -4,6 +4,7 @@ import com.example.ICustomRenderable;
 import com.example.wrapper.widget.ButtonWrapper;
 import com.example.wrapper.widget.ImageWrapper;
 import com.example.wrapper.widget.WidgetWrapper;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -79,13 +80,16 @@ public class WidgetHandler {
         boolean add = false;
 
         for(int i = 0; i < 9;i++){
+
             AbstractWidget widget = (AbstractWidget) screen.children().get(i);
             if(defaultButtons.isEmpty())
                 add = true;
             if(add)
                 defaultButtons.add(new ButtonWrapper(widget));
-
-            defaultButtons.get(i).setAbstractWidget(widget);
+            ButtonWrapper buttonWrapper = defaultButtons.get(i);
+            buttonWrapper.setAbstractWidget(widget);
+            buttonWrapper.setX((int) (buttonWrapper.getX() * ((double) Minecraft.getInstance().getWindow().getScreenWidth()) / (double) buttonWrapper.getDesignWidth()));
+            buttonWrapper.setY((int) (buttonWrapper.getY() * ((double) Minecraft.getInstance().getWindow().getScreenHeight()) / (double) buttonWrapper.getDesignHeight()));
             logger.debug("스크린 {}에 기본 버튼 추가 됨{}",screen.getTitle().getString(), widget.getMessage().getString());
         }
     }

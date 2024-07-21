@@ -30,7 +30,6 @@ public class ScreenMouseEvent {
                         break;
                     }
                     for(ImageWrapper imageWrapper : screenFlow.getWidget().getImageList()){
-
                         if(imageWrapper.isMouseOver(event.getMouseX(), event.getMouseY())){
                             logger.info("클릭된 이미지 : {}, 액션 : {}",imageWrapper.getMessage(), imageWrapper.getAction());
                             imageWrapper.runAction();
@@ -84,5 +83,17 @@ public class ScreenMouseEvent {
             }
         }
     }
-    
+    @SubscribeEvent
+    public void onMouseReleased(ScreenEvent.MouseButtonReleased.Post event) {
+        if (CustomScreenMod.isEditMode() && CustomScreenMod.hasScreen(event.getScreen())) {
+            logger.debug("마우스 버튼 릴리즈 이벤트 - 좌표: ({}, {})", event.getMouseX(), event.getMouseY());
+
+            ScreenFlow screenFlow = CustomScreenMod.getScreen(event.getScreen());
+            if (screenFlow.hasSelectWidget()) {
+                WidgetWrapper widget = screenFlow.selectWidget().getWidget();
+
+            }
+        }
+    }
+
 }

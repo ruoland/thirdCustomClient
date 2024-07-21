@@ -33,7 +33,7 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
             setTitle(title);
             setSize(500, 200);
             Window window = Minecraft.getInstance().getWindow();
-            setLocation(window.getX() - 400, window.getY());
+            setLocation(Math.max(window.getX() - 400, 0), window.getY());
             setLayout(new FlowLayout(FlowLayout.LEADING));
             this.widgetWrapper = widgetWrapper;
             if(isNameText) {
