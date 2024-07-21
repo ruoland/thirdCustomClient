@@ -1,8 +1,6 @@
 package com.example.screen;
 
 import com.example.ICustomRenderable;
-import com.example.TrackingList;
-import com.example.userscreen.ScreenUserCustom;
 import com.example.wrapper.widget.ButtonWrapper;
 import com.example.wrapper.widget.ImageWrapper;
 import com.example.wrapper.widget.WidgetWrapper;
@@ -14,24 +12,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedList;
 
 /*
     한 스크린의 위젯들을 관리하는 클래스
     위젯을 추가하거나 특정 위젯을 가져오려 할 때 여기서 가져옴
  */
-public class ScreenHandler {
+public class WidgetHandler {
     private Screen screen;
     private final ArrayList<ButtonWrapper> defaultButtons = new ArrayList<>();
     private final ArrayList<ButtonWrapper> buttons = new ArrayList<>();
     private final ArrayList<ImageWrapper> images = new ArrayList<>();
-    private final TrackingList<ImageWrapper> trackingList = new TrackingList<>(images);
-    private static final Logger logger = LoggerFactory.getLogger(ScreenHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(WidgetHandler.class);
 
-    public ScreenHandler(Screen screen){
+    public WidgetHandler(Screen screen){
         this.screen = screen;
+        logger.debug("위젯 핸들러 생성됨 {}", screen.getTitle().getString());
     }
 
     /**
@@ -42,6 +38,10 @@ public class ScreenHandler {
         wrapperLinkedList.removeAll(getImageList());
         for(WidgetWrapper widget : wrapperLinkedList ){
             logger.info("동기화 진행 중 {}", widget.getMessage());
+            if(widget.getWidget() == null){
+                logger.warn("연결된 위젯이 없습니다. 스킵: {}", widget.getMessage());
+                continue;
+            }
             widget.update();
         }
     }
@@ -70,10 +70,8 @@ public class ScreenHandler {
         return null;
     }
 
-    public TrackingList<ImageWrapper> getImageList() {
-        logger.info("55. 이미지 개수 {}", trackingList.size());
-        trackingList.getModificationLog().forEach(System.out::println);
-        return trackingList;
+    public ArrayList<ImageWrapper> getImageList() {
+        return images;
     }
 
     public void loadDefaultWidgets(){
@@ -88,7 +86,7 @@ public class ScreenHandler {
                 defaultButtons.add(new ButtonWrapper(widget));
 
             defaultButtons.get(i).setAbstractWidget(widget);
-            logger.debug("스크린 {}에 버튼 추가 됨{}",screen.getTitle().getString(), widget.getMessage().getString());
+            logger.debug("스크린 {}에 기본 버튼 추가 됨{}",screen.getTitle().getString(), widget.getMessage().getString());
         }
     }
 
@@ -98,42 +96,45 @@ public class ScreenHandler {
         customRenderable.addRenderableWidget(data.getWidget());
     }
 
-    public void addButton(ButtonWrapper data){
+    public void addNewButton(String name, int width, int height, int x, int y){
+        ButtonWrapper button = new ButtonWrapper(new Button.Builder(Component.literal(name), pButton -> {
+        }).size(width, height).pos(x, y).build());
+        addNewButton(button);
+    }
+
+    public void addNewButton(ButtonWrapper data){
         buttons.add(data);
-        ICustomRenderable customRenderable = (ICustomRenderable) screen ;
+        ICustomRenderable customRenderable = (ICustomRenderable) screen;
         customRenderable.addRenderableWidget(data.getWidget());
+        logger.debug("새로운 버튼 하나 생성하였습니다. "+data.getMessage());
     }
     public void makeCustomButtons(){
         logger.info("커스텀 버튼 생성 중");
-        for(ButtonWrapper data : buttons){
-            if(data.isVisible()) {
-                if(data.getWidget() == null) {
-                    AbstractWidget abstractWidget = new Button.Builder(Component.literal(data.getMessage()), (Button.OnPress) pButton -> {
-                    }).size(data.getWidth(), data.getHeight()).pos(data.getX(), data.getY()).build();
+        for(ButtonWrapper buttonWrapper : buttons){
+            if(buttonWrapper.isVisible()) {
+                //getWidget이 없다면 새로 생성된 버튼이라 판단함
+                if(buttonWrapper.getWidget() == null) {
+                    //제대로 정보 생성 후 등록하기
+                    AbstractWidget abstractWidget = new Button.Builder(Component.literal(buttonWrapper.getMessage()), (Button.OnPress) pButton -> {
+                    }).size(buttonWrapper.getWidth(), buttonWrapper.getHeight()).pos(buttonWrapper.getX(), buttonWrapper.getY()).build();
                     screen.renderables.add(abstractWidget);
-                    data.setAbstractWidget(abstractWidget);
-                } else {
-                    AbstractWidget widget = data.getWidget();
-                    widget.setWidth(data.getWidth());
-                    widget.setHeight(data.getHeight());
-                    widget.setPosition(data.getX(), data.getY());
-                    widget.setMessage(Component.literal(data.getMessage()));
+                    buttonWrapper.setAbstractWidget(abstractWidget);
+                    logger.debug("버튼에 위젯이 없어 등록함{}", abstractWidget.getMessage());
                 }
-                data.getWidget().visible = true;
-                data.getWidget().active = true;
+                buttonWrapper.getWidget().visible = true;
+                buttonWrapper.getWidget().active = true;
             } else {
-                if(data.getWidget() != null) {
-                    data.getWidget().visible = false;
-                    data.getWidget().active = false;
+                if(buttonWrapper.getWidget() != null) {
+                    buttonWrapper.getWidget().visible = false;
+                    buttonWrapper.getWidget().active = false;
                 }
             }
-            logger.debug("커스텀 버튼 업데이트됨: {}", data);
         }
     }
     public void addImage(ImageWrapper widgetImage){
         widgetImage.setTexture("customclient:"+widgetImage.getResource());
-        trackingList.add(widgetImage);
-
+        images.add(widgetImage);
+        logger.debug("이미지 추가 됨 {}",widgetImage.getResource());
     }
 
 

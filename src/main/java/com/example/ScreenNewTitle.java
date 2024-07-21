@@ -61,6 +61,8 @@ public class ScreenNewTitle extends TitleScreen implements ICustomBackground, IC
 
     }
 
+
+
     @Override
     public void renderBackground(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         if(hasBackground()) {
@@ -83,7 +85,8 @@ public class ScreenNewTitle extends TitleScreen implements ICustomBackground, IC
     @Override
     public void onFilesDrop(List<Path> pPacks) {
         super.onFilesDrop(pPacks);
-        setBackground(ScreenAPI.getDynamicTexture(pPacks.get(0)));
+        screenFlow.fileDropEvent(pPacks.get(0));
+        //setBackground(ScreenAPI.getDynamicTexture(pPacks.get(0)));
     }
 
     @Override

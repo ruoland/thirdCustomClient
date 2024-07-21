@@ -17,7 +17,7 @@ import java.util.List;
 
 public class ScreenUserCustom extends ScreenCustom implements ICustomRenderable {
     private static final Logger log = LoggerFactory.getLogger(ScreenUserCustom.class);
-    private ScreenFlow screenFlow;
+
     public ScreenUserCustom(Component pTitle) {
         super(pTitle);
 
@@ -36,20 +36,17 @@ public class ScreenUserCustom extends ScreenCustom implements ICustomRenderable 
         screenFlow.reset(true);
         screenFlow.openScreen(this);
         screenFlow.loadScreenData();
-        log.debug(screenFlow.getScreenName());
+
     }
 
     @Override
     public boolean isPauseScreen() {
-
         return false;
-
     }
 
     @Override
     public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
-        log.debug(screenFlow.getScreenName());
     }
 
     @Override

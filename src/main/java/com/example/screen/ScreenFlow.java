@@ -10,9 +10,7 @@ import com.google.gson.JsonObject;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -21,9 +19,15 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Handler로 직접 접근 하지 않고도 여기서 처리할 수 있도록
@@ -36,7 +40,7 @@ public class ScreenFlow {
     private CustomScreenData data;
 
     private SwingHandler swingHandler = new SwingHandler();
-    private ScreenHandler screenHandler;//loadScreenData 메서드에서 초기화됨
+    private WidgetHandler widgetHandler;//loadScreenData 메서드에서 초기화됨
     private SelectHandler selectHandler;
 
     ScreenFlow(){
@@ -52,12 +56,18 @@ public class ScreenFlow {
             data = null;
     }
 
+    /**
+     * 현재 선택한 위젯이 있느냐?
+     */
     public boolean hasSelectWidget(){
         return selectHandler != null;
     }
 
+    /**
+     * 해당하는 경로의 이미지 위젯이 있느냐?
+     */
     public boolean hasImageWidget(String resouce){
-        for(ImageWrapper imageWrapper : screenHandler.getImageList()){
+        for(ImageWrapper imageWrapper : widgetHandler.getImageList()){
             if(imageWrapper.getResource().toString().equals(resouce)){
                 return true;
             }
@@ -65,14 +75,13 @@ public class ScreenFlow {
         return false;
     }
 
+    public void openScreen(Screen screen){
+        this.screen = screen;
+    }
+
     public Screen getScreen() {
         return screen;
     }
-
-    public SwingHandler getSwingHandler() {
-        return swingHandler;
-    }
-
     public void setScreenName(String name){
         this.screenName = name;
     }
@@ -81,8 +90,8 @@ public class ScreenFlow {
         return screenName;
     }
 
-    public void openScreen(Screen screen){
-        this.screen = screen;
+    public SwingHandler getSwingHandler() {
+        return swingHandler;
     }
 
     public void save(){
@@ -93,40 +102,34 @@ public class ScreenFlow {
             throw new NullPointerException("스크린의 데이터 없음");
         }
     }
-
-    public boolean isTitle(){
-        return getScreenName().equals("ScreenNewTitle");
-    }
     public JsonObject getCustomData(){
         return this.data.getCustomObject();
     }
     public void loadScreenData(){
         logger.info("화면 데이터 로딩 중: {}", screenName);
-        screenHandler = new ScreenHandler(screen);
+        if(widgetHandler != null){
+            for(ButtonWrapper buttonWrapper : widgetHandler.getButtons()) {
+                if (screen.renderables.contains(buttonWrapper.getWidget())) {
+                    screen.renderables.remove(buttonWrapper.getWidget());
+                }
+            }
+            widgetHandler.getImageList().clear();
+        }
+        widgetHandler = new WidgetHandler(screen);
         data = new CustomScreenData(this, screenName);
         data.initFiles();
-        logger.info("-1. 이미지 개수 {}",screenHandler.getImageList().size());
 
         data.loadCustomWidgets();
-        logger.info("0. 이미지 개수 {}",screenHandler.getImageList().size());
-
         if(screenName.equals("ScreenNewTitle"))
-            screenHandler.loadDefaultWidgets();
-        logger.info("1. 이미지 개수 {}",screenHandler.getImageList().size());
-
-        screenHandler.makeCustomButtons();
-        logger.info("2. 이미지 개수 {}",screenHandler.getImageList().size());
-
-        screenHandler.syncWithSwing();
-        logger.info("3. 이미지 개수 {}",screenHandler.getImageList().size());
-
+            widgetHandler.loadDefaultWidgets();
+        widgetHandler.makeCustomButtons();
+        widgetHandler.syncWithSwing();
         if(screen instanceof ICustomBackground background)
-            background.setBackground(new ResourceLocation(data.background));
-        logger.info("4. 뒷배경 이후 이미지 개수 {}",screenHandler.getImageList().size());
-    }
+            background.setBackground(new ResourceLocation(data.background));}
+
     public boolean clickWidget(double mouseX, double mouseY){
         logger.debug("위젯 클릭 - 좌표: ({}, {})", mouseX, mouseY);
-        LinkedList<WidgetWrapper> allWidgets = screenHandler.getAllWidget();
+        LinkedList<WidgetWrapper> allWidgets = widgetHandler.getAllWidget();
 
         for(WidgetWrapper clickedWidget : allWidgets) {
             if (clickedWidget.isMouseOver(mouseX, mouseY) ) {
@@ -137,14 +140,6 @@ public class ScreenFlow {
                 return true;
             }
         }
-        for(WidgetWrapper widget : allWidgets) {
-            AbstractWidget widget1 = widget.getWidget();
-
-            if (widget.isMouseOver(mouseX, mouseY)) {
-                logger.debug("위젯 이름 {}이 마우스 오버 됨 ", widget1.getMessage().getString());
-            }
-
-        }
         return false;
     }
 
@@ -153,10 +148,9 @@ public class ScreenFlow {
         return selectHandler;
     }
 
-    public ScreenHandler getWidget() {
-        return screenHandler;
+    public WidgetHandler getWidget() {
+        return widgetHandler;
     }
-
 
     public void dragWidget(double mouseX, double mouseY){
         selectHandler.setPosition((int) mouseX, (int) mouseY);
@@ -164,42 +158,49 @@ public class ScreenFlow {
 
     public void fileDropEvent(Path path){
         ResourceLocation resourceLocation = ScreenAPI.getDynamicTexture(path);
+        System.out.println("파일 드롭 됨");
         if(resourceLocation == null) {
             return;
         }
         int select = JOptionPane.showOptionDialog(null, "어떤 걸로 설정할까요?", "이미지 불러오기", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]{"배경화면", "이미지", "취소"}, "취소");
-        switch (select) {
+        String fileName = path.getFileName().toString().toLowerCase();
+        try {
+            Path texturePack = Path.of("D:\\Projects\\four\\thirdCustomClient\\src\\main\\resources\\assets\\customclient\\", fileName);
+            Pattern pattern = Pattern.compile("[a-zA-Z0-9/._-]+");
+            Matcher matcher = pattern.matcher(fileName);
+            if(!matcher.matches()){
+                JOptionPane.showConfirmDialog(null, "파일 이름에 영어 소문자, 숫자, -_ 문자만 있어야 등록할 수 있습니다.");
+                return;
+            }
+            if(!Files.exists(texturePack))
+                Files.copy(path, texturePack);
+
+            BufferedImage bi = ImageIO.read(path.toFile());
+
+
+            switch (select) {
+
             case JOptionPane.YES_OPTION -> {
                 data.dynamicBackground = resourceLocation.toString();
-                data.setBackground("customclient:"+ path.getFileName().toString());
+                data.setBackground("customclient:"+fileName );
                 if(screen instanceof ICustomBackground background)//백그라운드 설정 가능한 GUI라면
                     background.setBackground(new ResourceLocation(data.background));
             }
             case JOptionPane.NO_OPTION -> {
+                ImageWrapper image = new ImageWrapper(resourceLocation, fileName, 0, 0, bi.getWidth(), bi.getHeight(), 1);
+                widgetHandler.addImage(image);
             }
         }
         if(select == JOptionPane.YES_OPTION)
             NeoForge.EVENT_BUS.post(new ImageWidgetEvent.Background(screen, resourceLocation, path));
-        else {
-            ImageWrapper image = new ImageWrapper(resourceLocation, path.getFileName().toString(), 0, 0, screen.width, screen.height, 1);
-            screenHandler.addImage(image);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
     public void renderImageWidget(GuiGraphics pGuiGraphics){
-        if(!screenHandler.getImageList().isEmpty()) {
-            for (ImageWrapper imageWrapper : screenHandler.getImageList()) {
-                imageWrapper.render(pGuiGraphics);
-            }
-        }
 
-
-    }
-
-    public void addButton(String name, int width, int height, int x, int y){
-        ButtonWrapper button = new ButtonWrapper(new Button.Builder(Component.literal(name), pButton -> {
-        }).size(width, height).pos(x, y).build());
-        screenHandler.addButton(button);
     }
 
     public static boolean isKeyDown(int key){

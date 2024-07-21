@@ -25,7 +25,7 @@ public abstract class WidgetWrapper implements IWidget {
     private String texture, message;
     private float alpha = 1;
     private boolean visible = true, lock = false;
-    private String action, value, command;
+    private String action, value;
 
     public WidgetWrapper() {
     }
@@ -130,21 +130,15 @@ public abstract class WidgetWrapper implements IWidget {
 
     }
     public boolean isMouseOver(double mouseX, double mouseY ){
-        if(abstractWidget ==null) {
+        if(abstractWidget ==null ) {
+            if(texture == null)
             logger.error("클릭한 버튼에 위젯이 연결되어 있지 않음 이 위젯 정보:{}", toString());
             return false;
         }
-        return abstractWidget.isMouseOver(mouseX, mouseY);
+        return abstractWidget.isMouseOver(mouseX, mouseY) && visible;
     }
     public boolean canSelectByMouse(double mouseX, double mouseY ){
         return !isLock() && abstractWidget.isMouseOver(mouseX, mouseY);
-    }
-
-    public void remove(){
-        visible = false;
-        abstractWidget.active = false;
-        abstractWidget.visible = false;
-
     }
 
     public void setMessage(String message){
@@ -154,11 +148,11 @@ public abstract class WidgetWrapper implements IWidget {
     public void setAction(String action){
         logger.debug("1.액션이 {}로 설정 되었습니다.",action);
         this.action = action;
-
     }
 
     public void setAbstractWidget(AbstractWidget abstractWidget) {
         this.abstractWidget = abstractWidget;
+
     }
 
     public AbstractWidget getWidget() {

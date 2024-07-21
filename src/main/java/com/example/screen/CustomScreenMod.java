@@ -1,11 +1,8 @@
 package com.example.screen;
 
 import com.example.wrapper.widget.ButtonWrapper;
-import com.example.wrapper.widget.ImageWrapper;
 import customclient.CustomClient;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
@@ -28,9 +25,6 @@ public class CustomScreenMod {
 
     @Nullable
     public static ScreenFlow getScreen(Screen screen){
-        logger.debug("화면 가져오기 요청: {}", screen.getTitle().getString());
-        //StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-
         return getScreen(screen.getTitle().getString());
     }
 
@@ -46,7 +40,7 @@ public class CustomScreenMod {
             ScreenFlow screenFlow = new ScreenFlow();
             screenFlow.setScreenName(name);
             screenMap.put(name, screenFlow);
-            System.out.println("스크린 흐름 생성됨"+name);
+
             return screenMap.get(name);
     }
     public static boolean hasScreen(Screen screen){
@@ -76,58 +70,29 @@ public class CustomScreenMod {
         CustomScreenMod.mcLogoVisible = mcLogoVisible;
     }
 
-    public static void changeEditMode(Screen screen){
+    public static void toggleEditMode(Screen screen){
         editMode = !editMode;
-
         ScreenFlow screenFlow = getScreen(screen);
-
         if(!editMode){ //편집 모드 종료, 파일 저장 후 스윙 정리
             screenFlow.save();
             if(screenFlow.getSwingHandler().isSwingOpen())
                 screenFlow.getSwingHandler().swingClose();
-            screenFlow.reset(true);
             screenFlow.getSwingHandler().swingClose();
         }
         else {//편집 모드 실행, GUI 데이터 불러옴
-            screenFlow.loadScreenData();
+            try {
+
+                screenFlow.openScreen(screen);
+                screenFlow.loadScreenData();
+            }catch (NullPointerException exception){
+                exception.printStackTrace();
+            }
         }
         logger.info("편집 모드 변경. 현재 모드: {}", editMode);
     }
+
     public static boolean isEditMode() {
         return editMode;
     }
 
-    public static void logoRender(ScreenFlow screenFlow){
-        Screen newTitle = Minecraft.getInstance().screen;
-        int i = newTitle.width / 2 - 128;
-        int j = newTitle.width / 2 - 64;
-        int k = 30 + 44 - 7;
-        boolean logo = false, edition = false;
-        for(ImageWrapper resource : screenFlow.getWidget().getImageList()){
-            if(resource.getResource().toString().equals("customclient:textures/minecraft.png"))
-                logo = true;
-            if(resource.getResource().toString().equals("customclient:textures/edition.png"))
-                edition = true;
-        }
-
-        if(!logo)
-            screenFlow.getWidget().addImage(new ImageWrapper(new ResourceLocation("customclient:textures/minecraft.png"), "textures/minecraft.png", i, 20, LogoRenderer.LOGO_WIDTH, LogoRenderer.LOGO_HEIGHT, 1));
-        if(!edition)
-            screenFlow.getWidget().addImage(new ImageWrapper(new ResourceLocation("customclient:textures/edition.png"), "textures/edition.png", j, k, 128, 14, 1));
-    }
-
-
-    public static void loadTitleWidgets(){
-        ScreenFlow screenFlow = getScreen("ScreenNewTitle");
-
-        for(int i = 0; i < screenFlow.getScreen().children().size();i++){
-            AbstractWidget widget = (AbstractWidget) screenFlow.getScreen().children().get(i);
-            ArrayList<ButtonWrapper> defaultButtons = screenFlow.getWidget().getDefaultButtons();
-            if(defaultButtons.size() <= i){
-                defaultButtons.add(new ButtonWrapper(widget));
-            }
-            else
-                defaultButtons.get(i).setAbstractWidget(widget);
-        }
-    }
 }

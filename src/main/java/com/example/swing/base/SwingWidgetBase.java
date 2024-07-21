@@ -156,7 +156,6 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
                 }
                 else
                     actionComboBox.setSelectedItem(widgetWrapper.getAction() +":"+widgetWrapper.getValue());
-                logger.info("액션 콤보 박스 업데이트 됨 위젯 액션: {}, 스윙 액션: {}, 위젯 값: {}, 스윙 값: {} ", widgetWrapper.getAction(), actionComboBox.getSelectedItem(), widgetWrapper.getValue(), actionField.getText());
             }
            
         }
@@ -169,7 +168,6 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
                     StringBuilder sb = new StringBuilder(visibleText);
                     sb.append(widgetWrapper.isVisible() ? ": 켜짐" : ": 꺼짐");
                     visibleButton.setText(sb.toString());
-
                 }
 
                 if (e.getSource() == actionComboBox) {

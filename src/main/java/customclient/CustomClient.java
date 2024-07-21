@@ -1,20 +1,19 @@
 package customclient;
 
 import com.example.ScreenCommand;
-import com.example.event.CustomScreenEvent;
-import com.example.event.KeyEvent;
-import com.example.event.ScreenMouseEvent;
-import com.example.event.TitleInitEvent;
+import com.example.event.*;
 import com.example.packet.ClientPayloadHandler;
 import com.example.packet.ScreenOpenData;
 import com.example.packet.ServerPayloadHandler;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.Blocks;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
@@ -32,11 +31,13 @@ public class CustomClient {
         // 모드 이벤트 버스에 리스너 등록
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::registerPayloadHandlers);
+        if (FMLEnvironment.dist == Dist.CLIENT) {
 
+        }
         // NeoForge 이벤트 버스에 리스너 등록
         NeoForge.EVENT_BUS.register(this);
         NeoForge.EVENT_BUS.register(new KeyEvent());
-        NeoForge.EVENT_BUS.register(new CustomScreenEvent());
+        NeoForge.EVENT_BUS.register(new ScreenRenderEvent());
         NeoForge.EVENT_BUS.register(new ScreenMouseEvent());
         NeoForge.EVENT_BUS.register(new TitleInitEvent());
 

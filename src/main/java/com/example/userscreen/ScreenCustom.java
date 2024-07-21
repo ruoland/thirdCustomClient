@@ -3,6 +3,7 @@ package com.example.userscreen;
 import com.example.ICustomBackground;
 import com.example.screen.CustomScreenMod;
 import com.example.screen.ScreenAPI;
+import com.example.screen.ScreenFlow;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -13,7 +14,7 @@ import java.util.List;
 
 public class ScreenCustom extends Screen implements ICustomBackground {
     private ResourceLocation BACKGROUND_IMAGE = new ResourceLocation("customclient", "textures/screenshot.png");
-
+    protected ScreenFlow screenFlow;
     protected ScreenCustom(Component pTitle) {
         super(pTitle);
     }
@@ -41,7 +42,7 @@ public class ScreenCustom extends Screen implements ICustomBackground {
     @Override
     public void onFilesDrop(List<Path> pPacks) {
         super.onFilesDrop(pPacks);
-        setBackground(ScreenAPI.getDynamicTexture(pPacks.get(0)));
+        screenFlow.fileDropEvent(pPacks.get(0));
     }
 
 }

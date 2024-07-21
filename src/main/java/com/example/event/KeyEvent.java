@@ -12,7 +12,7 @@ public class KeyEvent {
     @SubscribeEvent
     public void sizeEditEvent(ScreenEvent.KeyPressed.Pre event){
         if(CustomScreenMod.isEditMode() && event.getKeyCode() != GLFW.GLFW_KEY_LEFT_ALT) {
-            ScreenFlow screenFlow = CustomScreenMod.getScreen(event.getScreen());;
+            ScreenFlow screenFlow = CustomScreenMod.getScreen(event.getScreen());
             SelectHandler selectHandler = screenFlow.selectWidget();
             if(selectHandler != null) {
                 switch (event.getKeyCode()) {
@@ -21,7 +21,7 @@ public class KeyEvent {
                     case GLFW.GLFW_KEY_RIGHT -> selectHandler.addWidth(1);
                     case GLFW.GLFW_KEY_LEFT -> selectHandler.addWidth(-1);
 
-                    case GLFW.GLFW_KEY_DELETE -> selectHandler.getWidget().remove();
+                    case GLFW.GLFW_KEY_DELETE -> selectHandler.getWidget().setVisible(false);
                 }
                 screenFlow.getSwingHandler().updateSwingData();
                 event.setCanceled(true);
@@ -33,15 +33,15 @@ public class KeyEvent {
     @SubscribeEvent
     public void editModeEvent(ScreenEvent.KeyPressed.Post event){
         if(CustomScreenMod.hasScreen(event.getScreen()) && event.getKeyCode() == GLFW.GLFW_KEY_LEFT_ALT) {
-            CustomScreenMod.changeEditMode(event.getScreen());
+            CustomScreenMod.toggleEditMode(event.getScreen());
         }
     }
     @SubscribeEvent
     public void createButton(ScreenEvent.KeyPressed.Post event){
         if(CustomScreenMod.isEditMode()) {
             ScreenFlow screenFlow = CustomScreenMod.getScreen(event.getScreen());
-            if (!screenFlow.hasSelectWidget() && ScreenFlow.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT) && ScreenFlow.isKeyDown(GLFW.GLFW_KEY_B)) {
-                CustomScreenMod.getScreen(event.getScreen()).addButton("새로운 버튼", 200, 20, 0,0);
+            if (ScreenFlow.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT) && ScreenFlow.isKeyDown(GLFW.GLFW_KEY_B)) {
+                CustomScreenMod.getScreen(event.getScreen()).getWidget().addNewButton("새로운 버튼", 200, 20, 0,0);
             }
         }
     }

@@ -5,8 +5,11 @@ import customclient.FakeTextureWidget;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ImageWrapper extends WidgetWrapper {
+    private static final Logger log = LoggerFactory.getLogger(ImageWrapper.class);
     private transient ResourceLocation resourceLocation;
     private String resource;
 
@@ -23,6 +26,7 @@ public class ImageWrapper extends WidgetWrapper {
     public void init(){
         createFakeWidget(getX(),getY(),getWidth(),getHeight(), resource);
     }
+
     public ResourceLocation getResource() {
             return resourceLocation == null ? resourceLocation = new ResourceLocation("customclient", resource.replace("customclient:", "")) : resourceLocation;
     }
@@ -31,6 +35,7 @@ public class ImageWrapper extends WidgetWrapper {
     public String getMessage() {
         return getResource().toString();
     }
+
     public FakeTextureWidget createFakeWidget(int x, int y, int width, int height, String resource){
         if(getWidget() == null) {
             FakeTextureWidget fakeTextureWidget = new FakeTextureWidget(getX(), getY(), getWidth(), getHeight(), Component.literal(resource));
@@ -48,15 +53,18 @@ public class ImageWrapper extends WidgetWrapper {
             getWidget().setHeight(getHeight());
             getWidget().setMessage(Component.literal(resource));
         }
+
         return (FakeTextureWidget) getWidget();
     }
 
     public void render(GuiGraphics pGuiGraphics) {
         if(isVisible()) {
             if (getWidget() == null)
-                createFakeWidget(getX(), getY(), getWidth(), getHeight(), resource);
+                setAbstractWidget(createFakeWidget(getX(), getY(), getWidth(), getHeight(), resource));
             ScreenAPI.renderTexture(pGuiGraphics, getResource(), getX(), getY(), getWidth(), getHeight(), getAlpha());
         }
+        else
+            log.error("이미지가 투명한 상태입니다.");
     }
 
 }

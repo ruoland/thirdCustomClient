@@ -18,7 +18,7 @@ public class SwingHandler {
     public void updateSwingData(){
         SwingWidgetBase swingWidgetBase = (SwingWidgetBase) selectSwing;
         //만약 윈도우 포커스가 마인크래프트에 맞춰져 있다면 스윙창 업데이트
-        if(!swingWidgetBase.isFocused())
+        if(selectSwing != null && !swingWidgetBase.isFocused())
             selectSwing.update();
     }
 

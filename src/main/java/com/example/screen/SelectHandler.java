@@ -28,25 +28,11 @@ public class SelectHandler {
     public void setPosition(int x, int y){
         if(!isDrag()) {
             setDragX(x - getWidget().getX());
-            setDragY(y - getWidget().getY()
-            );
+            setDragY(y - getWidget().getY());
         }
         selectWidget.setPosition(x - dragX, y - dragY);
     }
 
-    public void setSize(int width, int height){
-        selectWidget.setSize(width, height);
-    }
-
-    public void setWidget(@Nullable WidgetWrapper widgetWrapper) {
-        if(widgetWrapper == null || this.selectWidget == widgetWrapper) {
-            if(widgetWrapper == null)
-                selectWidget = null;
-            return;
-        }
-        this.selectWidget = widgetWrapper;
-        lastSelectWidget = widgetWrapper;
-    }
 
     public void addWidth(int i){
         lastSelectWidget.setWidth(lastSelectWidget.getWidth() + i);

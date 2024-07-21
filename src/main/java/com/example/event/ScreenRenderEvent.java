@@ -2,13 +2,17 @@ package com.example.event;
 
 import com.example.screen.CustomScreenMod;
 import com.example.screen.ScreenFlow;
+import com.example.wrapper.widget.ImageWrapper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class CustomScreenEvent {
+public class ScreenRenderEvent {
+    private static final Logger log = LoggerFactory.getLogger(ScreenRenderEvent.class);
     ScreenFlow screenFlow;
     @SubscribeEvent
     public void screenRender(ScreenEvent.Render.Post render){
@@ -20,8 +24,18 @@ public class CustomScreenEvent {
             }
             if(screenFlow == null)
                 screenFlow = CustomScreenMod.getScreen(render.getScreen());
+            else if(screenFlow.getScreen() != render.getScreen()){
+                screenFlow = CustomScreenMod.getScreen(render.getScreen());
+            }
+            if(!screenFlow.getWidget().getImageList().isEmpty()) {
+                //log.debug("{}의 이미지에서 렌더링 중.",screenFlow.getScreenName());
+                for (ImageWrapper imageWrapper : screenFlow.getWidget().getImageList()) {
+                    if(imageWrapper.isVisible()) {
+                        imageWrapper.render(pGuiGraphics);
+                    }
+                }
+            }
 
-            screenFlow.renderImageWidget(pGuiGraphics);
         }
     }
 

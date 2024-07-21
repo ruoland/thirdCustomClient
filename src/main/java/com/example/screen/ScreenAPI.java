@@ -39,7 +39,6 @@ public class ScreenAPI {
         }
         catch (IOException e){
             JOptionPane.showMessageDialog(null, "인식할 수 없는 파일입니다! png 파일만 인식하며 윈도우 외의 환경에서는 정상작동 하지 않을 수 있습니다."+e.getMessage());
-
         }
         return null;
     }

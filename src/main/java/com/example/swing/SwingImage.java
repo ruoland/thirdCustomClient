@@ -14,20 +14,10 @@ public class SwingImage extends SwingWidgetBase implements ICustomSwing {
     public ImageWrapper widgetImage;
 
     public SwingImage(ImageWrapper widgetImage, String title) {
-        super(widgetImage, title, true, false, true, true, true);
+        super(widgetImage, title, true, true, true, true, true);
         this.widgetImage = widgetImage;
         visibleText = "이미지 표시";
-        nameField.setText(widgetImage.getResource().toString());
     }
-
-    @Override
-    public void keyTyped(KeyEvent e) {
-        super.keyTyped(e);
-        if(e.getSource() == nameField){
-            widgetImage.setTexture(nameField.getText());
-        }
-    }
-
     @Override
     public void keyPressed(KeyEvent e) {
         super.keyPressed(e);

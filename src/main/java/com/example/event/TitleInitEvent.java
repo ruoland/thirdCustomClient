@@ -7,6 +7,7 @@ import com.example.wrapper.widget.ButtonWrapper;
 import com.example.wrapper.widget.ImageWrapper;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
@@ -17,9 +18,12 @@ import org.slf4j.LoggerFactory;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Map;
 
 public class TitleInitEvent {
     private static final Logger logger = LoggerFactory.getLogger(TitleInitEvent.class);
+
 
     /**
      * 이 클래스에서 커스터마이징할 스크린을 지정함
@@ -32,21 +36,20 @@ public class TitleInitEvent {
         logger.info("화면이 열렸습니다. {}",screenName);
 
         if (screenName != null && screenName.equals("TitleScreen")) {
-            logger.debug("화면 열림 이벤트: {}", event.getNewScreen().getTitle().getString());
+            logger.info("화면 열림 이벤트: {}, 새로운 화면으로 대체합니다. ", event.getNewScreen().getTitle().getString());
             setFinalStatic("MINECRAFT_LOGO", new ResourceLocation("customclient:textures/logo.png"));
             setFinalStatic("MINECRAFT_EDITION", new ResourceLocation("customclient:textures/logo.png"));
             ScreenNewTitle newTitle = new ScreenNewTitle();
             event.setNewScreen(newTitle);
             ScreenFlow screenFlow =  CustomScreenMod.createScreenFlow("ScreenNewTitle");
             screenFlow.openScreen(event.getNewScreen()); //스크린 열림
-
         }
     }
     @SubscribeEvent
     public void screenCloseEvent(ScreenEvent.Closing event) {
         String screenName = CustomScreenMod.getScreenName(event.getScreen());
         if(screenName != null && screenName.equals("ScreenNewTitle")){
-
+            logger.info("새로운 타이틀 스크린이 닫혔습니다. {}",screenName);
         }
     }
 
@@ -54,17 +57,15 @@ public class TitleInitEvent {
 
     @SubscribeEvent
     public void screenMousePressedPost(ScreenEvent.MouseButtonPressed.Pre event) {
-        logger.debug("마우스 클릭 이벤트 - 좌표: ({}, {})", event.getMouseX(), event.getMouseY());
-        if(!CustomScreenMod.isEditMode() && CustomScreenMod.hasScreen(event.getScreen())) {
-            if (event.getButton() == 0) {
-                ScreenFlow screenFlow = CustomScreenMod.getScreen(event.getScreen());
-                for(ButtonWrapper buttonWrapper : screenFlow.getWidget().getDefaultButtons()){
-                    if(buttonWrapper.isMouseOver(event.getMouseX(), event.getMouseY())){
-                        logger.info("클릭된 버튼 : {}, 액션 : {}",buttonWrapper.getMessage(), buttonWrapper.getAction());
-                        buttonWrapper.runAction();
-                        event.setCanceled(true);
-                        break;
-                    }
+        logger.debug("마우스 클릭 액션 이벤트 - 좌표: ({}, {})", event.getMouseX(), event.getMouseY());
+        ScreenFlow screenFlow = CustomScreenMod.getScreen(event.getScreen());
+        if(event.getButton() == 0 && !CustomScreenMod.isEditMode() && CustomScreenMod.hasScreen(event.getScreen())) {
+            for(ButtonWrapper buttonWrapper : screenFlow.getWidget().getDefaultButtons()){
+                if(buttonWrapper.isMouseOver(event.getMouseX(), event.getMouseY())){
+                    logger.info("클릭된 버튼 : {}, 액션 : {}",buttonWrapper.getMessage(), buttonWrapper.getAction());
+                    buttonWrapper.runAction();
+                    event.setCanceled(true);
+                    break;
                 }
             }
         }
@@ -88,16 +89,31 @@ public class TitleInitEvent {
             screenFlow.save();
             screenFlow.getWidget().syncWithSwing();
             logger.info("위젯 동기화 완료 ");
-            CustomScreenMod.loadTitleWidgets();
+            loadTitleWidgets();
         }
     }
 
+    public static void loadTitleWidgets(){
+        ScreenFlow screenFlow = CustomScreenMod.getScreen("ScreenNewTitle");
+
+        for(int i = 0; i < screenFlow.getScreen().children().size();i++){
+            AbstractWidget widget = (AbstractWidget) screenFlow.getScreen().children().get(i);
+            ArrayList<ButtonWrapper> defaultButtons = screenFlow.getWidget().getDefaultButtons();
+            if(defaultButtons.size() <= i){
+                defaultButtons.add(new ButtonWrapper(widget));
+            }
+            else
+                defaultButtons.get(i).setAbstractWidget(widget);
+        }
+    }
     private void logoRender(ScreenFlow screenFlow){
         Screen newTitle = Minecraft.getInstance().screen;
         int i = newTitle.width / 2 - 128;
         int j = newTitle.width / 2 - 64;
         int k = 30 + 44 - 7;
         boolean logo = false, edition = false;
+
+        //중복 추가를 막기 위해
         for(ImageWrapper resource : screenFlow.getWidget().getImageList()){
             if(resource.getResource().toString().equals("customclient:textures/minecraft.png"))
                 logo = true;
