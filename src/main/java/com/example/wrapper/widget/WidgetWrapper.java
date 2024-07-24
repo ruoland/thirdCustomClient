@@ -23,7 +23,6 @@ public abstract class WidgetWrapper implements IWidget {
 
     private transient AbstractWidget abstractWidget;
     private int x, y, width, height, color;
-    private double designWidth, designHeight;
     private String texture, message;
     private float alpha = 1;
     private boolean visible = true, lock = false;
@@ -40,14 +39,6 @@ public abstract class WidgetWrapper implements IWidget {
 
     public int getColor() {
         return abstractWidget.getFGColor();
-    }
-
-    public double getDesignWidth(){
-        return designWidth;
-    }
-
-    public double getDesignHeight() {
-        return designHeight;
     }
 
     public int getHeight() {
@@ -89,8 +80,7 @@ public abstract class WidgetWrapper implements IWidget {
     public void setPosition(int x, int y){
         this.x = x;
         this.y = y;
-        designWidth = Minecraft.getInstance().getWindow().getScreenWidth();
-        designHeight = Minecraft.getInstance().getWindow().getScreenHeight();
+
         abstractWidget.setPosition(x, y);
     }
 

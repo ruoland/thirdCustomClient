@@ -111,6 +111,15 @@ public class CustomScreenData {
                 System.out.println(customObject+" : 생성됨");
             }
             logger.info("3. 이미지 개수 {}", widgetHandler.getImageList().size());
+            if(jsonObject.has("displaySize")) {
+                screenFlow.displayWidth = jsonObject.get("displayWidth").getAsInt();
+                screenFlow.displayHeight = jsonObject.get("displayHeight").getAsInt();
+            }else{
+                jsonObject.addProperty("displayWidth", screenFlow.getScreen().width);
+                jsonObject.addProperty("displayHeight", screenFlow.getScreen().height);
+
+            }
+
         } catch (IOException e) {
             logger.error("커스텀 위젯 로딩 중 오류 발생", e);
             throw new RuntimeException(e);

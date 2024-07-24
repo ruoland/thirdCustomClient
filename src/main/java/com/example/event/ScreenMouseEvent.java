@@ -6,6 +6,7 @@ import com.example.screen.ScreenFlow;
 import com.example.wrapper.widget.ButtonWrapper;
 import com.example.wrapper.widget.ImageWrapper;
 import com.example.wrapper.widget.WidgetWrapper;
+import net.minecraft.client.gui.screens.Screen;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import org.slf4j.Logger;
@@ -57,8 +58,12 @@ public class ScreenMouseEvent {
     @SubscribeEvent
     public void screenButton(ScreenEvent.MouseDragged.Post opening){
         if(CustomScreenMod.isEditMode() && CustomScreenMod.hasScreen(opening.getScreen())){
-            int mouseX = (int) (opening.getMouseX() + opening.getDragX());
-            int mouseY = (int) (opening.getMouseY() + opening.getDragY());
+            Screen screen = opening.getScreen();
+            int width = screen.width / 2;
+            int height = screen.height / 2;
+
+            int mouseX = width + (int) (opening.getMouseX() + opening.getDragX());
+            int mouseY = height + (int) (opening.getMouseY() + opening.getDragY());
 
             ScreenFlow screenFlow = CustomScreenMod.getScreen(opening.getScreen());
             if(screenFlow.hasSelectWidget()) {

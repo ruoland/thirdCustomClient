@@ -4,6 +4,7 @@ import com.example.ICustomRenderable;
 import com.example.wrapper.widget.ButtonWrapper;
 import com.example.wrapper.widget.ImageWrapper;
 import com.example.wrapper.widget.WidgetWrapper;
+import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
@@ -29,6 +30,7 @@ public class WidgetHandler {
     public WidgetHandler(Screen screen){
         this.screen = screen;
         logger.debug("위젯 핸들러 생성됨 {}", screen.getTitle().getString());
+
     }
 
     /**
@@ -88,8 +90,8 @@ public class WidgetHandler {
                 defaultButtons.add(new ButtonWrapper(widget));
             ButtonWrapper buttonWrapper = defaultButtons.get(i);
             buttonWrapper.setAbstractWidget(widget);
-            buttonWrapper.setX((int) (buttonWrapper.getX() * ((double) Minecraft.getInstance().getWindow().getScreenWidth()) / (double) buttonWrapper.getDesignWidth()));
-            buttonWrapper.setY((int) (buttonWrapper.getY() * ((double) Minecraft.getInstance().getWindow().getScreenHeight()) / (double) buttonWrapper.getDesignHeight()));
+            buttonWrapper.setX((int) (buttonWrapper.getX() * ((double) Minecraft.getInstance().getWindow().getScreenWidth())));
+            buttonWrapper.setY((int) (buttonWrapper.getY() * ((double) Minecraft.getInstance().getWindow().getScreenHeight())));
             logger.debug("스크린 {}에 기본 버튼 추가 됨{}",screen.getTitle().getString(), widget.getMessage().getString());
         }
     }
@@ -112,10 +114,11 @@ public class WidgetHandler {
         customRenderable.addRenderableWidget(data.getWidget());
         logger.debug("새로운 버튼 하나 생성하였습니다. "+data.getMessage());
     }
-    public void makeCustomButtons(){
+    public void makeCustomButtons(int displayWidth, int displayHeight){
         logger.info("커스텀 버튼 생성 중");
         for(ButtonWrapper buttonWrapper : buttons){
             if(buttonWrapper.isVisible()) {
+
                 //getWidget이 없다면 새로 생성된 버튼이라 판단함
                 if(buttonWrapper.getWidget() == null) {
                     //제대로 정보 생성 후 등록하기
@@ -133,6 +136,11 @@ public class WidgetHandler {
                     buttonWrapper.getWidget().active = false;
                 }
             }
+            Window window = Minecraft.getInstance().getWindow();
+            int x = buttonWrapper.getX();
+            int y = buttonWrapper.getY();
+            buttonWrapper.setX(x * window.getScreenWidth() / displayWidth);
+            buttonWrapper.setY(y * window.getScreenHeight() / displayHeight);
         }
     }
     public void addImage(ImageWrapper widgetImage){

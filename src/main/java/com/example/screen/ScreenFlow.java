@@ -36,7 +36,8 @@ public class ScreenFlow {
     private Screen screen;
     private String screenName;
     private CustomScreenData data;
-
+    int displayWidth = 0;
+    int displayHeight = 0;
     private SwingHandler swingHandler = new SwingHandler();
     private WidgetHandler widgetHandler;//loadScreenData 메서드에서 초기화됨
     private SelectHandler selectHandler;
@@ -93,8 +94,9 @@ public class ScreenFlow {
     }
 
     public void save(){
-        if(data != null)
+        if(data != null) {
             data.save();
+        }
         else {
             logger.error("{}의 스크린에서 오류 발생", getScreenName());
             throw new NullPointerException("스크린의 데이터 없음");
@@ -105,6 +107,14 @@ public class ScreenFlow {
     }
     public void loadScreenData(){
         logger.info("화면 데이터 로딩 중: {}", screenName);
+        if(displayWidth == 0)
+        {
+            displayWidth = Minecraft.getInstance().getWindow().getScreenWidth();
+        }
+        if(displayHeight == 0)
+        {
+            displayHeight = Minecraft.getInstance().getWindow().getScreenHeight();
+        }
         if(widgetHandler != null){
             for(ButtonWrapper buttonWrapper : widgetHandler.getButtons()) {
                 if (screen.renderables.contains(buttonWrapper.getWidget())) {
@@ -116,10 +126,11 @@ public class ScreenFlow {
         widgetHandler = new WidgetHandler(screen);
         data = new CustomScreenData(this, screenName);
         data.initFiles();
+
         data.loadCustomWidgets();
         if(screenName.equals("ScreenNewTitle"))
             widgetHandler.loadDefaultWidgets();
-        widgetHandler.makeCustomButtons();
+        widgetHandler.makeCustomButtons(displayWidth, displayHeight);
         widgetHandler.syncWithSwing();
         if(screen instanceof ICustomBackground background)
             background.setBackground(new ResourceLocation(data.background));}
