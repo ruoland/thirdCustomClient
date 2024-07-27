@@ -24,3 +24,10 @@ runs
 run-data
 
 repo
+/src/main/resources/assets/customclient/textures/sticker_240709182951.png
+/src/main/java.zip
+/src/main/java/com/example/event/ScreenKeyEvent.java
+/src/main/resources/assets/customclient/sticker_240709182951.png
+/src/main/resources/assets/customclient/sticker_240709203115.png
+/src/main/resources/assets/customclient/stickersheet_240709175806.png
+/src/main/resources/assets/customclient/ticker_240709203115.png
