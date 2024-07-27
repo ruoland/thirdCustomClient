@@ -118,8 +118,8 @@ public abstract class WidgetWrapper implements IWidget {
 
     private void applyPosition() {
         if (abstractWidget != null) {
-            abstractWidget.setPosition(x, y);
-            setPosition(x,y);
+            abstractWidget.setX(x);
+            abstractWidget.setY(y);
         }
     }
 
