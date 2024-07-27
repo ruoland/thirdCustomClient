@@ -1,7 +1,10 @@
 package customclient;
 
 import com.example.ScreenCommand;
-import com.example.event.*;
+import com.example.event.KeyEvent;
+import com.example.event.ScreenMouseEvent;
+import com.example.event.ScreenRenderEvent;
+import com.example.event.TitleInitEvent;
 import com.example.packet.ClientPayloadHandler;
 import com.example.packet.ScreenOpenData;
 import com.example.packet.ServerPayloadHandler;
@@ -40,6 +43,7 @@ public class CustomClient {
         NeoForge.EVENT_BUS.register(new ScreenRenderEvent());
         NeoForge.EVENT_BUS.register(new ScreenMouseEvent());
         NeoForge.EVENT_BUS.register(new TitleInitEvent());
+
         // DeferredRegister 등록
 
     }

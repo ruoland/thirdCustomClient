@@ -1,8 +1,6 @@
 package com.example.screen;
 
 import com.example.wrapper.widget.WidgetWrapper;
-import com.mojang.blaze3d.platform.Window;
-import net.minecraft.client.Minecraft;
 
 public class SelectHandler {
     private WidgetWrapper selectWidget;
@@ -32,7 +30,6 @@ public class SelectHandler {
             setDragY(y - getWidget().getY());
         }
         selectWidget.setPosition(x - dragX, y - dragY);
-
     }
 
 

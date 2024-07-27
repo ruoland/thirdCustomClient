@@ -1,8 +1,6 @@
 package com.example.screen;
 
-import com.example.wrapper.widget.WidgetWrapper;
 import customclient.CustomClient;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
@@ -39,7 +37,6 @@ public class CustomScreenMod {
             ScreenFlow screenFlow = new ScreenFlow();
             screenFlow.setScreenName(name);
             screenMap.put(name, screenFlow);
-        // 초기 위젯 위치의 비율 설정
 
             return screenMap.get(name);
     }
