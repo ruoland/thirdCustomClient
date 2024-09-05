@@ -6,8 +6,14 @@ import com.example.event.ScreenMouseEvent;
 import com.example.event.ScreenRenderEvent;
 import com.example.event.TitleInitEvent;
 import com.example.packet.*;
+import com.mojang.blaze3d.platform.Window;
 import com.mojang.logging.LogUtils;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -15,6 +21,8 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
+import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
@@ -32,6 +40,7 @@ public class CustomClient {
         // 모드 이벤트 버스에 리스너 등록
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::registerPayloadHandlers);
+
         if (FMLEnvironment.dist == Dist.CLIENT) {
 
         }

@@ -3,14 +3,23 @@ package com.example.event;
 import com.example.screen.CustomScreenMod;
 import com.example.screen.ScreenFlow;
 import com.example.wrapper.widget.ImageWrapper;
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.Window;
 import customclient.HUDWidget;
+import customclient.TimeWidget;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RenderGuiEvent;
 import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
+import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,19 +27,34 @@ import org.slf4j.LoggerFactory;
 public class ScreenRenderEvent {
     private static final Logger log = LoggerFactory.getLogger(ScreenRenderEvent.class);
     ScreenFlow screenFlow;
+
+
     @SubscribeEvent
     public void screenUI(RenderGuiEvent.Post event){
-        if(!HUDWidget.isEmpty()) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null) return;
+
+        if(!TimeWidget.isEmpty()) {
+            for (ImageWrapper wrapper : TimeWidget.getImageList()) {
+                wrapper.render(event.getGuiGraphics());
+
+            }
+        }
+
+
+        if(!HUDWidget.isEmpty()){
             for (ImageWrapper wrapper : HUDWidget.getImageList()) {
                 wrapper.render(event.getGuiGraphics());
 
             }
         }
+
+
     }
 
     @SubscribeEvent
     public void tick(ServerTickEvent.Post event){
-        HUDWidget.cooldown();
+        TimeWidget.cooldown();
     }
 
     @SubscribeEvent

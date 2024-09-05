@@ -1,6 +1,5 @@
 package com.example.packet;
 
-import com.example.event.UIImage;
 import net.minecraft.network.chat.Component;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
