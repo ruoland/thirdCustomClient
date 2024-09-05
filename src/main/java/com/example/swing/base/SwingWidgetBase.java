@@ -1,22 +1,23 @@
-package com.example.swing.base;
+    package com.example.swing.base;
 
-import com.example.wrapper.widget.WidgetWrapper;
-import com.mojang.blaze3d.platform.Window;
-import net.minecraft.client.Minecraft;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+    import com.example.wrapper.widget.WidgetWrapper;
+    import com.mojang.blaze3d.platform.Window;
+    import net.minecraft.client.Minecraft;
+    import org.slf4j.Logger;
+    import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.util.function.Consumer;
+    import javax.swing.*;
+    import javax.swing.event.DocumentEvent;
+    import javax.swing.event.DocumentListener;
+    import java.awt.*;
+    import java.awt.event.ActionEvent;
+    import java.awt.event.ActionListener;
+    import java.awt.event.KeyEvent;
+    import java.awt.event.KeyListener;
+    import java.util.function.Consumer;
 
-public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener, ActionListener, DocumentListener {
+    public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener, ActionListener, DocumentListener {
+        protected JTextField idField = new JTextField(10);
         protected JTextField nameField = new JTextField(20);
         protected JTextField actionField = new JTextField(20);
         protected JTextField xField = new JTextField(4);
@@ -36,15 +37,22 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
             setLocation(Math.max(window.getX() - 400, 0), window.getY());
             setLayout(new FlowLayout(FlowLayout.LEADING));
             this.widgetWrapper = widgetWrapper;
+            idField.addKeyListener(this);
+            idField.setText(widgetWrapper.getId());
+            idField.getDocument().addDocumentListener(this);
+            idField.setToolTipText("고유 ID를 입력하세요.");
+            add(idField);
             if(isNameText) {
                 nameField.addKeyListener(this);
                 nameField.setText(widgetWrapper.getMessage());
                 nameField.getDocument().addDocumentListener(this);
+                idField.setToolTipText("표시될 내용을 입력하세요.");
                 add(nameField);
             }
             if(isAction)
             {
-                actionField.setText(widgetWrapper.getAction());
+                actionField.setText(widgetWrapper.getValue());
+                idField.setToolTipText("대상의 ID나 서버 접속의 경우 서버 주소를 입력하세요.");
             }
             if(positionField) {
                 xField.addKeyListener(this);
@@ -61,6 +69,8 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
                 widthField.setText(widgetWrapper.getWidth() + "");
                 heightField.addKeyListener(this);
                 heightField.setText(widgetWrapper.getHeight() + "");
+                widthField.setToolTipText("개체의 넓이입니다.");
+                heightField.setToolTipText("개체의 높낮이입니다.");
                 widthField.getDocument().addDocumentListener(this);
                 heightField.getDocument().addDocumentListener(this);
                 add(widthField);
@@ -68,6 +78,7 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
             }
             if(visibleButton) {
                 this.visibleButton.addActionListener(this);
+                widthField.setToolTipText("개체를 표시하거나 숨길 수 있습니다. (에디트 모드에서는 무조건 보입니다)");
                 add(this.visibleButton);
             }
 
@@ -104,8 +115,11 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
                 actionField.setText(widgetWrapper.getValue());
                 logger.info("초기화 : 명령어 : {},{} ", widgetWrapper.getAction(), widgetWrapper.getValue());
 
-            } else
-                actionComboBox.setSelectedItem(widgetWrapper.getAction() + ":" + widgetWrapper.getValue());
+            } else if(widgetWrapper.getValue() != null){
+                actionComboBox.setSelectedItem(widgetWrapper.getAction());
+                actionField.setText(widgetWrapper.getValue());
+
+            }
         }
         isInit = true;
     }
@@ -121,8 +135,14 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
             actionComboBox.addItem("열기:접근성");
             actionComboBox.addItem("접속:");
             actionComboBox.addItem("종료:종료");
-            if(Minecraft.getInstance().player != null)
+            if(Minecraft.getInstance().player != null) {
                 actionComboBox.addItem("명령어");
+            }
+            actionComboBox.addItem("배경 변경:");
+            actionComboBox.addItem("버튼 표시:");
+            actionComboBox.addItem("버튼 숨기기:");
+            actionComboBox.addItem("이미지 표시:");
+            actionComboBox.addItem("이미지 숨기기:");
         }
 
 
@@ -130,7 +150,7 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
         public void keyTyped(KeyEvent e) {
 
         }
-        
+
         @Override
         public void keyPressed(KeyEvent e) {
 
@@ -157,12 +177,13 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
                 else
                     actionComboBox.setSelectedItem(widgetWrapper.getAction() +":"+widgetWrapper.getValue());
             }
-           
+
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             if(isInit) {
+                String itemMessage = actionComboBox.getSelectedItem().toString();
                 if (e.getSource() == visibleButton) {
                     widgetWrapper.setVisible(!widgetWrapper.isVisible());
                     StringBuilder sb = new StringBuilder(visibleText);
@@ -171,17 +192,19 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
                 }
 
                 if (e.getSource() == actionComboBox) {
-                    logger.info("이벤트 발동됨, 현재 선택된 액션: {}, 액션 필드: {}", actionComboBox.getSelectedItem(), actionField.getText());
+                    logger.info("이벤트 발동됨, 현재 선택된 액션: {}, 액션 필드: {}", itemMessage, actionField.getText());
 
-                    if (actionComboBox.getSelectedItem().equals("접속:")) {
+                    if (itemMessage.equals("접속:")) {
                         if (actionField.getText() == null || actionField.getText().equals(""))
                             actionField.setText("127.0.0.1");
                     }
 
                     widgetWrapper.setAction(actionComboBox.getSelectedItem().toString());
 
-                    if(actionComboBox.getSelectedItem().toString().contains(":") || actionComboBox.getSelectedItem().toString().equals("명령어"))
+                    if(itemMessage.contains(":") || itemMessage.equals("명령어")) {
                         widgetWrapper.setValue(actionField.getText());
+
+                    }
                 }
             }
         }
@@ -198,7 +221,7 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
 
 
     /**
-     *  swing에 키보드로 뭔가 입력이 된다면 업데이트됨
+     *  swing에 키보드로 뭔가 입력이 된다면 바로바로 위젯에 업데이트됨
      */
     public void dataUpdate(){
         // 사용 예:
@@ -212,14 +235,8 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
                     widgetWrapper.setMessage(nameField.getText());
 
                 if (!actionField.getText().isEmpty()) {
-                    if (actionComboBox.getSelectedItem().equals("접속:")) {
-                        widgetWrapper.setAction(actionComboBox.getSelectedItem().toString());
-                        widgetWrapper.setValue(actionField.getText());
-                    }
-                    if (actionComboBox.getSelectedItem().equals("명령어")) {
-                        widgetWrapper.setAction(actionComboBox.getSelectedItem().toString());
-                        widgetWrapper.setValue(actionField.getText());
-                    }
+                    widgetWrapper.setAction(actionComboBox.getSelectedItem().toString());
+                    widgetWrapper.setValue(actionField.getText());
                     logger.info("액션 업데이트 됨 액션: {}, 값: {}", actionComboBox.getSelectedItem(), actionField.getText());
                 }
             }
@@ -240,4 +257,4 @@ public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener
 
         dataUpdate();
     }
-}
+    }

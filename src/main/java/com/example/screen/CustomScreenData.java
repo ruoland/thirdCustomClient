@@ -73,6 +73,7 @@ public class CustomScreenData {
         this.background = background;
     }
 
+
     public void loadCustomWidgets(){
         logger.info("1.커스텀 위젯 로딩 중 - 파일: {}", screenDataPath);
         WidgetHandler widgetHandler = screenFlow.getWidget();
@@ -85,19 +86,19 @@ public class CustomScreenData {
             if(jsonObject.has("titleWidgetButton")) {
                 widgetHandler.getDefaultButtons().addAll(GSON.fromJson(jsonObject.get("titleWidgetButton"), new TypeToken<ArrayList<ButtonWrapper>>() {
                 }.getType()));
+                logger.info("기본 버튼 불러오는 중 {}", jsonObject.get("titleWidgetButton"));
             }
             ArrayList<ButtonWrapper> arrayList = GSON.fromJson(jsonObject.get("widgetButton"), new TypeToken<ArrayList<ButtonWrapper>>(){}.getType());
-            ArrayList<ButtonWrapper> buttonWrappers = arrayList;
-            logger.info("커스텀 버튼의 개수 {}",buttonWrappers.size());
+            logger.info("커스텀 버튼의 개수 {}", arrayList.size());
 
             for(int i = 0; i < arrayList.size(); i++){
                 ButtonWrapper buttonWrapper = arrayList.get(i);
                 if(!buttonWrapper.isVisible()) {
-                    buttonWrappers.remove(i);
-                    logger.info("버튼 제거 됨{}", buttonWrappers.size());
+                    arrayList.remove(i);
+                    logger.info("버튼 제거 됨{}", arrayList.size());
                 }
             }
-            widgetHandler.getButtons().addAll(buttonWrappers);
+            widgetHandler.getButtons().addAll(arrayList);
 
             if(!jsonObject.get("widgetImage").getAsJsonArray().isEmpty()){
                 widgetHandler.getImageList().addAll(GSON.fromJson(jsonObject.get("widgetImage"), new TypeToken<ArrayList<ImageWrapper>>(){}.getType()));

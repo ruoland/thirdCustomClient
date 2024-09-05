@@ -62,18 +62,6 @@ public class ScreenFlow {
         return selectHandler != null;
     }
 
-    /**
-     * 해당하는 경로의 이미지 위젯이 있느냐?
-     */
-    public boolean hasImageWidget(String resouce){
-        for(ImageWrapper imageWrapper : widgetHandler.getImageList()){
-            if(imageWrapper.getResource().toString().equals(resouce)){
-                return true;
-            }
-        }
-        return false;
-    }
-
     public void openScreen(Screen screen){
         this.screen = screen;
     }
@@ -117,9 +105,7 @@ public class ScreenFlow {
         }
         if(widgetHandler != null){
             for(ButtonWrapper buttonWrapper : widgetHandler.getButtons()) {
-                if (screen.renderables.contains(buttonWrapper.getWidget())) {
-                    screen.renderables.remove(buttonWrapper.getWidget());
-                }
+                screen.renderables.remove(buttonWrapper.getWidget());
             }
             widgetHandler.getImageList().clear();
         }
@@ -128,6 +114,7 @@ public class ScreenFlow {
         data.initFiles();
 
         data.loadCustomWidgets();
+        logger.info("불러온 기본 위젯들 : {}", getWidget().getDefaultButtons());
         if(screenName.equals("ScreenNewTitle"))
             widgetHandler.loadDefaultWidgets();
         widgetHandler.makeCustomButtons();
@@ -173,32 +160,30 @@ public class ScreenFlow {
         int select = JOptionPane.showOptionDialog(null, "어떤 걸로 설정할까요?", "이미지 불러오기", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]{"배경화면", "이미지", "취소"}, "취소");
         String fileName = path.getFileName().toString().toLowerCase();
         try {
-            Path texturePack = Path.of("D:\\Projects\\four\\thirdCustomClient\\src\\main\\resources\\assets\\customclient\\", fileName);
+            //TODO 나중에 경로 바꾸기!!!!!!!!!!!!
+            Path texturePack = Path.of("D:\\Projects\\thirdCustomClient\\src\\main\\resources\\assets\\customclient\\textures/", fileName);
             Pattern pattern = Pattern.compile("[a-zA-Z0-9/._-]+");
             Matcher matcher = pattern.matcher(fileName);
             if(!matcher.matches()){
                 JOptionPane.showConfirmDialog(null, "파일 이름에 영어 소문자, 숫자, -_ 문자만 있어야 등록할 수 있습니다.");
                 return;
             }
-            if(!Files.exists(texturePack))
+            if(!Files.exists(texturePack)) {
                 Files.copy(path, texturePack);
+                logger.info("파일이 복사 되었습니다. path: {} texturepack:{} ", path, texturePack);
+            }
 
             BufferedImage bi = ImageIO.read(path.toFile());
 
-
             switch (select) {
-
-            case JOptionPane.YES_OPTION -> {
-                data.dynamicBackground = resourceLocation.toString();
-                data.setBackground("customclient:"+fileName );
-                if(screen instanceof ICustomBackground background)//백그라운드 설정 가능한 GUI라면
-                    background.setBackground(new ResourceLocation(data.background));
+                case JOptionPane.YES_OPTION -> {
+                    setBackground(fileName);
+                }
+                case JOptionPane.NO_OPTION -> {
+                    ImageWrapper image = new ImageWrapper(resourceLocation, fileName, 0, 0, bi.getWidth(), bi.getHeight(), 1);
+                    widgetHandler.addImage(image);
+                }
             }
-            case JOptionPane.NO_OPTION -> {
-                ImageWrapper image = new ImageWrapper(resourceLocation, fileName, 0, 0, bi.getWidth(), bi.getHeight(), 1);
-                widgetHandler.addImage(image);
-            }
-        }
         if(select == JOptionPane.YES_OPTION)
             NeoForge.EVENT_BUS.post(new ImageWidgetEvent.Background(screen, resourceLocation, path));
 
@@ -207,6 +192,12 @@ public class ScreenFlow {
         }
     }
 
+    public void setBackground(String fileName){
+
+        data.setBackground("customclient:"+fileName );
+        if(screen instanceof ICustomBackground background)//백그라운드 설정 가능한 GUI라면
+            background.setBackground(new ResourceLocation(data.background));
+    }
     public void renderImageWidget(GuiGraphics pGuiGraphics){
 
     }

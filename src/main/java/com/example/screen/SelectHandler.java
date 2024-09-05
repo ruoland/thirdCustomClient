@@ -3,14 +3,12 @@ package com.example.screen;
 import com.example.wrapper.widget.WidgetWrapper;
 
 public class SelectHandler {
-    private WidgetWrapper selectWidget;
-    private WidgetWrapper lastSelectWidget;
+    private final WidgetWrapper selectWidget;
     private int dragX = -1;
     private int dragY = -1;
 
     public SelectHandler(WidgetWrapper widgetWrapper){
         this.selectWidget = widgetWrapper;
-        this.lastSelectWidget = widgetWrapper;
     }
 
     public boolean isDrag(){
@@ -33,11 +31,11 @@ public class SelectHandler {
     }
 
     public void addWidth(int i){
-        lastSelectWidget.setWidth(lastSelectWidget.getWidth() + i);
+        selectWidget.setWidth(selectWidget.getWidth() + i);
     }
 
     public void addHeight(int i){
-        lastSelectWidget.setHeight(lastSelectWidget.getHeight() + i);
+        selectWidget.setHeight(selectWidget.getHeight() + i);
     }
 
     public String getMessage(){
@@ -51,8 +49,7 @@ public class SelectHandler {
     @Override
     public String toString() {
         return "SelectHandler{" +
-                "selectWidget=" + selectWidget +
-                ", lastSelectWidget=" + lastSelectWidget +
+                "selectWidget=" + selectWidget+
                 '}';
     }
 }

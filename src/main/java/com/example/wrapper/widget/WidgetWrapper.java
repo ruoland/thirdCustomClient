@@ -13,6 +13,7 @@ import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.client.gui.ModListScreen;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,11 +22,11 @@ public abstract class WidgetWrapper implements IWidget {
     private static final Logger logger = LoggerFactory.getLogger(WidgetWrapper.class);
 
     private transient AbstractWidget abstractWidget;
-    private int x, y, width, height, color;
+    private int x, y, width, height;
     private String texture, message;
     private float alpha = 1;
     private boolean visible = true, lock = false;
-    private String action, value;
+    private String action, value, id;
 
     public WidgetWrapper() {
     }
@@ -48,7 +49,10 @@ public abstract class WidgetWrapper implements IWidget {
     }
 
     public boolean isVisible() {
-        return abstractWidget == null ? visible: abstractWidget.visible;
+        if(CustomScreenMod.isEditMode())
+            return true;
+        else
+            return abstractWidget == null ? visible: abstractWidget.visible;
     }
 
     public void setVisible(boolean visible) {
@@ -131,7 +135,7 @@ public abstract class WidgetWrapper implements IWidget {
     public boolean isMouseOver(double mouseX, double mouseY ){
         if(abstractWidget ==null ) {
             if(texture == null)
-            logger.error("클릭한 버튼에 위젯이 연결되어 있지 않음 이 위젯 정보:{}", toString());
+                logger.error("클릭한 버튼에 위젯이 연결되어 있지 않음 이 위젯 정보:{}", this);
             return false;
         }
         return abstractWidget.isMouseOver(mouseX, mouseY) && visible;
@@ -224,12 +228,40 @@ public abstract class WidgetWrapper implements IWidget {
             }
         }
 
-        if(action.contains("종료"))
+        if(action.contains("종료")){
             mc.stop();
+        }
 
+        if(action.contains("배경 변경:")){
+            screenFlow.setBackground(value);
+        }
 
+        if(action.contains("버튼 표시")) {
+            screenFlow.getWidget().findButtonByString(value).setVisible(true);
+        }
+
+        if(action.contains("버튼 숨기기")) {
+            screenFlow.getWidget().findButtonByString(value).setVisible(false);
+        }
+
+        if(action.contains("이미지 표시")) {
+            screenFlow.getWidget().findImageByString(value).setVisible(true);
+        }
+
+        if(action.contains("이미지 숨기기")) {
+            screenFlow.getWidget().findImageByString(value).setVisible(false);
+        }
         return true;
     }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
         return "WidgetWrapper{" +
@@ -237,7 +269,6 @@ public abstract class WidgetWrapper implements IWidget {
                 ", y=" + y +
                 ", width=" + width +
                 ", height=" + height +
-                ", color=" + color +
                 ", texture='" + texture + '\'' +
                 ", message='" + message + '\'' +
                 ", alpha=" + alpha +
