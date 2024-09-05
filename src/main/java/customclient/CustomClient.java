@@ -5,9 +5,7 @@ import com.example.event.KeyEvent;
 import com.example.event.ScreenMouseEvent;
 import com.example.event.ScreenRenderEvent;
 import com.example.event.TitleInitEvent;
-import com.example.packet.ClientPayloadHandler;
-import com.example.packet.ScreenData;
-import com.example.packet.ServerPayloadHandler;
+import com.example.packet.*;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.Blocks;
@@ -61,8 +59,16 @@ public class CustomClient {
                 ScreenData.TYPE,
                 ScreenData.STREAM_CODEC,
                 new DirectionalPayloadHandler<>(
-                        ClientPayloadHandler::handleData,
-                        ServerPayloadHandler::handleData
+                        ScreenClientPayloadHandler::handleData,
+                        ScreenServerPayloadHandler::handleData
+                )
+        );
+        registrar.playBidirectional(
+                ImageData.TYPE,
+                ImageData.STREAM_CODEC,
+                new DirectionalPayloadHandler<>(
+                        ImageClientPayloadHandler::handleData,
+                        ImageServerPayloadHandler::handleData
                 )
         );
     }

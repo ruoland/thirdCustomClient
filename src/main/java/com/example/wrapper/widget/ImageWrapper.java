@@ -51,7 +51,7 @@ public class ImageWrapper extends WidgetWrapper {
         if(isVisible()) {
             if (getWidget() == null)
                 setAbstractWidget(createFakeWidget(getX(), getY(), getWidth(), getHeight(), resourcePath));
-
+            
             ScreenAPI.renderTexture(pGuiGraphics, getResource(), getX(), getY(), getWidth(), getHeight(), getAlpha());
         }
     }

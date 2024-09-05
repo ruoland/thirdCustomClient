@@ -120,7 +120,7 @@ public class WidgetHandler {
 
                         case 6:
                         buttonWrapper.setMessage("menu.quit");
-                        buttonWrapper.setAction("종료:종료");
+                        buttonWrapper.setAction("종료:게임");
                         break;
                     case 7:
                         buttonWrapper.setAction("열기:접근성");
