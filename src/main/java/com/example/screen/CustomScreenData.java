@@ -21,7 +21,7 @@ public class CustomScreenData {
     private final ScreenFlow screenFlow;
     private JsonObject widgetObject = new JsonObject();
     private JsonObject customObject = new JsonObject();
-    protected String background = "customclient:textures/screenshot.png", dynamicBackground;
+    protected String background = "customclient:textures/screenshot.png";
     private Path screenDataPath;
     private static final Logger logger = LoggerFactory.getLogger(CustomScreenData.class);
 
@@ -73,9 +73,8 @@ public class CustomScreenData {
         this.background = background;
     }
 
-
     public void loadCustomWidgets(){
-        logger.info("1.커스텀 위젯 로딩 중 - 파일: {}", screenDataPath);
+                logger.info("1.커스텀 위젯 로딩 중 - 파일: {}", screenDataPath);
         WidgetHandler widgetHandler = screenFlow.getWidget();
         try {
             String json = new String(Files.readAllBytes(screenDataPath));
@@ -101,8 +100,13 @@ public class CustomScreenData {
             widgetHandler.getButtons().addAll(arrayList);
 
             if(!jsonObject.get("widgetImage").getAsJsonArray().isEmpty()){
-                widgetHandler.getImageList().addAll(GSON.fromJson(jsonObject.get("widgetImage"), new TypeToken<ArrayList<ImageWrapper>>(){}.getType()));
+                ArrayList<ImageWrapper> imageWrappers = GSON.fromJson(jsonObject.get("widgetImage"), new TypeToken<ArrayList<ImageWrapper>>(){}.getType());
+                for (ImageWrapper imageWrapper : imageWrappers) {
+                    imageWrapper.createFakeWidget(imageWrapper.getX(), imageWrapper.getY(), imageWrapper.getWidth(), imageWrapper.getHeight(), imageWrapper.getMessage());
+                }
+                widgetHandler.getImageList().addAll(imageWrappers);
             }
+
 
             if(jsonObject.has("customObject")) {
                 customObject = jsonObject.get("customObject").getAsJsonObject();

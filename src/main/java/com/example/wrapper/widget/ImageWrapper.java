@@ -10,47 +10,37 @@ import org.slf4j.LoggerFactory;
 
 public class ImageWrapper extends WidgetWrapper {
     private static final Logger log = LoggerFactory.getLogger(ImageWrapper.class);
-    private transient ResourceLocation resourceLocation;
-    private String resource;
+    private String resourcePath;
 
-    public ImageWrapper(ResourceLocation resourceLocation, String fileName, int x, int y, int width, int height, float alpha){
-        createFakeWidget(x,y,width,height,fileName);
-        this.resourceLocation = resourceLocation;
+    public ImageWrapper(String resourcePath, int x, int y, int width, int height, float alpha){
+        createFakeWidget(x, y, width, height, resourcePath);
+        this.resourcePath = resourcePath;
         setAlpha(alpha);
     }
 
-    public ImageWrapper(ResourceLocation resourceLocation, String fileName, int i, int j, int logoWidth, int logoHeight) {
-            this(resourceLocation, fileName, i, j, logoWidth, logoHeight, 1);
-    }
-
-    public void init(){
-        createFakeWidget(getX(),getY(),getWidth(),getHeight(), resource);
-    }
-
     public ResourceLocation getResource() {
-            return resourceLocation == null ? resourceLocation = new ResourceLocation("customclient", resource.replace("customclient:", "")) : resourceLocation;
+        return new ResourceLocation("customclient", resourcePath.replace("customclient:", ""));
     }
 
     @Override
     public String getMessage() {
-        return getResource().toString();
+        return resourcePath;
     }
 
     public FakeTextureWidget createFakeWidget(int x, int y, int width, int height, String resource){
         if(getWidget() == null) {
-            FakeTextureWidget fakeTextureWidget = new FakeTextureWidget(getX(), getY(), getWidth(), getHeight(), Component.literal(resource));
+            FakeTextureWidget fakeTextureWidget = new FakeTextureWidget(x, y, width, height, Component.literal(resource));
             setAbstractWidget(fakeTextureWidget);
             setX(x);
             setY(y);
             setWidth(width);
             setHeight(height);
-            this.resource = resource;
-        }
-        else{
-            getWidget().setX(getX());
-            getWidget().setY(getY());
-            getWidget().setWidth(getWidth());
-            getWidget().setHeight(getHeight());
+            this.resourcePath = resource;
+        } else {
+            getWidget().setX(x);
+            getWidget().setY(y);
+            getWidget().setWidth(width);
+            getWidget().setHeight(height);
             getWidget().setMessage(Component.literal(resource));
         }
 
@@ -60,12 +50,9 @@ public class ImageWrapper extends WidgetWrapper {
     public void render(GuiGraphics pGuiGraphics) {
         if(isVisible()) {
             if (getWidget() == null)
-                setAbstractWidget(createFakeWidget(getX(), getY(), getWidth(), getHeight(), resource));
+                setAbstractWidget(createFakeWidget(getX(), getY(), getWidth(), getHeight(), resourcePath));
+
             ScreenAPI.renderTexture(pGuiGraphics, getResource(), getX(), getY(), getWidth(), getHeight(), getAlpha());
         }
-        else
-            log.error("이미지가 투명한 상태입니다.");
     }
-
 }
-    

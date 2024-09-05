@@ -3,6 +3,7 @@ package com.example.wrapper.widget;
 import com.example.screen.CustomScreenMod;
 import com.example.screen.ScreenFlow;
 import com.mojang.realmsclient.RealmsMainScreen;
+
 import customclient.FakeTextureWidget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -223,13 +224,19 @@ public abstract class WidgetWrapper implements IWidget {
         }
 
         if(action.equals("명령어")){
-            if (Minecraft.getInstance().player != null) {
-                Minecraft.getInstance().player.connection.sendCommand(value);
+            if (mc.player != null) {
+                for(String command : value.split(" "))
+                    if(command.equals("@c"))
+                        value = value.replace("@c", mc.player.getDisplayName().getString());
+                mc.player.connection.sendCommand(value);
             }
         }
 
         if(action.contains("종료")){
-            mc.stop();
+            if(action.contains("게임"))
+                mc.stop();
+            if(action.contains("화면"))
+                mc.setScreen( null);
         }
 
         if(action.contains("배경 변경:")){

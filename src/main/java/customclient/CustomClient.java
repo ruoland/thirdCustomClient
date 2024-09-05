@@ -6,7 +6,7 @@ import com.example.event.ScreenMouseEvent;
 import com.example.event.ScreenRenderEvent;
 import com.example.event.TitleInitEvent;
 import com.example.packet.ClientPayloadHandler;
-import com.example.packet.ScreenOpenData;
+import com.example.packet.ScreenData;
 import com.example.packet.ServerPayloadHandler;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -58,8 +58,8 @@ public class CustomClient {
     private void registerPayloadHandlers(final RegisterPayloadHandlersEvent event) {
         final PayloadRegistrar registrar = event.registrar(MODID);
         registrar.playBidirectional(
-                ScreenOpenData.TYPE,
-                ScreenOpenData.STREAM_CODEC,
+                ScreenData.TYPE,
+                ScreenData.STREAM_CODEC,
                 new DirectionalPayloadHandler<>(
                         ClientPayloadHandler::handleData,
                         ServerPayloadHandler::handleData

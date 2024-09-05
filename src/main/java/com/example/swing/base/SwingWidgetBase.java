@@ -41,6 +41,7 @@
             idField.setText(widgetWrapper.getId());
             idField.getDocument().addDocumentListener(this);
             idField.setToolTipText("고유 ID를 입력하세요.");
+            
             add(idField);
             if(isNameText) {
                 nameField.addKeyListener(this);
@@ -78,7 +79,6 @@
             }
             if(visibleButton) {
                 this.visibleButton.addActionListener(this);
-                widthField.setToolTipText("개체를 표시하거나 숨길 수 있습니다. (에디트 모드에서는 무조건 보입니다)");
                 add(this.visibleButton);
             }
 
@@ -134,10 +134,13 @@
             actionComboBox.addItem("열기:언어");
             actionComboBox.addItem("열기:접근성");
             actionComboBox.addItem("접속:");
-            actionComboBox.addItem("종료:종료");
             if(Minecraft.getInstance().player != null) {
                 actionComboBox.addItem("명령어");
+                actionComboBox.addItem("종료:화면");
             }
+            else
+                actionComboBox.addItem("종료:게임");
+
             actionComboBox.addItem("배경 변경:");
             actionComboBox.addItem("버튼 표시:");
             actionComboBox.addItem("버튼 숨기기:");

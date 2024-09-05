@@ -119,6 +119,7 @@ public class ScreenFlow {
             widgetHandler.loadDefaultWidgets();
         widgetHandler.makeCustomButtons();
         widgetHandler.syncWithSwing();
+        logger.info("불러온 이미지 위젯들: {}", widgetHandler.getImageList());
         if(screen instanceof ICustomBackground background)
             background.setBackground(new ResourceLocation(data.background));}
 
@@ -150,18 +151,12 @@ public class ScreenFlow {
     public void dragWidget(double mouseX, double mouseY){
         selectHandler.setPosition((int) mouseX, (int) mouseY);
     }
-
     public void fileDropEvent(Path path){
-        ResourceLocation resourceLocation = ScreenAPI.getDynamicTexture(path);
-        System.out.println("파일 드롭 됨");
-        if(resourceLocation == null) {
-            return;
-        }
-        int select = JOptionPane.showOptionDialog(null, "어떤 걸로 설정할까요?", "이미지 불러오기", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]{"배경화면", "이미지", "취소"}, "취소");
         String fileName = path.getFileName().toString().toLowerCase();
+        System.out.println("파일 드롭 됨");
+
         try {
-            //TODO 나중에 경로 바꾸기!!!!!!!!!!!!
-            Path texturePack = Path.of("D:\\Projects\\thirdCustomClient\\src\\main\\resources\\assets\\customclient\\textures/", fileName);
+            Path texturePack = Path.of("D:\\Projects\\thirdCustomClient\\src\\main\\resources\\assets\\customclient\\textures\\", fileName);
             Pattern pattern = Pattern.compile("[a-zA-Z0-9/._-]+");
             Matcher matcher = pattern.matcher(fileName);
             if(!matcher.matches()){
@@ -175,23 +170,25 @@ public class ScreenFlow {
 
             BufferedImage bi = ImageIO.read(path.toFile());
 
+            int select = JOptionPane.showOptionDialog(null, "어떤 걸로 설정할까요?", "이미지 불러오기", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]{"배경화면", "이미지", "취소"}, "취소");
+
             switch (select) {
                 case JOptionPane.YES_OPTION -> {
-                    setBackground(fileName);
+                    setBackground("textures/" + fileName);
                 }
                 case JOptionPane.NO_OPTION -> {
-                    ImageWrapper image = new ImageWrapper(resourceLocation, fileName, 0, 0, bi.getWidth(), bi.getHeight(), 1);
+                    ImageWrapper image = new ImageWrapper("textures/" + fileName, 0, 0, bi.getWidth(), bi.getHeight(), 1);
                     widgetHandler.addImage(image);
                 }
             }
-        if(select == JOptionPane.YES_OPTION)
-            NeoForge.EVENT_BUS.post(new ImageWidgetEvent.Background(screen, resourceLocation, path));
+
+            if(select == JOptionPane.YES_OPTION)
+                NeoForge.EVENT_BUS.post(new ImageWidgetEvent.Background(screen, new ResourceLocation("customclient", "textures/" + fileName), path));
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
-
     public void setBackground(String fileName){
 
         data.setBackground("customclient:"+fileName );

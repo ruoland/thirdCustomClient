@@ -13,7 +13,7 @@ import java.nio.file.Paths;
 
 public abstract class ImageWidgetEvent extends ScreenEvent implements ICancellableEvent {
     protected static final int YES_OPTION= JOptionPane.YES_OPTION, NO_OPTION = JOptionPane.NO_OPTION, CANCEL_OPTION = JOptionPane.CANCEL_OPTION;
-    private static final Path CUSTOM_CLIENT_PATH = Paths.get("D:\\Projects\\thirdCustomClient\\src\\main\\resources\\assets\\customclient/");
+    private static final Path CUSTOM_CLIENT_PATH = Paths.get("D:\\Projects\\thirdCustomClient\\src\\main\\resources\\assets\\customclient\\");
 
     private ResourceLocation resourceLocation;
 

@@ -121,9 +121,9 @@ public class TitleInitEvent {
         }
 
         if(!logo)
-            screenFlow.getWidget().addImage(new ImageWrapper(new ResourceLocation("customclient:textures/minecraft.png"), "textures/minecraft.png", i, 20, LogoRenderer.LOGO_WIDTH, LogoRenderer.LOGO_HEIGHT, 1));
+            screenFlow.getWidget().addImage(new ImageWrapper("textures/minecraft.png", i, 20, LogoRenderer.LOGO_WIDTH, LogoRenderer.LOGO_HEIGHT, 1));
         if(!edition)
-            screenFlow.getWidget().addImage(new ImageWrapper(new ResourceLocation("customclient:textures/edition.png"), "textures/edition.png", j, k, 128, 14, 1));
+            screenFlow.getWidget().addImage(new ImageWrapper("textures/edition.png", j, k, 128, 14, 1));
     }
 
 

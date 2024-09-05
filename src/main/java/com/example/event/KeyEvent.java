@@ -11,8 +11,11 @@ public class KeyEvent {
 
     @SubscribeEvent
     public void sizeEditEvent(ScreenEvent.KeyPressed.Pre event){
+
         if(CustomScreenMod.isEditMode() && event.getKeyCode() != GLFW.GLFW_KEY_LEFT_ALT) {
             ScreenFlow screenFlow = CustomScreenMod.getScreen(event.getScreen());
+            if(screenFlow == null)
+                return;
             SelectHandler selectHandler = screenFlow.selectWidget();
             if(selectHandler != null) {
                 switch (event.getKeyCode()) {
@@ -41,7 +44,6 @@ public class KeyEvent {
     @SubscribeEvent
     public void createButton(ScreenEvent.KeyPressed.Post event){
         if(CustomScreenMod.isEditMode()) {
-            ScreenFlow screenFlow = CustomScreenMod.getScreen(event.getScreen());
             if (ScreenFlow.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT) && ScreenFlow.isKeyDown(GLFW.GLFW_KEY_B)) {
                 CustomScreenMod.getScreen(event.getScreen()).getWidget().addNewButton("새로운 버튼", 200, 20, 0,0);
             }
