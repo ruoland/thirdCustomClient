@@ -130,7 +130,7 @@ public class ScreenFlow {
         data.loadCustomWidgets();
         if(screenName.equals("ScreenNewTitle"))
             widgetHandler.loadDefaultWidgets();
-        widgetHandler.makeCustomButtons(displayWidth, displayHeight);
+        widgetHandler.makeCustomButtons();
         widgetHandler.syncWithSwing();
         if(screen instanceof ICustomBackground background)
             background.setBackground(new ResourceLocation(data.background));}

@@ -32,7 +32,6 @@ public class SelectHandler {
         selectWidget.setPosition(x - dragX, y - dragY);
     }
 
-
     public void addWidth(int i){
         lastSelectWidget.setWidth(lastSelectWidget.getWidth() + i);
     }
@@ -41,10 +40,6 @@ public class SelectHandler {
         lastSelectWidget.setHeight(lastSelectWidget.getHeight() + i);
     }
 
-    public void visible(boolean visible){
-        lastSelectWidget.setVisible(visible);
-
-    }
     public String getMessage(){
         return selectWidget.getMessage();
     }

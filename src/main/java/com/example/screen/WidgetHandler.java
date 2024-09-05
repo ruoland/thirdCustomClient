@@ -88,8 +88,8 @@ public class WidgetHandler {
                 defaultButtons.add(new ButtonWrapper(widget));
             ButtonWrapper buttonWrapper = defaultButtons.get(i);
             buttonWrapper.setAbstractWidget(widget);
-            buttonWrapper.setX((int) (buttonWrapper.getX() * ((double) Minecraft.getInstance().getWindow().getScreenWidth()) / (double) buttonWrapper.getDesignWidth()));
-            buttonWrapper.setY((int) (buttonWrapper.getY() * ((double) Minecraft.getInstance().getWindow().getScreenHeight()) / (double) buttonWrapper.getDesignHeight()));
+            buttonWrapper.setX(buttonWrapper.getX());
+            buttonWrapper.setY(buttonWrapper.getY());
             logger.debug("스크린 {}에 기본 버튼 추가 됨{}",screen.getTitle().getString(), widget.getMessage().getString());
         }
     }

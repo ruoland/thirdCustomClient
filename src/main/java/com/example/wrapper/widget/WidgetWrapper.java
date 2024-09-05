@@ -88,7 +88,6 @@ public abstract class WidgetWrapper implements IWidget {
     public void setX(int x) {
         this.x = x;
         abstractWidget.setX(x);
-
     }
 
     public void setAlpha(float alpha) {
