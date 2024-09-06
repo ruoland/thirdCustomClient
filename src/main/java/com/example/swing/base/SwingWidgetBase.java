@@ -9,6 +9,7 @@
     import javax.swing.*;
     import javax.swing.event.DocumentEvent;
     import javax.swing.event.DocumentListener;
+    import javax.swing.text.NumberFormatter;
     import java.awt.*;
     import java.awt.event.ActionEvent;
     import java.awt.event.ActionListener;
@@ -17,28 +18,36 @@
     import java.util.function.Consumer;
 
     public class SwingWidgetBase extends JFrame implements ICustomSwing, KeyListener, ActionListener, DocumentListener {
-        protected JTextField idField = new JTextField(10);
+        protected JFormattedTextField idField;
         protected JTextField nameField = new JTextField(20);
         protected JTextField actionField = new JTextField(20);
         protected JTextField xField = new JTextField(4);
         protected JTextField yField = new JTextField(4);
         protected JTextField widthField = new JTextField(4);
         protected JTextField heightField = new JTextField(4);
+        protected JTextField fontField = new JTextField(15);
         protected JButton visibleButton = new JButton("버튼 표시: 켜짐");
         protected String visibleText = "버튼 표시: ";
         protected JComboBox<String> actionComboBox;
+
         private static final Logger logger = LoggerFactory.getLogger(SwingWidgetBase.class);
         private boolean isInit = false;
         protected WidgetWrapper widgetWrapper;
-        public SwingWidgetBase(WidgetWrapper widgetWrapper, String title, boolean isNameText, boolean isAction, boolean positionField, boolean sizeField, boolean visibleButton) {
+
+        public SwingWidgetBase(WidgetWrapper widgetWrapper, String title, boolean isNameText, boolean isAction, boolean positionField, boolean sizeField, boolean visibleButton, boolean useFont) {
             setTitle(title);
             setSize(500, 200);
             Window window = Minecraft.getInstance().getWindow();
             setLocation(Math.max(window.getX() - 400, 0), window.getY());
             setLayout(new FlowLayout(FlowLayout.LEADING));
             this.widgetWrapper = widgetWrapper;
+            NumberFormatter numberFormatter = new NumberFormatter();
+            numberFormatter.setValueClass(Integer.class);
+            numberFormatter.setMinimum(0);
+            numberFormatter.setMaximum(1000);
+            idField = new JFormattedTextField(numberFormatter);
             idField.addKeyListener(this);
-            idField.setText(widgetWrapper.getId());
+            idField.setText(String.valueOf(widgetWrapper.getId()));
             idField.getDocument().addDocumentListener(this);
             idField.setToolTipText("고유 ID를 입력하세요.");
             
@@ -92,6 +101,13 @@
                 add(this.actionField);
                 comboBoxAddItem();
             }
+            if(useFont){
+                fontField.setText(widgetWrapper.getCustomFont());
+                this.fontField.addKeyListener(this);
+                this.fontField.getDocument().addDocumentListener(this);
+                this.fontField.setToolTipText("전용 폰트가 있다면, 폰트 이름을 입력하세요.");
+                add(fontField);
+            }
 
             setFocusableWindowState(false);
             setVisible(true);
@@ -107,7 +123,8 @@
         yField.setText(""+ widgetWrapper.getY());
         widthField.setText(""+ widgetWrapper.getWidth());
         heightField.setText(""+ widgetWrapper.getHeight());
-
+        if(fontField != null)
+            fontField.setText("" + widgetWrapper.getCustomFont());
         if(actionComboBox != null) {
             logger.info("액션 정보 : {}, 값 정보: {} ", widgetWrapper.getAction(), widgetWrapper.getValue());
             if (widgetWrapper.getAction() != null && widgetWrapper.getAction().equals("명령어")) {
@@ -118,7 +135,6 @@
             } else if(widgetWrapper.getValue() != null){
                 actionComboBox.setSelectedItem(widgetWrapper.getAction());
                 actionField.setText(widgetWrapper.getValue());
-
             }
         }
         isInit = true;
@@ -170,6 +186,8 @@
             yField.setText(""+ widgetWrapper.getY());
             widthField.setText(""+ widgetWrapper.getWidth());
             heightField.setText(""+ widgetWrapper.getHeight());
+            if(fontField != null)
+                fontField.setText(widgetWrapper.getCustomFont());
 
             if(actionComboBox != null && widgetWrapper.getAction() != null){
                 if(widgetWrapper.getAction().equals("명령어"))
@@ -236,7 +254,12 @@
                 setIntegerFieldIfNotEmpty(heightField, widgetWrapper::setHeight);
                 if (!nameField.getText().equals(""))
                     widgetWrapper.setMessage(nameField.getText());
-
+                if(!idField.getText().equals(""))
+                    widgetWrapper.setId(Integer.parseInt(idField.getText()));
+                if(!fontField.getText().isEmpty()){
+                    widgetWrapper.setCustomFont(fontField.getText());
+                    widgetWrapper.setMessage(nameField.getText());
+                }
                 if (!actionField.getText().isEmpty()) {
                     widgetWrapper.setAction(actionComboBox.getSelectedItem().toString());
                     widgetWrapper.setValue(actionField.getText());

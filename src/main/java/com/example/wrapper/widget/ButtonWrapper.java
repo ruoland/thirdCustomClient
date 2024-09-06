@@ -12,12 +12,18 @@ public class ButtonWrapper extends WidgetWrapper {
             dataUpdate();
         }
 
-        public void dataUpdate(){
+    @Override
+    public void setMessage(String message) {
+        super.setMessage(message);
+    }
+
+    public void dataUpdate(){
             setX(getWidget().getX());
             setY(getWidget().getY());
             setWidth(getWidget().getWidth());
             setHeight(getWidget().getHeight());
             setVisible(getWidget().visible);
             setMessage(getWidget().getMessage().getString());
+
         }
 }

@@ -8,10 +8,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-public class SwingButton extends SwingWidgetBase implements ActionListener, KeyListener {
+public class SwingString extends SwingWidgetBase implements ActionListener, KeyListener {
 
-    public SwingButton(WidgetWrapper widgetWrapper, String title) {
-        super(widgetWrapper, title, true, true, true, true, true, true);
+    public SwingString(WidgetWrapper widgetWrapper, String title) {
+        super(widgetWrapper, title, true, false, true, true, true, true);
     }
 
 

@@ -14,7 +14,7 @@ public class SwingImage extends SwingWidgetBase implements ICustomSwing {
     public ImageWrapper widgetImage;
 
     public SwingImage(ImageWrapper widgetImage, String title) {
-        super(widgetImage, title, true, true, true, true, true);
+        super(widgetImage, title, true, true, true, true, true, false);
         this.widgetImage = widgetImage;
         visibleText = "이미지 표시";
     }

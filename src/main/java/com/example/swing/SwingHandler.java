@@ -41,6 +41,10 @@ public class SwingHandler {
                 selectSwing.init();
                 return;
             }
+            case STRING -> {
+                selectSwing = build(EnumSwing.STRING, widgetWrapper, "문자 위젯");
+                selectSwing.init();
+            }
             default -> {
                 if (selectSwing != null) {
                     selectSwing.dispose();
@@ -66,6 +70,9 @@ public class SwingHandler {
             }
             case BUTTON -> {
                 return new SwingButton(wrapperWidget, title);
+            }
+            case STRING -> {
+                return new SwingString(wrapperWidget, title);
             }
         }
         throw new NullPointerException("어떤 위젯을 만들지 알 수 없음");

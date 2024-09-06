@@ -2,10 +2,13 @@ package com.example.screen;
 
 import com.example.wrapper.widget.ButtonWrapper;
 import com.example.wrapper.widget.ImageWrapper;
+import com.example.wrapper.widget.StringWrapper;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,16 +16,18 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 
 //스크린 데이터를 저장하고 관리하는 클래스
 public class CustomScreenData {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     private final ScreenFlow screenFlow;
-    private JsonObject widgetObject = new JsonObject();
+    private final JsonObject widgetObject = new JsonObject();
+    private final Path screenDataPath;
     private JsonObject customObject = new JsonObject();
     protected String background = "customclient:textures/screenshot.png";
-    private Path screenDataPath;
+
     private static final Logger logger = LoggerFactory.getLogger(CustomScreenData.class);
 
     public CustomScreenData(ScreenFlow screenFlow, String screenName){
@@ -40,7 +45,6 @@ public class CustomScreenData {
      */
     public void initFiles(){
         Path customClient = Path.of("./customclient");
-
         try {
             if(!Files.exists(customClient))
                 Files.createDirectories(customClient);
@@ -63,6 +67,9 @@ public class CustomScreenData {
             }
             widgetObject.add("widgetButton", GSON.toJsonTree(screenFlow.getWidget().getButtons()));
             widgetObject.add("widgetImage", GSON.toJsonTree(screenFlow.getWidget().getImageList()));
+            widgetObject.add("widgetString", GSON.toJsonTree(screenFlow.getWidget().getStringWrappers()));
+
+            widgetObject.addProperty("global_font", ScreenFlow.getGlobalFont().toString());
             widgetObject.add("customObject", customObject);
             Files.writeString(screenDataPath, GSON.toJson(widgetObject));
         } catch (IOException e) {
@@ -74,39 +81,32 @@ public class CustomScreenData {
     }
 
     public void loadCustomWidgets(){
-                logger.info("1.커스텀 위젯 로딩 중 - 파일: {}", screenDataPath);
+        logger.info("1.유저가 추가한 위젯 로딩 중 - 파일: {}", screenDataPath);
         WidgetHandler widgetHandler = screenFlow.getWidget();
         try {
-            String json = new String(Files.readAllBytes(screenDataPath));
-            if(json.equals("[]") || json.equals("{}"))
+            String screenJson = new String(Files.readAllBytes(screenDataPath));
+
+            if(screenJson.equals("[]") || screenJson.equals("{}")) //위젯이 비어 있음!
                 return;
-            JsonObject jsonObject = GSON.fromJson(json, JsonObject.class);
+
+            JsonObject jsonObject = GSON.fromJson(screenJson, JsonObject.class);
+
+            //배경 설정
             setBackground(jsonObject.get("background").getAsString());
-            if(jsonObject.has("titleWidgetButton")) {
-                widgetHandler.getDefaultButtons().addAll(GSON.fromJson(jsonObject.get("titleWidgetButton"), new TypeToken<ArrayList<ButtonWrapper>>() {
-                }.getType()));
-                logger.info("기본 버튼 불러오는 중 {}", jsonObject.get("titleWidgetButton"));
-            }
-            ArrayList<ButtonWrapper> arrayList = GSON.fromJson(jsonObject.get("widgetButton"), new TypeToken<ArrayList<ButtonWrapper>>(){}.getType());
-            logger.info("커스텀 버튼의 개수 {}", arrayList.size());
 
-            for(int i = 0; i < arrayList.size(); i++){
-                ButtonWrapper buttonWrapper = arrayList.get(i);
-                if(!buttonWrapper.isVisible()) {
-                    arrayList.remove(i);
-                    logger.info("버튼 제거 됨{}", arrayList.size());
-                }
-            }
-            widgetHandler.getButtons().addAll(arrayList);
+            if(jsonObject.has("titleWidgetButton"))
+                initTitle(jsonObject, widgetHandler);
 
-            if(!jsonObject.get("widgetImage").getAsJsonArray().isEmpty()){
-                ArrayList<ImageWrapper> imageWrappers = GSON.fromJson(jsonObject.get("widgetImage"), new TypeToken<ArrayList<ImageWrapper>>(){}.getType());
-                for (ImageWrapper imageWrapper : imageWrappers) {
-                    imageWrapper.createFakeWidget(imageWrapper.getX(), imageWrapper.getY(), imageWrapper.getWidth(), imageWrapper.getHeight(), imageWrapper.getMessage());
-                }
-                widgetHandler.getImageList().addAll(imageWrappers);
-            }
+            removeWidget(jsonObject, widgetHandler);
 
+            if(!jsonObject.get("widgetImage").getAsJsonArray().isEmpty())
+                loadImage(jsonObject, widgetHandler);
+
+            if(jsonObject.has("widgetString" ))
+                loadString(jsonObject, widgetHandler);
+
+            if(jsonObject.has("global_font"))
+                loadGlobalFont(jsonObject, widgetHandler);
 
             if(jsonObject.has("customObject")) {
                 customObject = jsonObject.get("customObject").getAsJsonObject();
@@ -115,15 +115,8 @@ public class CustomScreenData {
                 jsonObject.add("customObject", customObject);
                 System.out.println(customObject+" : 생성됨");
             }
-            logger.info("3. 이미지 개수 {}", widgetHandler.getImageList().size());
-            if(jsonObject.has("displaySize")) {
-                screenFlow.displayWidth = jsonObject.get("displayWidth").getAsInt();
-                screenFlow.displayHeight = jsonObject.get("displayHeight").getAsInt();
-            }else{
-                jsonObject.addProperty("displayWidth", screenFlow.getScreen().width);
-                jsonObject.addProperty("displayHeight", screenFlow.getScreen().height);
 
-            }
+
 
         } catch (IOException e) {
             logger.error("커스텀 위젯 로딩 중 오류 발생", e);
@@ -133,4 +126,56 @@ public class CustomScreenData {
 
     }
 
+    public void initTitle(JsonObject jsonObject, WidgetHandler widgetHandler){
+    //타이틀 스크린
+        widgetHandler.getDefaultButtons().addAll(GSON.fromJson(jsonObject.get("titleWidgetButton"), new TypeToken<ArrayList<ButtonWrapper>>() {
+        }.getType()));
+        logger.info("기본 버튼 불러오는 중 {}", jsonObject.get("titleWidgetButton"));
+    }
+
+    public void loadImage(JsonObject jsonObject, WidgetHandler widgetHandler){
+
+        ArrayList<ImageWrapper> imageWrappers = GSON.fromJson(jsonObject.get("widgetImage"), new TypeToken<ArrayList<ImageWrapper>>(){}.getType());
+        for (ImageWrapper imageWrapper : imageWrappers) {
+            imageWrapper.createFakeWidget(imageWrapper.getX(), imageWrapper.getY(), imageWrapper.getWidth(), imageWrapper.getHeight(), imageWrapper.getMessage());
+        }
+        widgetHandler.getImageList().addAll(imageWrappers);
+        logger.info("이미지 개수 {}", widgetHandler.getImageList().size());
+    }
+
+    public void loadGlobalFont(JsonObject jsonObject, WidgetHandler widgetHandler){
+            screenFlow.setGlobalFont(new ResourceLocation(jsonObject.get("global_font").getAsString()));
+
+    }
+    public void loadString(JsonObject jsonObject, WidgetHandler widgetHandler){
+            ArrayList<StringWrapper> stringWidgets = GSON.fromJson(jsonObject.get("widgetString"), new TypeToken<ArrayList<StringWrapper>>(){}.getType());
+            widgetHandler.getStringWrappers().addAll(stringWidgets);
+            logger.info("문자열 불러옵니다 :{}", stringWidgets);
+
+    }
+    public void removeWidget(JsonObject jsonObject, WidgetHandler widgetHandler){
+        ArrayList<ButtonWrapper> buttonList = GSON.fromJson(jsonObject.get("widgetButton"), new TypeToken<ArrayList<ButtonWrapper>>(){}.getType());
+        logger.info("커스텀 버튼의 개수 {}", buttonList.size());
+
+        for(int i = 0; i < buttonList.size(); i++){
+            ButtonWrapper buttonWrapper = buttonList.get(i);
+            if(!buttonWrapper.isVisible()) {
+                buttonList.remove(i);
+                logger.info("버튼 제거 됨{}", buttonList.size());
+            }
+        }
+        widgetHandler.getButtons().addAll(buttonList);
+
+        ArrayList<StringWrapper> stringList = GSON.fromJson(jsonObject.get("widgetString"), new TypeToken<ArrayList<StringWrapper>>(){}.getType());
+        logger.info("커스텀 버튼의 개수 {}", stringList.size());
+
+        for(int i = 0; i < stringList.size(); i++){
+            StringWrapper stringWrapper = stringList.get(i);
+            if(!stringWrapper.isVisible()) {
+                stringList.remove(i);
+                logger.info("문자열 제거 됨{}", stringList.size());
+            }
+        }
+        widgetHandler.getStringWrappers().addAll(stringList);
+    }
 }

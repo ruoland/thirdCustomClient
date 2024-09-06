@@ -11,7 +11,7 @@ public class SwingNewTitle extends SwingWidgetBase implements ItemListener {
     JToggleButton logoToggle = new JToggleButton("로고: ");
     JToggleButton splashToggle = new JToggleButton("스플래시: ");
     public SwingNewTitle(){
-        super(null, "메인메뉴", false, false, false, false, false);
+        super(null, "메인메뉴", false, false, false, false, false, true);
 
         setTitle("메인메뉴");
         logoToggle.addItemListener(this);

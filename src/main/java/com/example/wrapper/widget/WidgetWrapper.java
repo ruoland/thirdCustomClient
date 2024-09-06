@@ -14,6 +14,7 @@ import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.client.gui.ModListScreen;
 import org.slf4j.Logger;
@@ -24,10 +25,11 @@ public abstract class WidgetWrapper implements IWidget {
 
     private transient AbstractWidget abstractWidget;
     private int x, y, width, height;
-    private String texture, message;
+    private String texture, message, customFont;
     private float alpha = 1;
     private boolean visible = true, lock = false;
-    private String action, value, id;
+    private String action, value;
+            private int id;
 
     public WidgetWrapper() {
     }
@@ -43,6 +45,10 @@ public abstract class WidgetWrapper implements IWidget {
 
     public int getHeight() {
         return abstractWidget == null ? height: abstractWidget.getHeight();
+    }
+
+    public String getCustomFont() {
+        return customFont;
     }
 
     public int getWidth() {
@@ -132,6 +138,8 @@ public abstract class WidgetWrapper implements IWidget {
         this.setVisible(isVisible());
         this.setAlpha(getAlpha());
 
+        this.setMessage(message);
+
     }
     public boolean isMouseOver(double mouseX, double mouseY ){
         if(abstractWidget ==null ) {
@@ -139,15 +147,41 @@ public abstract class WidgetWrapper implements IWidget {
                 logger.error("클릭한 버튼에 위젯이 연결되어 있지 않음 이 위젯 정보:{}", this);
             return false;
         }
-        return abstractWidget.isMouseOver(mouseX, mouseY) && visible;
+        return mouseX >= (double)getWidget().getX() &&
+                mouseY >= (double)getWidget().getY() &&
+                mouseX < (double)(getWidget().getX() + getWidget().getWidth()) &&
+                mouseY < (double)(getWidget().getY() + getWidget().getHeight()) && visible;
     }
     public boolean canSelectByMouse(double mouseX, double mouseY ){
         return !isLock() && abstractWidget.isMouseOver(mouseX, mouseY);
     }
 
+    public void setCustomFont(String customFont) {
+        this.customFont = customFont;
+    }
+
     public void setMessage(String message){
         this.message = message;
-        abstractWidget.setMessage(Component.literal(message));
+        Component textComponent;
+        ResourceLocation fontLocation = null;
+        if(customFont != null)
+             fontLocation = ResourceLocation.tryBuild("customclient", customFont);
+        
+        if(!ScreenFlow.getGlobalFont().getPath().isEmpty()){
+            textComponent = Component.literal(message).withStyle(Style.EMPTY.withFont(ScreenFlow.getGlobalFont()));
+            logger.info("글로벌 폰트:{}",ScreenFlow.getGlobalFont());
+        }
+        else if(customFont != null && fontLocation != null){
+
+            textComponent = Component.literal(message).withStyle(Style.EMPTY.withFont(fontLocation));
+            logger.info(new ResourceLocation("customclient", customFont).toString());
+        }
+        else{
+            textComponent = Component.literal(message);
+
+        }
+
+        getWidget().setMessage(textComponent);
     }
 
     public void setAction(String action){
@@ -261,11 +295,11 @@ public abstract class WidgetWrapper implements IWidget {
         return true;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 

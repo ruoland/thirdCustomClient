@@ -9,7 +9,6 @@ import com.example.wrapper.widget.WidgetWrapper;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.NeoForge;
@@ -32,15 +31,15 @@ import java.util.regex.Pattern;
  */
 public class ScreenFlow {
     private static final Logger logger = LoggerFactory.getLogger(ScreenFlow.class);
-
+    private static ResourceLocation globalFontLocation = new ResourceLocation("");
     private Screen screen;
     private String screenName;
     private CustomScreenData data;
-    int displayWidth = 0;
-    int displayHeight = 0;
+
     private SwingHandler swingHandler = new SwingHandler();
     private WidgetHandler widgetHandler;//loadScreenData 메서드에서 초기화됨
     private SelectHandler selectHandler;
+
 
     ScreenFlow(){
 
@@ -93,25 +92,22 @@ public class ScreenFlow {
     public JsonObject getCustomData(){
         return this.data.getCustomObject();
     }
+    public void clearWidgetHandler(){
+        for(ButtonWrapper buttonWrapper : widgetHandler.getButtons()) {
+            screen.renderables.remove(buttonWrapper.getWidget());
+        }
+        widgetHandler.getImageList().clear();
+    }
     public void loadScreenData(){
         logger.info("화면 데이터 로딩 중: {}", screenName);
-        if(displayWidth == 0)
-        {
-            displayWidth = Minecraft.getInstance().getWindow().getScreenWidth();
-        }
-        if(displayHeight == 0)
-        {
-            displayHeight = Minecraft.getInstance().getWindow().getScreenHeight();
-        }
+
         if(widgetHandler != null){
-            for(ButtonWrapper buttonWrapper : widgetHandler.getButtons()) {
-                screen.renderables.remove(buttonWrapper.getWidget());
-            }
-            widgetHandler.getImageList().clear();
+            clearWidgetHandler();
         }
         widgetHandler = new WidgetHandler(screen);
         data = new CustomScreenData(this, screenName);
         data.initFiles();
+
 
         data.loadCustomWidgets();
         logger.info("불러온 기본 위젯들 : {}", getWidget().getDefaultButtons());
@@ -120,6 +116,7 @@ public class ScreenFlow {
         widgetHandler.makeCustomButtons();
         widgetHandler.syncWithSwing();
         logger.info("불러온 이미지 위젯들: {}", widgetHandler.getImageList());
+        logger.info("불러온 문자열 위젯들: {}", widgetHandler.getStringWrappers());
         if(screen instanceof ICustomBackground background)
             background.setBackground(new ResourceLocation(data.background));}
 
@@ -129,8 +126,10 @@ public class ScreenFlow {
 
         for(WidgetWrapper clickedWidget : allWidgets) {
             if (clickedWidget.isMouseOver(mouseX, mouseY) ) {
+                //클릭한 위젯이 같은 위젯인 경우
                 if(selectHandler != null && selectHandler.getWidget() == clickedWidget)
                     return true;
+
                 this.swingHandler.openSwing(clickedWidget);
                 selectHandler = new SelectHandler(clickedWidget);
                 return true;
@@ -156,6 +155,7 @@ public class ScreenFlow {
         System.out.println("파일 드롭 됨");
 
         try {
+            //TODO 여기 주소 수정해야
             Path texturePack = Path.of("D:\\Projects\\thirdCustomClient\\src\\main\\resources\\assets\\customclient\\textures\\", fileName);
             Pattern pattern = Pattern.compile("[a-zA-Z0-9/._-]+");
             Matcher matcher = pattern.matcher(fileName);
@@ -190,18 +190,24 @@ public class ScreenFlow {
         }
     }
     public void setBackground(String fileName){
-
         data.setBackground("customclient:"+fileName );
+
         if(screen instanceof ICustomBackground background)//백그라운드 설정 가능한 GUI라면
             background.setBackground(new ResourceLocation(data.background));
     }
-    public void renderImageWidget(GuiGraphics pGuiGraphics){
 
-    }
 
     public static boolean isKeyDown(int key){
         Minecraft mc = Minecraft.getInstance();
         long windowLong = mc.getWindow().getWindow();
         return InputConstants.isKeyDown(windowLong, key);
+    }
+
+    public void setGlobalFont(ResourceLocation globalFont) {
+        globalFontLocation = globalFont;
+    }
+
+    public static ResourceLocation getGlobalFont() {
+        return globalFontLocation;
     }
 }

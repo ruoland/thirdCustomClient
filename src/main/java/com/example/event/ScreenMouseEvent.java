@@ -5,6 +5,7 @@ import com.example.screen.CustomScreenMod;
 import com.example.screen.ScreenFlow;
 import com.example.wrapper.widget.ButtonWrapper;
 import com.example.wrapper.widget.ImageWrapper;
+import com.example.wrapper.widget.StringWrapper;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import org.slf4j.Logger;
@@ -28,15 +29,24 @@ public class ScreenMouseEvent {
                         event.setCanceled(true);
                         break;
                     }
-                    for(ImageWrapper imageWrapper : screenFlow.getWidget().getImageList()){
 
-                        if(imageWrapper.isMouseOver(event.getMouseX(), event.getMouseY())){
-                            logger.info("클릭된 이미지 : {}, 액션 : {}",imageWrapper.getMessage(), imageWrapper.getAction());
-                            imageWrapper.runAction();
-                            event.setCanceled(true);
-                            break;
-                        }
-                }}
+                }
+                for(ImageWrapper imageWrapper : screenFlow.getWidget().getImageList()){
+                    if(imageWrapper.isMouseOver(event.getMouseX(), event.getMouseY())){
+                        logger.info("클릭된 이미지 : {}, 액션 : {}",imageWrapper.getMessage(), imageWrapper.getAction());
+                        imageWrapper.runAction();
+                        event.setCanceled(true);
+                        break;
+                    }
+                }
+                for(StringWrapper stringWrapper : screenFlow.getWidget().getStringWrappers()){
+                    if(stringWrapper.isMouseOver(event.getMouseX(), event.getMouseY())){
+                        logger.info("클릭된 텍스트 : {}, 액션 : {}",stringWrapper.getMessage(), stringWrapper.getAction());
+
+                        event.setCanceled(true);
+                        break;
+                    }
+                }
             }
         }
     }
@@ -59,7 +69,6 @@ public class ScreenMouseEvent {
         if(CustomScreenMod.isEditMode() && CustomScreenMod.hasScreen(opening.getScreen())){
             int mouseX = (int) (opening.getMouseX() + opening.getDragX());
             int mouseY = (int) (opening.getMouseY() + opening.getDragY());
-
             ScreenFlow screenFlow = CustomScreenMod.getScreen(opening.getScreen());
             if(screenFlow.hasSelectWidget()) {
                 screenFlow.getSwingHandler().updateSwingData();

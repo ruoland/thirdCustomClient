@@ -30,7 +30,7 @@ public class ImageClientPayloadHandler {
                     float scale = Math.min(data.scale() * screenWidth / imageWidth, data.scale() * screenHeight / imageHeight);
                     int displayWidth = (int)(imageWidth * scale);
                     int displayHeight = (int)(imageHeight * scale);
-                    HUDWidget.addImage(data.imagePath(), x, y, displayWidth, displayHeight, data.duration());
+                    HUDWidget.addImage(data.id(), data.imagePath(), x, y, displayWidth, displayHeight).setDuration(data.duration());
                 })
                 .exceptionally(e -> {
                     context.disconnect(Component.translatable("customclient.networking.failed", e.getMessage()));

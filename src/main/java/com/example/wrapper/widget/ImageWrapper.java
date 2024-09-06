@@ -11,11 +11,20 @@ import org.slf4j.LoggerFactory;
 public class ImageWrapper extends WidgetWrapper {
     private static final Logger log = LoggerFactory.getLogger(ImageWrapper.class);
     private String resourcePath;
+    private int duration;
 
     public ImageWrapper(String resourcePath, int x, int y, int width, int height, float alpha){
         createFakeWidget(x, y, width, height, resourcePath);
         this.resourcePath = resourcePath;
         setAlpha(alpha);
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    public int getDuration() {
+        return duration;
     }
 
     public ResourceLocation getResource() {

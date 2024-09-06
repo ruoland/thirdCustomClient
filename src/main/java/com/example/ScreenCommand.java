@@ -20,8 +20,8 @@ public class ScreenCommand {
         dispatcher.register(
                 Commands.literal("screen")
                         .then(Commands.argument("player", EntityArgument.players())
-
                                 .then(Commands.literal("image")
+                                        .then(Commands.argument("id", IntegerArgumentType.integer())
                                         .then(Commands.argument("imagePath", StringArgumentType.string())
                                                 .executes(context -> executeScreenImageCommand(context))
                                                 .then(Commands.argument("x", IntegerArgumentType.integer())
@@ -37,12 +37,11 @@ public class ScreenCommand {
                                                         )
                                                 )
                                 )
-                        ).then(Commands.argument("targets", EntityArgument.players())
-                                .then(Commands.literal("open")
+                        ).then(Commands.literal("open")
                                         .then(Commands.argument("imagePath", StringArgumentType.greedyString())
                                                 .executes(context -> {
                                                     String name = StringArgumentType.getString(context, "imagePath");
-                                                    for(ServerPlayer player :EntityArgument.getPlayers(context, "targets")) {
+                                                    for(ServerPlayer player :EntityArgument.getPlayers(context, "player")) {
                                                         PacketDistributor.sendToPlayer(player, new ScreenData(name, 0));
                                                     }
                                                     return 1;
@@ -51,7 +50,7 @@ public class ScreenCommand {
                                 )
                                 .then(Commands.literal("close")
                                         .executes(context -> {
-                                            for(ServerPlayer player :EntityArgument.getPlayers(context, "targets")) {
+                                            for(ServerPlayer player :EntityArgument.getPlayers(context, "player")) {
                                                 PacketDistributor.sendToPlayer(player, new ScreenData("", 1));
                                             }
                                             return 1;
@@ -67,13 +66,14 @@ public class ScreenCommand {
         String imagePath = "customclient:textures/"+StringArgumentType.getString(context, "imagePath");
 
         // 모든 인자를 선택적으로 처리
+        int id = getOptionalArgument(context, "id", 0);  // 기본값 0
         int x = getOptionalArgument(context, "x", 0);  // 기본값 0
         int y = getOptionalArgument(context, "y", 0);  // 기본값 0
         float scale = getOptionalArgument(context, "scale", 0F);  // 기본값 0
 
         int duration = getOptionalArgument(context, "duration", 6000);  // 기본 지속 시간 6000 (5초, 틱 기준)
 
-        PacketDistributor.sendToPlayer(player, new ImageData(imagePath, x, y,scale, duration));
+        PacketDistributor.sendToPlayer(player, new ImageData(id, imagePath, x, y,scale, duration));
 
         return 1;
     }

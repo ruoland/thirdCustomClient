@@ -57,7 +57,6 @@ public class ScreenNewTitle extends TitleScreen implements ICustomBackground, IC
             screenFlow = CustomScreenMod.getScreen(this);
         }
 
-        screenFlow.renderImageWidget(pGuiGraphics);
 
     }
 
@@ -69,6 +68,8 @@ public class ScreenNewTitle extends TitleScreen implements ICustomBackground, IC
             renderBlurredBackground(pPartialTick);
             ScreenAPI.renderTexture(pGuiGraphics, BACKGROUND_IMAGE, 0, 0, width, height, 1);
         }
+        else
+            super.renderBackground(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
     }
 
     @Override
@@ -78,7 +79,7 @@ public class ScreenNewTitle extends TitleScreen implements ICustomBackground, IC
     }
 
     public boolean hasBackground(){
-        return (BACKGROUND_IMAGE != CustomScreenMod.DEFAULT_BACKGROUND_IMAGE);
+        return !(BACKGROUND_IMAGE.equals(CustomScreenMod.DEFAULT_BACKGROUND_IMAGE));
     }
 
 

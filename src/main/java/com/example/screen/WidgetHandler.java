@@ -3,6 +3,7 @@ package com.example.screen;
 import com.example.ICustomRenderable;
 import com.example.wrapper.widget.ButtonWrapper;
 import com.example.wrapper.widget.ImageWrapper;
+import com.example.wrapper.widget.StringWrapper;
 import com.example.wrapper.widget.WidgetWrapper;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
@@ -23,6 +24,7 @@ public class WidgetHandler {
     private final Screen screen;
     private final ArrayList<ButtonWrapper> defaultButtons = new ArrayList<>();
     private final ArrayList<ButtonWrapper> buttons = new ArrayList<>();
+    private final ArrayList<StringWrapper> stringWrappers = new ArrayList<>();
     private final ArrayList<ImageWrapper> images = new ArrayList<>();
     private static final Logger logger = LoggerFactory.getLogger(WidgetHandler.class);
 
@@ -40,8 +42,15 @@ public class WidgetHandler {
         for(WidgetWrapper widget : wrapperLinkedList ){
             logger.info("동기화 진행 중 {}", widget.getMessage());
             if(widget.getWidget() == null){
-                logger.warn("연결된 위젯이 없습니다. 스킵: {}", widget.getMessage());
-                continue;
+                if(widget instanceof StringWrapper){
+                    ((StringWrapper) widget).createWidget(widget.getMessage());
+                    logger.info("문자 불러오는 중:{}", widget.getMessage());
+
+                }
+                else {
+                    logger.warn("연결된 위젯이 없습니다. 스킵: {}", widget.getMessage());
+                    continue;
+                }
             }
             widget.update();
         }
@@ -76,11 +85,16 @@ public class WidgetHandler {
         allWidget.addAll(getButtons());
         allWidget.addAll(getDefaultButtons());
         allWidget.addAll(getImageList());
+        allWidget.addAll(getStringWrappers());
         return allWidget;
     }
 
     public ArrayList<ImageWrapper> getImageList() {
         return images;
+    }
+
+    public ArrayList<StringWrapper> getStringWrappers() {
+        return stringWrappers;
     }
 
     public void loadDefaultWidgets(){
@@ -143,6 +157,11 @@ public class WidgetHandler {
         customRenderable.addRenderableWidget(data.getWidget());
     }
 
+    public void addStringWidget(StringWrapper data){
+        stringWrappers.add(data);
+        ICustomRenderable customRenderable = (ICustomRenderable) screen ;
+        customRenderable.addRenderableWidget(data.getWidget());
+    }
     public void addNewButton(String name, int width, int height, int x, int y){
         ButtonWrapper button = new ButtonWrapper(new Button.Builder(Component.literal(name), pButton -> {
         }).size(width, height).pos(x, y).build());
@@ -166,7 +185,7 @@ public class WidgetHandler {
                     }).size(buttonWrapper.getWidth(), buttonWrapper.getHeight()).pos(buttonWrapper.getX(), buttonWrapper.getY()).build();
                     screen.renderables.add(abstractWidget);
                     buttonWrapper.setAbstractWidget(abstractWidget);
-                    buttonWrapper.setId("새로운 버튼");
+
                     logger.debug("버튼에 위젯이 없어 등록함{}", abstractWidget.getMessage());
                 }
                 buttonWrapper.getWidget().visible = true;

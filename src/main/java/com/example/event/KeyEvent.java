@@ -3,6 +3,7 @@ package com.example.event;
 import com.example.screen.CustomScreenMod;
 import com.example.screen.ScreenFlow;
 import com.example.screen.SelectHandler;
+import com.example.wrapper.widget.StringWrapper;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import org.lwjgl.glfw.GLFW;
@@ -11,7 +12,6 @@ public class KeyEvent {
 
     @SubscribeEvent
     public void sizeEditEvent(ScreenEvent.KeyPressed.Pre event){
-
         if(CustomScreenMod.isEditMode() && event.getKeyCode() != GLFW.GLFW_KEY_LEFT_ALT) {
             ScreenFlow screenFlow = CustomScreenMod.getScreen(event.getScreen());
             if(screenFlow == null)
@@ -47,6 +47,10 @@ public class KeyEvent {
             if (ScreenFlow.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT) && ScreenFlow.isKeyDown(GLFW.GLFW_KEY_B)) {
                 CustomScreenMod.getScreen(event.getScreen()).getWidget().addNewButton("새로운 버튼", 200, 20, 0,0);
             }
+            if (ScreenFlow.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT) && ScreenFlow.isKeyDown(GLFW.GLFW_KEY_T)) {
+                CustomScreenMod.getScreen(event.getScreen()).getWidget().addStringWidget(new StringWrapper("새로운 문자열", 0,0));
+            }
+
         }
     }
 

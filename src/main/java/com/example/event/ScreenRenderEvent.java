@@ -3,6 +3,7 @@ package com.example.event;
 import com.example.screen.CustomScreenMod;
 import com.example.screen.ScreenFlow;
 import com.example.wrapper.widget.ImageWrapper;
+import com.example.wrapper.widget.StringWrapper;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.Window;
 import customclient.HUDWidget;
@@ -33,6 +34,7 @@ public class ScreenRenderEvent {
     public void screenUI(RenderGuiEvent.Post event){
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
+
 
         if(!TimeWidget.isEmpty()) {
             for (ImageWrapper wrapper : TimeWidget.getImageList()) {
@@ -70,11 +72,21 @@ public class ScreenRenderEvent {
             else if(screenFlow.getScreen() != render.getScreen()){
                 screenFlow = CustomScreenMod.getScreen(render.getScreen());
             }
+            //이미지 렌더링
             if(!screenFlow.getWidget().getImageList().isEmpty()) {
                 //log.debug("{}의 이미지에서 렌더링 중.",screenFlow.getScreenName());
                 for (ImageWrapper imageWrapper : screenFlow.getWidget().getImageList()) {
                     if(imageWrapper.isVisible()) {
                         imageWrapper.render(pGuiGraphics);
+                    }
+                }
+            }
+            //문자열 렌더링 하는 중
+            if(!screenFlow.getWidget().getStringWrappers().isEmpty()) {
+                //log.debug("{}의 이미지에서 렌더링 중.",screenFlow.getScreenName());
+                for (StringWrapper stringWrapper : screenFlow.getWidget().getStringWrappers()) {
+                    if(stringWrapper.isVisible()) {
+                        stringWrapper.render(pGuiGraphics, mc.getPartialTick());
                     }
                 }
             }
