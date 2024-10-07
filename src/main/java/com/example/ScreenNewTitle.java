@@ -66,7 +66,7 @@ public class ScreenNewTitle extends TitleScreen implements ICustomBackground, IC
     public void renderBackground(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         if(hasBackground()) {
             renderBlurredBackground(pPartialTick);
-            ScreenAPI.renderTexture(pGuiGraphics, BACKGROUND_IMAGE, 0, 0, width, height, 1);
+            ScreenAPI.renderTexture(pGuiGraphics, BACKGROUND_IMAGE, 0, 0, 0, width, height, 1);
         }
         else
             super.renderBackground(pGuiGraphics, pMouseX, pMouseY, pPartialTick);

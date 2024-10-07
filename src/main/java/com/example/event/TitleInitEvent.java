@@ -89,6 +89,7 @@ public class TitleInitEvent {
             screenFlow.getWidget().syncWithSwing();
             logger.info("위젯 동기화 완료 ");
             loadTitleWidgets();
+            screenFlow.onScreenResize(event.getScreen().width,event.getScreen().height);
         }
     }
 

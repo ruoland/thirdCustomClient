@@ -61,6 +61,7 @@ public class ScreenRenderEvent {
 
     @SubscribeEvent
     public void screenRender(ScreenEvent.Render.Post render){
+
         Minecraft mc = Minecraft.getInstance();
         if(CustomScreenMod.hasScreen(render.getScreen())) {
             GuiGraphics pGuiGraphics = render.getGuiGraphics();
@@ -78,6 +79,7 @@ public class ScreenRenderEvent {
                 for (ImageWrapper imageWrapper : screenFlow.getWidget().getImageList()) {
                     if(imageWrapper.isVisible()) {
                         imageWrapper.render(pGuiGraphics);
+
                     }
                 }
             }

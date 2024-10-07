@@ -22,7 +22,9 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -108,7 +110,6 @@ public class ScreenFlow {
         data = new CustomScreenData(this, screenName);
         data.initFiles();
 
-
         data.loadCustomWidgets();
         logger.info("불러온 기본 위젯들 : {}", getWidget().getDefaultButtons());
         if(screenName.equals("ScreenNewTitle"))
@@ -123,17 +124,32 @@ public class ScreenFlow {
     public boolean clickWidget(double mouseX, double mouseY){
         logger.debug("위젯 클릭 - 좌표: ({}, {})", mouseX, mouseY);
         LinkedList<WidgetWrapper> allWidgets = widgetHandler.getAllWidget();
-
+        List<WidgetWrapper> clickWidgetList = new ArrayList<>();
         for(WidgetWrapper clickedWidget : allWidgets) {
             if (clickedWidget.isMouseOver(mouseX, mouseY) ) {
                 //클릭한 위젯이 같은 위젯인 경우
                 if(selectHandler != null && selectHandler.getWidget() == clickedWidget)
                     return true;
+                //마우스 좌표에 있는 위젯들을 전부 불러옵니다..
+                clickWidgetList.add(clickedWidget);
 
-                this.swingHandler.openSwing(clickedWidget);
-                selectHandler = new SelectHandler(clickedWidget);
-                return true;
             }
+        }
+
+        WidgetWrapper forwardWrapper = null;
+        for(WidgetWrapper widgetWrapper : clickWidgetList){
+            if(forwardWrapper != null){
+                if(forwardWrapper.getZ() < widgetWrapper.getZ())
+                    forwardWrapper = widgetWrapper;
+                    //위젯들 중에서 가장 높은 Z를 가진 위젯 선택
+            }
+            else
+                forwardWrapper = widgetWrapper;
+        }
+        if(forwardWrapper != null) {
+            this.swingHandler.openSwing(forwardWrapper);
+            selectHandler = new SelectHandler(forwardWrapper);
+            return true;
         }
         return false;
     }
@@ -178,6 +194,7 @@ public class ScreenFlow {
                 }
                 case JOptionPane.NO_OPTION -> {
                     ImageWrapper image = new ImageWrapper("textures/" + fileName, 0, 0, bi.getWidth(), bi.getHeight(), 1);
+                    image.setVisible(true);
                     widgetHandler.addImage(image);
                 }
             }
@@ -196,7 +213,13 @@ public class ScreenFlow {
             background.setBackground(new ResourceLocation(data.background));
     }
 
+    public void onScreenResize(int newWidth, int newHeight) {
+        for (ButtonWrapper button : getWidget().getButtons()) {
+            button.updatePosition(newWidth, newHeight);
+        }
 
+        // ImageWrapper와 StringWrapper에 대해서도 동일한 작업 수행
+    }
     public static boolean isKeyDown(int key){
         Minecraft mc = Minecraft.getInstance();
         long windowLong = mc.getWindow().getWindow();

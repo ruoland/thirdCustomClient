@@ -18,11 +18,12 @@ public class ScreenAPI {
 
     private static final Logger log = LoggerFactory.getLogger(ScreenAPI.class);
 
-    public static void renderTexture(GuiGraphics pGuiGraphics, ResourceLocation pShaderLocation, int x, int y, int width, int height, float pAlpha) {
+    public static void renderTexture(GuiGraphics pGuiGraphics, ResourceLocation pShaderLocation, int x, int y, int z, int width, int height, float pAlpha) {
         RenderSystem.disableDepthTest();
         RenderSystem.depthMask(false);
         RenderSystem.enableBlend();
         pGuiGraphics.setColor(1.0F, 1.0F, 1.0F, pAlpha);
+        pGuiGraphics.pose().translate(0,0,z);
         pGuiGraphics.blit(pShaderLocation, x, y, -90, 0.0F, 0.0F, width, height, width, height);
         RenderSystem.disableBlend();
         RenderSystem.depthMask(true);

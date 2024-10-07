@@ -23,7 +23,7 @@ public class KeyEvent {
                     case GLFW.GLFW_KEY_DOWN -> selectHandler.addHeight(1);
                     case GLFW.GLFW_KEY_RIGHT -> selectHandler.addWidth(1);
                     case GLFW.GLFW_KEY_LEFT -> selectHandler.addWidth(-1);
-                    case GLFW.GLFW_KEY_DELETE -> selectHandler.getWidget().setVisible(false);
+                    case GLFW.GLFW_KEY_DELETE -> selectHandler.getWidget().setDelete(true);
                 }
                 screenFlow.getSwingHandler().updateSwingData();
                 event.setCanceled(true);

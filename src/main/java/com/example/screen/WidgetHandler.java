@@ -86,6 +86,9 @@ public class WidgetHandler {
         allWidget.addAll(getDefaultButtons());
         allWidget.addAll(getImageList());
         allWidget.addAll(getStringWrappers());
+        allWidget = new LinkedList<>(allWidget.stream()
+                .filter(widgetWrapper -> !widgetWrapper.isDelete())
+                .toList());
         return allWidget;
     }
 

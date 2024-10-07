@@ -23,6 +23,7 @@
         protected JTextField actionField = new JTextField(20);
         protected JTextField xField = new JTextField(4);
         protected JTextField yField = new JTextField(4);
+        protected JTextField zField = new JTextField(4);
         protected JTextField widthField = new JTextField(4);
         protected JTextField heightField = new JTextField(4);
         protected JTextField fontField = new JTextField(15);
@@ -69,10 +70,14 @@
                 xField.setText(widgetWrapper.getX() + "");
                 yField.addKeyListener(this);
                 yField.setText(widgetWrapper.getY() + "");
+                zField.addKeyListener(this);
+                zField.setText(widgetWrapper.getZ()+"");
                 xField.getDocument().addDocumentListener(this);
                 yField.getDocument().addDocumentListener(this);
+                zField.getDocument().addDocumentListener(this);
                 add(xField);
                 add(yField);
+                add(zField);
             }
             if(sizeField) {
                 widthField.addKeyListener(this);
@@ -121,10 +126,12 @@
 
         xField.setText(""+ widgetWrapper.getX());
         yField.setText(""+ widgetWrapper.getY());
+        zField.setText(""+ widgetWrapper.getZ());
         widthField.setText(""+ widgetWrapper.getWidth());
         heightField.setText(""+ widgetWrapper.getHeight());
+
         if(fontField != null)
-            fontField.setText("" + widgetWrapper.getCustomFont());
+            fontField.setText(widgetWrapper.getCustomFont());
         if(actionComboBox != null) {
             logger.info("액션 정보 : {}, 값 정보: {} ", widgetWrapper.getAction(), widgetWrapper.getValue());
             if (widgetWrapper.getAction() != null && widgetWrapper.getAction().equals("명령어")) {
@@ -184,6 +191,7 @@
         public void update(){
             xField.setText(""+ widgetWrapper.getX());
             yField.setText(""+ widgetWrapper.getY());
+            zField.setText("" + widgetWrapper.getZ());
             widthField.setText(""+ widgetWrapper.getWidth());
             heightField.setText(""+ widgetWrapper.getHeight());
             if(fontField != null)
@@ -244,12 +252,13 @@
     /**
      *  swing에 키보드로 뭔가 입력이 된다면 바로바로 위젯에 업데이트됨
      */
-    public void dataUpdate(){
+    public void typeUpdate(){
         // 사용 예:
         if(isInit) {
             if (isFocused()) {
                 setIntegerFieldIfNotEmpty(xField, widgetWrapper::setX);
                 setIntegerFieldIfNotEmpty(yField, widgetWrapper::setY);
+                setIntegerFieldIfNotEmpty(zField, widgetWrapper::setZ);
                 setIntegerFieldIfNotEmpty(widthField, widgetWrapper::setWidth);
                 setIntegerFieldIfNotEmpty(heightField, widgetWrapper::setHeight);
                 if (!nameField.getText().equals(""))
@@ -270,17 +279,17 @@
     }
     @Override
     public void insertUpdate(DocumentEvent e) {
-        dataUpdate();
+        typeUpdate();
     }
 
     @Override
     public void removeUpdate(DocumentEvent e) {
-        dataUpdate();
+        typeUpdate();
     }
 
     @Override
     public void changedUpdate(DocumentEvent e) {
 
-        dataUpdate();
+        typeUpdate();
     }
     }

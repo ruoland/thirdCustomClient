@@ -15,36 +15,47 @@ public class ScreenMouseEvent {
     private static final Logger logger = LoggerFactory.getLogger(ScreenMouseEvent.class);
 
     @SubscribeEvent
-    public void screenMousePressedPost(ScreenEvent.MouseButtonPressed.Pre event) {
+    public void editModeButton(ScreenEvent.MouseButtonPressed.Pre event){
+        if(CustomScreenMod.isEditMode() && CustomScreenMod.hasScreen(event.getScreen())) {
+            event.setCanceled(true);
+            boolean isClickButton = CustomScreenMod.getScreen(event.getScreen()).clickWidget(event.getMouseX(), event.getMouseY());
+            //클릭했는데 버튼이 없는 경우, 리셋
+            if (!isClickButton) {
+                logger.debug("클릭된 위젯이 없습니다.");
+                CustomScreenMod.getScreen(event.getScreen()).reset(false);
+            }
+
+        }
+    }
+    @SubscribeEvent
+    public void customButtonPressed(ScreenEvent.MouseButtonPressed.Pre event) {
         if(!CustomScreenMod.isEditMode() && CustomScreenMod.hasScreen(event.getScreen())) {
-            logger.debug("1.마우스 클릭 이벤트 - 좌표: ({}, {})", event.getMouseX(), event.getMouseY());
+            ScreenFlow screenFlow = CustomScreenMod.getScreen(event.getScreen());
+            if(!screenFlow.hasSelectWidget()) {
+                if (event.getButton() == 0) {
+                    for (ButtonWrapper buttonWrapper : screenFlow.getWidget().getButtons()) {
+                        if (buttonWrapper.isMouseOver(event.getMouseX(), event.getMouseY())) {
+                            logger.info("클릭된 버튼 : {}, 액션 : {}", buttonWrapper.getMessage(), buttonWrapper.getAction());
+                            buttonWrapper.runAction();
+                            event.setCanceled(true);
+                            break;
+                        }
 
-            if (event.getButton() == 0) {
-                ScreenFlow screenFlow = CustomScreenMod.getScreen(event.getScreen());
-
-                for(ButtonWrapper buttonWrapper : screenFlow.getWidget().getButtons()){
-                    if(buttonWrapper.isMouseOver(event.getMouseX(), event.getMouseY())){
-                        logger.info("클릭된 버튼 : {}, 액션 : {}",buttonWrapper.getMessage(), buttonWrapper.getAction());
-                        buttonWrapper.runAction();
-                        event.setCanceled(true);
-                        break;
                     }
-
-                }
-                for(ImageWrapper imageWrapper : screenFlow.getWidget().getImageList()){
-                    if(imageWrapper.isMouseOver(event.getMouseX(), event.getMouseY())){
-                        logger.info("클릭된 이미지 : {}, 액션 : {}",imageWrapper.getMessage(), imageWrapper.getAction());
-                        imageWrapper.runAction();
-                        event.setCanceled(true);
-                        break;
+                    for (ImageWrapper imageWrapper : screenFlow.getWidget().getImageList()) {
+                        if (imageWrapper.isMouseOver(event.getMouseX(), event.getMouseY())) {
+                            logger.info("클릭된 이미지 : {}, 액션 : {}", imageWrapper.getMessage(), imageWrapper.getAction());
+                            imageWrapper.runAction();
+                            event.setCanceled(true);
+                            break;
+                        }
                     }
-                }
-                for(StringWrapper stringWrapper : screenFlow.getWidget().getStringWrappers()){
-                    if(stringWrapper.isMouseOver(event.getMouseX(), event.getMouseY())){
-                        logger.info("클릭된 텍스트 : {}, 액션 : {}",stringWrapper.getMessage(), stringWrapper.getAction());
-
-                        event.setCanceled(true);
-                        break;
+                    for (StringWrapper stringWrapper : screenFlow.getWidget().getStringWrappers()) {
+                        if (stringWrapper.isMouseOver(event.getMouseX(), event.getMouseY())) {
+                            logger.info("클릭된 텍스트 : {}, 액션 : {}", stringWrapper.getMessage(), stringWrapper.getAction());
+                            event.setCanceled(true);
+                            break;
+                        }
                     }
                 }
             }
@@ -67,6 +78,7 @@ public class ScreenMouseEvent {
     @SubscribeEvent
     public void screenButton(ScreenEvent.MouseDragged.Post opening){
         if(CustomScreenMod.isEditMode() && CustomScreenMod.hasScreen(opening.getScreen())){
+
             int mouseX = (int) (opening.getMouseX() + opening.getDragX());
             int mouseY = (int) (opening.getMouseY() + opening.getDragY());
             ScreenFlow screenFlow = CustomScreenMod.getScreen(opening.getScreen());
@@ -77,20 +89,4 @@ public class ScreenMouseEvent {
         }
     }
 
-    //마우스 클릭시 클릭한 위젯을 수정할 위젯으로 설정합니다
-    @SubscribeEvent
-    public void screenButton(ScreenEvent.MouseButtonPressed.Pre event){
-        if (CustomScreenMod.isEditMode()) {
-            if(CustomScreenMod.hasScreen(event.getScreen())) {
-                event.setCanceled(true);
-                boolean isClickButton = CustomScreenMod.getScreen(event.getScreen()).clickWidget(event.getMouseX(), event.getMouseY());
-                //클릭했는데 버튼이 없는 경우, 리셋
-                if(!isClickButton){
-                    logger.debug("클릭된 위젯이 없습니다.");
-                    CustomScreenMod.getScreen(event.getScreen()).reset(false);
-                }
-            }
-        }
-    }
-    
 }

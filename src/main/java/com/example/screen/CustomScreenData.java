@@ -7,6 +7,7 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
@@ -65,6 +66,7 @@ public class CustomScreenData {
 
                 widgetObject.add("titleWidgetButton", GSON.toJsonTree(screenFlow.getWidget().getDefaultButtons()));
             }
+            normalizeWidgetPositions();
             widgetObject.add("widgetButton", GSON.toJsonTree(screenFlow.getWidget().getButtons()));
             widgetObject.add("widgetImage", GSON.toJsonTree(screenFlow.getWidget().getImageList()));
             widgetObject.add("widgetString", GSON.toJsonTree(screenFlow.getWidget().getStringWrappers()));
@@ -75,6 +77,18 @@ public class CustomScreenData {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+    private void normalizeWidgetPositions() {
+        int screenWidth = Minecraft.getInstance().getWindow().getGuiScaledWidth();
+        int screenHeight = Minecraft.getInstance().getWindow().getGuiScaledHeight();
+
+        for (ButtonWrapper button : screenFlow.getWidget().getButtons()) {
+            float normalizedX = (float) button.getX() / screenWidth;
+            float normalizedY = (float) button.getY() / screenHeight;
+            button.setNormalizedPosition(normalizedX, normalizedY);
+        }
+
+        // ImageWrapper와 StringWrapper에 대해서도 동일한 작업 수행
     }
     public void setBackground(String background) {
         this.background = background;
@@ -115,7 +129,7 @@ public class CustomScreenData {
                 jsonObject.add("customObject", customObject);
                 System.out.println(customObject+" : 생성됨");
             }
-
+            updateWidgetPositions();
 
 
         } catch (IOException e) {
@@ -125,7 +139,16 @@ public class CustomScreenData {
         }
 
     }
+    private void updateWidgetPositions() {
+        int screenWidth = Minecraft.getInstance().getWindow().getGuiScaledWidth();
+        int screenHeight = Minecraft.getInstance().getWindow().getGuiScaledHeight();
 
+        for (ButtonWrapper button : screenFlow.getWidget().getButtons()) {
+            button.updatePosition(screenWidth, screenHeight);
+        }
+
+        // ImageWrapper와 StringWrapper에 대해서도 동일한 작업 수행
+    }
     public void initTitle(JsonObject jsonObject, WidgetHandler widgetHandler){
     //타이틀 스크린
         widgetHandler.getDefaultButtons().addAll(GSON.fromJson(jsonObject.get("titleWidgetButton"), new TypeToken<ArrayList<ButtonWrapper>>() {
@@ -134,7 +157,6 @@ public class CustomScreenData {
     }
 
     public void loadImage(JsonObject jsonObject, WidgetHandler widgetHandler){
-
         ArrayList<ImageWrapper> imageWrappers = GSON.fromJson(jsonObject.get("widgetImage"), new TypeToken<ArrayList<ImageWrapper>>(){}.getType());
         for (ImageWrapper imageWrapper : imageWrappers) {
             imageWrapper.createFakeWidget(imageWrapper.getX(), imageWrapper.getY(), imageWrapper.getWidth(), imageWrapper.getHeight(), imageWrapper.getMessage());
@@ -145,7 +167,6 @@ public class CustomScreenData {
 
     public void loadGlobalFont(JsonObject jsonObject, WidgetHandler widgetHandler){
             screenFlow.setGlobalFont(new ResourceLocation(jsonObject.get("global_font").getAsString()));
-
     }
     public void loadString(JsonObject jsonObject, WidgetHandler widgetHandler){
             ArrayList<StringWrapper> stringWidgets = GSON.fromJson(jsonObject.get("widgetString"), new TypeToken<ArrayList<StringWrapper>>(){}.getType());
@@ -159,9 +180,9 @@ public class CustomScreenData {
 
         for(int i = 0; i < buttonList.size(); i++){
             ButtonWrapper buttonWrapper = buttonList.get(i);
-            if(!buttonWrapper.isVisible()) {
+            if(buttonWrapper.isDelete()) {
                 buttonList.remove(i);
-                logger.info("버튼 제거 됨{}", buttonList.size());
+                logger.info("버튼 제거 {}", buttonWrapper.getMessage());
             }
         }
         widgetHandler.getButtons().addAll(buttonList);
@@ -171,9 +192,9 @@ public class CustomScreenData {
 
         for(int i = 0; i < stringList.size(); i++){
             StringWrapper stringWrapper = stringList.get(i);
-            if(!stringWrapper.isVisible()) {
+            if(stringWrapper.isDelete()) {
                 stringList.remove(i);
-                logger.info("문자열 제거 됨{}", stringList.size());
+                logger.info("문자열 제거 됨{}", stringWrapper.getMessage());
             }
         }
         widgetHandler.getStringWrappers().addAll(stringList);

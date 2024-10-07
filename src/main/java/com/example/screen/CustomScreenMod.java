@@ -78,7 +78,6 @@ public class CustomScreenMod {
         }
         else {//편집 모드 실행, GUI 데이터 불러옴
             try {
-
                 screenFlow.openScreen(screen);
                 screenFlow.loadScreenData();
             }catch (NullPointerException exception){

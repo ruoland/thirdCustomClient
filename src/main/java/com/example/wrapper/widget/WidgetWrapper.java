@@ -24,21 +24,40 @@ public abstract class WidgetWrapper implements IWidget {
     private static final Logger logger = LoggerFactory.getLogger(WidgetWrapper.class);
 
     private transient AbstractWidget abstractWidget;
-    private int x, y, width, height;
+    private int x, y, z, width, height;
     private String texture, message, customFont;
     private float alpha = 1;
-    private boolean visible = true, lock = false;
+    private boolean visible = true, lock = false, isDelete = false;
     private String action, value;
             private int id;
-
+    private float normalizedX;
+    private float normalizedY;
     public WidgetWrapper() {
     }
+
 
     WidgetWrapper(AbstractWidget widget) {
         this.abstractWidget = widget;
         abstractWidget.active =true;
     }
+    public void setNormalizedPosition(float normalizedX, float normalizedY) {
+        this.normalizedX = normalizedX;
+        this.normalizedY = normalizedY;
+    }
 
+    public float getNormalizedX() {
+        return normalizedX;
+    }
+
+    public float getNormalizedY() {
+        return normalizedY;
+    }
+
+    public void updatePosition(int screenWidth, int screenHeight) {
+        int newX = (int) (normalizedX * screenWidth);
+        int newY = (int) (normalizedY * screenHeight);
+        setPosition(newX, newY);
+    }
     public int getColor() {
         return abstractWidget.getFGColor();
     }
@@ -56,10 +75,23 @@ public abstract class WidgetWrapper implements IWidget {
     }
 
     public boolean isVisible() {
-        if(CustomScreenMod.isEditMode())
+        if(isDelete)
+            return false;
+        else if(CustomScreenMod.isEditMode())
             return true;
         else
             return abstractWidget == null ? visible: abstractWidget.visible;
+    }
+
+    public void setDelete(boolean delete) {
+        isDelete = delete;
+        setVisible(false);
+        abstractWidget.active = false;
+        abstractWidget.visible = false;
+    }
+
+    public boolean isDelete() {
+        return isDelete;
     }
 
     public void setVisible(boolean visible) {
@@ -130,6 +162,9 @@ public abstract class WidgetWrapper implements IWidget {
         return alpha;
     }
 
+    public void init(){
+
+    }
     public void update(){
         createFakeWidget(getX(), getY(), getWidth(), getHeight(), getMessage());
         this.setPosition(x, y);
@@ -139,14 +174,25 @@ public abstract class WidgetWrapper implements IWidget {
         this.setAlpha(getAlpha());
 
         this.setMessage(message);
-
     }
+
+    public int getZ() {
+        return z;
+    }
+
+    public void setZ(int z) {
+        this.z = z;
+    }
+
     public boolean isMouseOver(double mouseX, double mouseY ){
         if(abstractWidget ==null ) {
             if(texture == null)
                 logger.error("클릭한 버튼에 위젯이 연결되어 있지 않음 이 위젯 정보:{}", this);
             return false;
         }
+        logger.info("클릭 검사 중 : {}, {}, {}, {}, {}, {}",this, mouseX >= (double)getWidget().getX(), mouseY >= (double)getWidget().getY() ,  mouseX < (double)(getWidget().getX() + getWidget().getWidth())
+        , mouseY < (double)(getWidget().getY() + getWidget().getHeight()) , visible);
+
         return mouseX >= (double)getWidget().getX() &&
                 mouseY >= (double)getWidget().getY() &&
                 mouseX < (double)(getWidget().getX() + getWidget().getWidth()) &&
